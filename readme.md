@@ -1,6 +1,4 @@
-
 ## 相关文档
-
 - [Laravel 5.5中文文档](https://d.laravel-china.org/docs/5.5/routing)
 - [vuejs2中文文档](https://cn.vuejs.org/v2/guide/installation.html)
 - [vue-router中文文档](https://router.vuejs.org/zh-cn/)
@@ -37,3 +35,4 @@ Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead �
 
 ## 第三方composer包
 - [Laravel 的 API 认证系统 Passport](https://d.laravel-china.org/docs/5.5/passport)
+- [predis](https://github.com/nrk/predis) `composer require predis/predis`
