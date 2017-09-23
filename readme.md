@@ -4,11 +4,13 @@
 - [Laravel 5.5中文文档](https://d.laravel-china.org/docs/5.5/routing)
 - [vuejs2中文文档](https://cn.vuejs.org/v2/guide/installation.html)
 - [vue-router中文文档](https://router.vuejs.org/zh-cn/)
-
+- [vuejs管理后台模板地址](https://github.com/lin-xin/vue-manage-system)
+- [laravel注释跳转生成包](https://github.com/barryvdh/laravel-ide-helper)
 ## 提交代码注意事项
 - 提交代码之前需要使用phpstorm格式化代码
 - commit 之后需要rebase 在push到远程分支
 - master分支正式部署的代码. dev分支是团队开发提交的代码
+- api文档请写到相应的gitlab厂库wiki里面去
 
 ## 映利PHP-API项目(使用Laravel5.5框架,vuejs2前端框架)
 Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead 虚拟机都能满足，因此强烈建议你使用 Homestead 作为你本地的 Laravel 开发环境。
