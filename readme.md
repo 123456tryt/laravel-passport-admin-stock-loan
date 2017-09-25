@@ -4,6 +4,7 @@
 - [vue-router中文文档](https://router.vuejs.org/zh-cn/)
 - [vuejs管理后台模板地址](https://github.com/lin-xin/vue-manage-system)
 - [laravel注释跳转生成包](https://github.com/barryvdh/laravel-ide-helper)
+
 ## 提交代码注意事项
 - 提交代码之前需要使用phpstorm格式化代码
 - commit 之后需要rebase 在push到远程分支
