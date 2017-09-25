@@ -13,11 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post("/foo", "Api\FooController@say");
 
 Route::group([
     'prefix' => '/v1',
     'middleware' => ['api']
 ], function () {
-    Route::post('/user/login', 'Api\LoginController@login');
+    Route::post("/foo", "Api\FooController@say");
 });

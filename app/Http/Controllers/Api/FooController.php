@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\ApiController;
-use Illuminate\Http\Request;
-use App\User;
-use Validator;
+use App\Http\Controllers\Controller;
 
-
-class FooController extends ApiController
+class FooController extends Controller
 {
     public function __construct()
     {

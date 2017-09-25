@@ -33,4 +33,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    //自定义passport 登陆用户名 id 可以改成其他字段
+    //https://stackoverflow.com/questions/39194917/how-to-use-laravel-passport-with-a-custom-username-column
+    public function findForPassport($username) {
+        return $this->where('name', $username)->first();
+    }
 }
