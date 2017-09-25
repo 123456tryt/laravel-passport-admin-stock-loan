@@ -1,0 +1,47 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<body>
+<form action="">
+    验证码:
+    <input type="text" name="verify">
+    <input type="hidden" name="verifyId">
+    <img src="" alt="" id="verify">
+    <br>
+    <input type="submit" value="提交">
+</form>
+
+<script src="https://cdn.bootcss.com/jquery/2.2.3/jquery.min.js"></script>
+<script>
+    var verifyId = new Date().getTime() + parseInt(Math.random() * 100000),
+        url = "http://10.10.1.233:802/api/v1/";
+
+    $("input[name=verifyId]").val(verifyId);
+
+    setVerify();
+
+    $("#verify").click(setVerify);
+
+    function setVerify() {
+        $.get(url + "setVerify/" + verifyId, [], function (data) {
+            $("#verify").attr("src", data.data);
+        }, "json");
+    }
+
+    $("form").submit(function () {
+        $.ajax({
+            url: url + "verify",
+            type: "post",
+            data: $(this).serialize(),
+            dataType: "json",
+            success: function (ret) {
+                alert(ret.msg);
+            }
+        })
+        return false;
+    })
+
+</script>
+</body>
+</html>

@@ -19,4 +19,6 @@ Route::group([
     'middleware' => ['api']
 ], function () {
     Route::post("/foo", "Api\FooController@say");
+    Route::get("/setVerify/{id}", "Api\VerifyController@setVerify");
+    Route::post("/verify", "Api\VerifyController@verify");
 });
