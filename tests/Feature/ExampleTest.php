@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ExampleTest extends TestCase
 {
+    //在项目目录下面 执行 vendor/bin/phpunit
     /**
      * A basic test example.
      *
