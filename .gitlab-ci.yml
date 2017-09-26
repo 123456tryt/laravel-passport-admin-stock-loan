@@ -3,7 +3,7 @@ stages:
 deploy:
   stage: deploy
   script:
-    - deploy php api
+    - ~/deploy php api
   only:
     - dev
   tags:
