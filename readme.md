@@ -9,7 +9,7 @@
 - 提交代码之前需要使用phpstorm格式化代码
 - commit 之后需要rebase 在push到远程分支
 - master分支正式部署的代码. dev分支是团队开发提交的代码
-- api文档请写到相应的gitlab厂库wiki里面去
+- api文档请写到相应的gitlab仓库wiki里面去
 
 ## 映利PHP-API项目(使用Laravel5.5框架,vuejs2前端框架)
 Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead 虚拟机都能满足，因此强烈建议你使用 Homestead 作为你本地的 Laravel 开发环境。
