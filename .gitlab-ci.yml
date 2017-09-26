@@ -1,0 +1,10 @@
+stages:
+- deploy
+deploy:
+  stage: deploy
+  script:
+    - deploy php api
+  only:
+    - dev
+  tags:
+    - api
