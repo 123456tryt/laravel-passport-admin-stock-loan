@@ -65,8 +65,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::prefix('api')
-             ->middleware('api')
+        //https://laracasts.com/discuss/channels/laravel/how-to-remove-api-prefix-from-url
+        Route::middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
     }
