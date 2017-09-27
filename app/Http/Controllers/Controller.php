@@ -21,9 +21,12 @@ class Controller extends BaseController
      * @param $captchaId ,$captchaCode
      * @return bool
      */
-    protected function verifyCaptchaCode($captchaId, $captchaCode): bool
+    static function verifyCaptchaCode($captchaId, $captchaCode): bool
     {
-        return Cache::store(self::CAPTCHA_CACHE)->get(self::CAPTCHA_PREFIX . $captchaId) == $captchaCode;
+        $cacheKey = self::CAPTCHA_PREFIX . $captchaId;
+        $cachedCode = Cache::store(self::CAPTCHA_CACHE)->get($cacheKey);
+        //Cache::forget($cacheKey);
+        return $cachedCode == $captchaCode;
     }
 
     /**
@@ -31,7 +34,7 @@ class Controller extends BaseController
      * @param $captchaId
      * @return string 返回图片base64 string
      */
-    protected function generateCaptchaImage($captchaId): string
+    static function generateCaptchaImage($captchaId): string
     {
         $builder = new CaptchaBuilder();
         $builder->build();
