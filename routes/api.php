@@ -15,7 +15,6 @@ use Illuminate\Http\Request;
 
 
 Route::group([
-    'prefix' => '/v1',
     'middleware' => ['api']
 ], function () {
     Route::post("/foo", "Api\FooController@say");

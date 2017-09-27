@@ -16,6 +16,7 @@ class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
 
+    protected $table = "u_customer";
     /**
      * The attributes that are mass assignable.
      *
@@ -33,9 +34,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
     //自定义passport 登陆用户名 id 可以改成其他字段
-    //https://stackoverflow.com/questions/39194917/how-to-use-laravel-passport-with-a-custom-username-column
     public function findForPassport($username) {
-        return $this->where('name', $username)->first();
+        return $this->where('nick_name', $username)->first();
+    }
+
+    //获取加密后密码
+    public function getAuthPassword()
+    {
+        return $this->login_pw;
     }
 }
