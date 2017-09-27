@@ -32,11 +32,9 @@ class Kernel extends ConsoleKernel
         //将redis中post api记录写入数据库
         $schedule->call(function () {
             $dataList = Redis::command("lrange", ["postApiLog", 0, -1]);
-            $datas = [];
-            foreach ($dataList as $v) {
-                $datas[] = ["content" => $v];
-            }
-            DB::table("post_api_log")->insert($datas);
+            $datas = array_map("unserialize", $dataList);
+
+            DB::table("u_request_api_log")->insert($datas);
             Redis::command("ltrim", ["postApiLog", 1, 0]);
         })->dailyAt("22:00");
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class FooController extends Controller
 {
@@ -11,8 +12,8 @@ class FooController extends Controller
         $this->middleware("auth:api");
     }
 
-    public function say()
+    public function say(Request $request)
     {
-        return "hello world";
+        var_dump("hello world");
     }
 }

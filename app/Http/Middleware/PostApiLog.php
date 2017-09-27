@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Redis;
+use \Lcobucci\JWT\Parser;
 
 class PostApiLog
 {
@@ -19,15 +20,26 @@ class PostApiLog
         //是post方法就记录相关日志
         if ($request->isMethod("post")) {
             $url = $request->getUri();
-            $param = $request->all();
+            $parameter = $request->all();
+            $authorization = $request->header("Authorization");
             $data = [
+                "cust_id" => 0,
                 "url" => $url,
-                "referer" => $request->header("Referer"),
-                "time" => time(),
-                "param" => $param,
-                "token" => $request->header("Authorization")
+                "referer" => (string)$request->header("Referer"),
+                "create_time" => date("Y-m-d H:i:s"),
+                "parameter" => json_encode($parameter),
             ];
-            Redis::command("RPUSH", ["postApiLog", json_encode($data)]);
+            //记录用户id
+            $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $authorization));
+            if ($jwt) {
+                try {
+                    $token = (new Parser())->parse($jwt);
+                    $data["cust_id"] = $token->getClaim("sub");
+                } catch (\Exception $e) {
+                }
+            }
+
+            Redis::command("RPUSH", ["postApiLog", serialize($data)]);
 
             $urlDatas = Redis::get("postUrlLog");
             $urlDataList = $urlDatas ? unserialize($urlDatas) : [];

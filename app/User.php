@@ -39,10 +39,4 @@ class User extends Authenticatable
     public function findForPassport($username) {
         return $this->where('nick_name', $username)->first();
     }
-
-    //获取加密后密码
-    public function getAuthPassword()
-    {
-        return $this->login_pw;
-    }
 }
