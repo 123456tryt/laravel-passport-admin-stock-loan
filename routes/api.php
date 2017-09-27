@@ -15,9 +15,10 @@ use Illuminate\Http\Request;
 
 
 Route::group([
+    'prefix' => '/v1',
     'middleware' => ['api']
 ], function () {
     Route::post("/foo", "Api\FooController@say");
-    Route::get("/setVerify/{id}", "Api\VerifyController@setVerify");
-    Route::post("/verify", "Api\VerifyController@verify");
+    Route::post("/createCaptcha", "Api\CaptchaController@generateCaptcha");
+    Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");
 });

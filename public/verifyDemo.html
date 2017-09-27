@@ -5,9 +5,9 @@
 <body>
 <form action="">
     验证码:
-    <input type="text" name="verify">
-    <input type="hidden" name="verifyId">
-    <img src="" alt="" id="verify">
+    <input type="text" name="captchaCode">
+    <input type="hidden" name="captchaId">
+    <img src="" alt="" id="captcha">
     <br>
     <input type="submit" value="提交">
 </form>
@@ -17,21 +17,21 @@
     var verifyId = new Date().getTime() + parseInt(Math.random() * 100000),
         url = "/api/v1/";
 
-    $("input[name=verifyId]").val(verifyId);
+    $("input[name=captchaId]").val(verifyId);
 
     setVerify();
 
     $("#verify").click(setVerify);
 
     function setVerify() {
-        $.get(url + "setVerify/" + verifyId, [], function (data) {
-            $("#verify").attr("src", data.data);
+        $.post(url + "createCaptcha", {captchaId: verifyId}, function (data) {
+            $("#captcha").attr("src", data.data);
         }, "json");
     }
 
     $("form").submit(function () {
         $.ajax({
-            url: url + "verify",
+            url: url + "verifyCaptcha",
             type: "post",
             data: $(this).serialize(),
             dataType: "json",
