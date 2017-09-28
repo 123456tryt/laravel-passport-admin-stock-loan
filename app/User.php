@@ -16,6 +16,9 @@ class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
 
+    const CREATED_AT = "created_time";
+    const UPDATED_AT = "updated_time";
+
     protected $table = "u_customer";
     /**
      * The attributes that are mass assignable.
@@ -23,7 +26,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'nick_name', 'password', 'real_name', 'id_card', 'withdraw_pw'
     ];
 
     /**

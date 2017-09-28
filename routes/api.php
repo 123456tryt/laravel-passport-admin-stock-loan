@@ -18,9 +18,16 @@ Route::group([
 ], function () {
     Route::get("/foo", "Api\FooController@say");
 
-    Route::post("/bindBankCard", "Api\UserController@storeBankCard");
-    Route::post("/updateBankCard/{id}", "Api\UserController@updateBankCard");
-    Route::post("/deleteBankCard/{id}", "Api\UserController@deleteBankCard");
+    Route::post("/createBankCard", "Api\UserDataController@storeBankCard");
+    Route::post("/updateBankCard/{id}", "Api\UserDataController@updateBankCard");
+    Route::post("/deleteBankCard/{id}", "Api\UserDataController@deleteBankCard");
+
+    Route::post("/updateNickname", "Api\UserDataController@updateNickname");
+
+    Route::post("/createCertification", "Api\UserDataController@storeCetification");
+
+    Route::post("/createWithdrawPassword", "Api\UserDataController@storeWithdrawPassword");
+    Route::post("/updateWithdrawPassword", "Api\UserDataController@updateWithdrawPassword");
 
     Route::post("/createCaptcha", "Api\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");

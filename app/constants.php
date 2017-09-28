@@ -20,3 +20,6 @@ define('FAIL_TO_DELETE_POST', 1004);
 define('FAIL_TO_LIKE_POST', 1005);
 define('FAIL_TO_TOGGLE_PUBLISH', 1006);
 
+//UserData
+define('ORIGIN_PASSWORD_ERROR', 2001);
+
