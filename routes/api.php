@@ -12,13 +12,16 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-
 Route::group([
-    'prefix' => '/v1',
+    'prefix' => 'v1',
     'middleware' => ['api']
 ], function () {
-    Route::post("/foo", "Api\FooController@say");
+    Route::get("/foo", "Api\FooController@say");
+
+    Route::post("/bindBankCard", "Api\UserController@storeBankCard");
+    Route::post("/updateBankCard/{id}", "Api\UserController@updateBankCard");
+    Route::post("/deleteBankCard/{id}", "Api\UserController@deleteBankCard");
+
     Route::post("/createCaptcha", "Api\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");
 });
