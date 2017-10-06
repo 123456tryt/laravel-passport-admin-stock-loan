@@ -1,0 +1,38 @@
+{
+	"variables": [],
+	"info": {
+		"name": "谷宝管理后台",
+		"_postman_id": "07f96002-fdd1-36b0-3b26-49d544d8aa4b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "生成验证码",
+			"request": {
+				"url": "http://yl.qmmian.cn/v1/createCaptcha ",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "captchaId",
+							"value": "1412351251234",
+							"description": "根据当前timestamp生成的数据",
+							"type": "text"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
