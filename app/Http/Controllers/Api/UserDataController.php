@@ -38,9 +38,11 @@ class UserDataController extends Controller
      * 修改绑定银行卡
      * @param Request $request
      */
-    public function updateBankCard(Request $request, $id)
+    public function updateBankCard(Request $request)
     {
         $user = $request->user();
+        $id = $request->get("id");
+
         $cardRecord = CustBankCard::find($id);
         if (!$cardRecord || $cardRecord->cust_id != $user->id) {
             return response()->json(["error" => POST_NOT_FOUND, "message" => "数据不存在"]);
@@ -61,11 +63,12 @@ class UserDataController extends Controller
     /**
      * 删除银行卡
      * @param Request $request
-     * @param $id
      */
-    public function deleteBankCard(Request $request, $id)
+    public function deleteBankCard(Request $request)
     {
         $user = $request->user();
+        $id = $request->get("id");
+
         $cardRecord = CustBankCard::find($id);
         if (!$cardRecord || $cardRecord->cust_id != $user->id) {
             return response()->json(["error" => POST_NOT_FOUND, "message" => "数据不存在"]);

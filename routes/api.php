@@ -19,8 +19,8 @@ Route::group([
     Route::get("/foo", "Api\FooController@say");
 
     Route::post("/createBankCard", "Api\UserDataController@storeBankCard");
-    Route::post("/updateBankCard/{id}", "Api\UserDataController@updateBankCard");
-    Route::post("/deleteBankCard/{id}", "Api\UserDataController@deleteBankCard");
+    Route::post("/updateBankCard", "Api\UserDataController@updateBankCard");
+    Route::post("/deleteBankCard", "Api\UserDataController@deleteBankCard");
 
     Route::post("/updateNickname", "Api\UserDataController@updateNickname");
 
