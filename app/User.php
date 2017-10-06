@@ -16,17 +16,15 @@ class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
 
-    const CREATED_AT = "created_time";
-    const UPDATED_AT = "updated_time";
 
-    protected $table = "u_customer";
+    protected $table = "s_system_user";
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'nick_name', 'password', 'real_name', 'id_card', 'withdraw_pw'
+        'agent_id', 'email', 'phone', 'name', 'password', 'rank', 'is_lock'
     ];
 
     /**
@@ -34,12 +32,12 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+    protected $hidden = ['password'];
 
     //自定义passport 登陆用户名 id 可以改成其他字段
     public function findForPassport($username) {
         return $this->where('phone', $username)->first();
     }
+
+
 }

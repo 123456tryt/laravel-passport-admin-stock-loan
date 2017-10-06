@@ -33,8 +33,8 @@ class PostApiLog
                 "parameter" => json_encode($parameter),
             ];
             //记录用户id
-            $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $authorization));
-            if ($jwt) {
+            if ($authorization) {
+                $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $authorization));
                 try {
                     $token = (new Parser())->parse($jwt);
                     $data["cust_id"] = $token->getClaim("sub");

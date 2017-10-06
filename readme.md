@@ -21,6 +21,7 @@ Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead �
 - PHP Mbstring 扩展
 - PHP Tokenizer 扩展
 - PHP XML 扩展
+- 跨域支持:服务器域名配置文件中添加跨域支持[nginx](https://enable-cors.org/server_nginx.html)[apache](https://enable-cors.org/server_apache.html)
 
 ## 环境
 
