@@ -22,9 +22,12 @@ class PostApiLog
             $url = $request->getUri();
             $parameter = $request->all();
             $authorization = $request->header("Authorization");
+            $ip_addr = $request->ip();
+
             $data = [
                 "cust_id" => 0,
                 "url" => $url,
+                'ip' => $ip_addr,
                 "referer" => (string)$request->header("Referer"),
                 "create_time" => date("Y-m-d H:i:s"),
                 "parameter" => json_encode($parameter),
@@ -38,9 +41,8 @@ class PostApiLog
                 } catch (\Exception $e) {
                 }
             }
-
             Redis::command("RPUSH", ["postApiLog", serialize($data)]);
-
+            //记录API请求次数
             $urlDatas = Redis::get("postUrlLog");
             $urlDataList = $urlDatas ? unserialize($urlDatas) : [];
             if (isset($urlDataList[$url])) {

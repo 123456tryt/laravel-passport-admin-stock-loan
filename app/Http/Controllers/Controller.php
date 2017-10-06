@@ -8,8 +8,6 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Gregwar\Captcha\CaptchaBuilder;
 use Illuminate\Support\Facades\Cache;
-use phpDocumentor\Reflection\Types\Self_;
-use Zend\Diactoros\Request;
 
 class Controller extends BaseController
 {
