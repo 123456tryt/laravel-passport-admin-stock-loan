@@ -40,6 +40,6 @@ class User extends Authenticatable
 
     //自定义passport 登陆用户名 id 可以改成其他字段
     public function findForPassport($username) {
-        return $this->where('phone', $username)->first();
+        return $this->where('cellphone', $username)->first();
     }
 }

@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Model\CustBankCard;
+use App\Repositories\UserDataRepository;
 
 class UserDataController extends Controller
 {
-    public function __construct()
+    private $userData = null;
+
+    public function __construct(UserDataRepository $userData)
     {
         $this->middleware("auth:api");
+
+        $this->userData = $userData;
     }
 
     /**
@@ -20,16 +24,13 @@ class UserDataController extends Controller
      */
     public function storeBankCard(Request $request)
     {
-        $user = $request->user();
         $this->validate($request, [
             "bank_card" => "required|between:16,19",
             "bank_name" => "required|max:125",
             "bank_reg_cellphone" => "required|numeric",
         ]);
 
-        $data = $request->all();
-        $data["cust_id"] = $user->id;
-        $ret = CustBankCard::create($data);
+        $ret = $this->userData->storeBankCard($request->user(), $request->all());
         return $ret ? response()->json([], REST_CREATE_SUCCESS) :
             response()->json(["error" => FAIL_TO_CREATE_POST, "message" => "添加失败"]);
     }
@@ -40,22 +41,13 @@ class UserDataController extends Controller
      */
     public function updateBankCard(Request $request)
     {
-        $user = $request->user();
-        $id = $request->get("id");
-
-        $cardRecord = CustBankCard::find($id);
-        if (!$cardRecord || $cardRecord->cust_id != $user->id) {
-            return response()->json(["error" => POST_NOT_FOUND, "message" => "数据不存在"]);
-        }
-
         $this->validate($request, [
             "bank_card" => "required|between:16,19",
             "bank_name" => "required|max:125",
             "bank_reg_cellphone" => "required|numeric",
         ]);
 
-        $data = $request->all();
-        $ret = $cardRecord->update($data);
+        $ret = $this->userData->updateBankCard($request->user(), $request->get("id"), $request->all());
         return $ret ? response()->json([], REST_UPDATE_SUCCESS) :
             response()->json(["error" => FAIL_TO_UPDATE_POST, "message" => "更新失败"]);
     }
@@ -66,15 +58,7 @@ class UserDataController extends Controller
      */
     public function deleteBankCard(Request $request)
     {
-        $user = $request->user();
-        $id = $request->get("id");
-
-        $cardRecord = CustBankCard::find($id);
-        if (!$cardRecord || $cardRecord->cust_id != $user->id) {
-            return response()->json(["error" => POST_NOT_FOUND, "message" => "数据不存在"]);
-        }
-
-        $ret = $cardRecord->delete();
+        $ret = $this->userData->deleteBankCard($request->user(), $request->id);
         return $ret ? response()->json([], REST_DELETE_SUCCESS) :
             response()->json(["error" => FAIL_TO_DELETE_POST, "message" => "删除失败"]);
     }
@@ -86,13 +70,11 @@ class UserDataController extends Controller
      */
     public function updateNickname(Request $request)
     {
-        $user = $request->user();
         $this->validate($request, [
             "nick_name" => "required|between:1,20",
         ]);
 
-        $data = $request->only(["nick_name"]);
-        $ret = $user->update($data);
+        $ret = $this->userData->updateNickname($request->user(), $request->get("nick_name"));
         return $ret ? response()->json([], REST_UPDATE_SUCCESS) :
             response()->json(["error" => FAIL_TO_UPDATE_POST, "message" => "修改失败"]);
     }
@@ -104,21 +86,12 @@ class UserDataController extends Controller
      */
     public function storeCetification(Request $request)
     {
-        $user = $request->user();
-
-        //已绑定
-        if ($user->real_name || $user->id_card) {
-            return response()->json(["error" => POST_NOT_FOUND, "message" => "数据不存在"]);
-        }
-
         $this->validate($request, [
             "real_name" => "required|between:1,20",
             "id_card" => "required|between:15,18"
         ]);
 
-        $data = $request->only(["real_name", "id_card"]);
-        $ret = $user->update($data);
-
+        $ret = $this->userData->storeCetification($request->user(), $request->get("real_name"), $request->get("id_card"));
         return $ret ? response()->json([], REST_CREATE_SUCCESS) :
             response()->json(["error" => FAIL_TO_CREATE_POST, "message" => "设置失败"]);
     }
@@ -131,19 +104,11 @@ class UserDataController extends Controller
      */
     public function storeWithdrawPassword(Request $request)
     {
-        $user = $request->user();
-
-        //已设置
-        if ($user->withdraw_pw) {
-            return response()->json(["error" => POST_NOT_FOUND, "message" => "数据不存在"]);
-        }
-
         $this->validate($request, [
             "withdraw_pw" => "required|between:6,20"
         ]);
 
-        $data = $request->only("withdraw_pw");
-        $ret = $user->update($data);
+        $ret = $this->userData->storeWithdrawPassword($request->user(), $request->get("withdraw_pw"));
 
         return $ret ? response()->json([], REST_CREATE_SUCCESS) :
             response()->json(["error" => FAIL_TO_CREATE_POST, "message" => "设置失败"]);
@@ -156,20 +121,13 @@ class UserDataController extends Controller
      */
     public function updateWithdrawPassword(Request $request)
     {
-        $user = $request->user();
-
         $this->validate($request, [
             "old_withdraw_pw" => "required|between:6,20",
             "withdraw_pw" => "required|between:6,20",
         ]);
 
-        if ($user->withdraw_pw != $request->input("old_withdraw_pw")) {
-            return response()->json(["error" => ORIGIN_PASSWORD_ERROR, "message" => "原密码错误"]);
-        }
-
-        $data = $request->only(["withdraw_pw"]);
-        $ret = $user->update($data);
-
+        $ret = $this->userData->updateWithdrawPassword($request->user(), $request->get("old_withdraw_pw"),
+            $request->get("withdraw_pw"));
         return $ret ? response()->json([], REST_UPDATE_SUCCESS) :
             response()->json(["error" => FAIL_TO_UPDATE_POST, "message" => "修改失败"]);
     }
