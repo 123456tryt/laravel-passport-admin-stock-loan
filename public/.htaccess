@@ -19,3 +19,7 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
+#apache vhost 文件已经设置了
+#Header set Access-Control-Allow-Origin "*"
+#Header set Access-Control-Allow-Methods "GET,PUT,POST,DELETE,PATCH,OPTIONS"
+#Header set Access-Control-Allow-Headers "Authorization,Content-Type"

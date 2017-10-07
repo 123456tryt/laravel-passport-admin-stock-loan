@@ -16,7 +16,7 @@ class Controller extends BaseController
     const CAPTCHA_PREFIX = "captcha_";
     const CAPTCHA_CACHE = "redis";
     const CODE_SUCCESS = 1;
-    const Code_FAIL = 0;
+    const CODE_FAIL = 0;
 
 
     /**
@@ -41,7 +41,8 @@ class Controller extends BaseController
     {
         $builder = new CaptchaBuilder();
         $builder->build();
-        Cache::store(self::CAPTCHA_CACHE)->put(self::CAPTCHA_PREFIX . $captchaId, $builder->getPhrase(), 10);
+        $cacheKey = self::CAPTCHA_PREFIX . $captchaId;
+        Cache::store(self::CAPTCHA_CACHE)->put($cacheKey, $builder->getPhrase(), 10);
         return $builder->inline();
     }
 

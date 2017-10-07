@@ -40,3 +40,63 @@ Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead �
 ## 第三方composer包
 - [Laravel 的 API 认证系统 Passport](https://d.laravel-china.org/docs/5.5/passport)
 - [predis](https://github.com/nrk/predis) `composer require predis/predis`
+
+## Apache 跨域 vhost.conf
+```
+<VirtualHost *:80>
+    #跨域支持
+    DocumentRoot "/Users/ericzhou/webServer/yingli-api/public"
+    ServerName   yl.qmmian.cn
+    <Directory "/Users/ericzhou/webServer/yingli-api/public"> 
+        Require all granted   
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET,PUT,POST,DELETE,PATCH,OPTIONS"
+        Header set Access-Control-Allow-Headers "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization"
+    </Directory> 
+</VirtualHost>
+
+```
+## nginx 跨域 enable-php-cors.conf
+```
+<VirtualHost *:80>
+location ~ [^/]\.php(/|$)
+{
+    try_files $uri =404;
+    fastcgi_pass  unix:/tmp/php-cgi.sock;
+    fastcgi_index index.php;
+    include fastcgi.conf;
+
+    # CORS settings
+    # http://enable-cors.org/server_nginx.html
+    # http://10.10.0.64 - It's my front end application
+     if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        #
+        # Custom headers and headers various browsers *should* be OK with but aren't
+        #
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization';
+        #
+        # Tell client that this pre-flight info is valid for 20 days 有效期20天
+        #
+        add_header 'Access-Control-Max-Age' 1728000;
+        add_header 'Content-Type' 'text/plain; charset=utf-8';
+        add_header 'Content-Length' 0;
+        return 204;
+     }
+     if ($request_method = 'POST') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
+        add_header 'Access-Control-Expose-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization';
+     }
+     if ($request_method = 'GET') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
+        add_header 'Access-Control-Expose-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization';
+     }
+}
+</VirtualHost>
+
+```
