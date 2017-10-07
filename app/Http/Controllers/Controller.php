@@ -38,7 +38,8 @@ class Controller extends BaseController
     {
         $builder = new CaptchaBuilder();
         $builder->build();
-        Cache::store(self::CAPTCHA_CACHE)->put(self::CAPTCHA_PREFIX . $captchaId, $builder->getPhrase(), 10);
+        $cacheKey = self::CAPTCHA_PREFIX . $captchaId;
+        Cache::store(self::CAPTCHA_CACHE)->put($cacheKey, $builder->getPhrase(), 10);
         return $builder->inline();
     }
 
