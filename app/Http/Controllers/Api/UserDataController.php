@@ -18,6 +18,29 @@ class UserDataController extends Controller
     }
 
     /**
+     * 银行卡列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bankCards(Request $request)
+    {
+        $list = $this->userData->bankCards($request->user());
+        return response()->json(["data" => $list]);
+    }
+
+    /**
+     * 获取银行卡详情
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBankCard(Request $request)
+    {
+        $ret = $this->userData->GetBankCard($request->user(), $request->get("id"));
+        return $ret ? response()->json($ret) :
+            response()->json(["error" => "add error", "message" => "查询失败"]);
+    }
+
+    /**
      * 保存银行卡
      * @param Request $requests
      * TODO:绑定卡数量限制,字段限制,实名认证
@@ -25,14 +48,18 @@ class UserDataController extends Controller
     public function storeBankCard(Request $request)
     {
         $this->validate($request, [
-            "bank_card" => "required|between:16,19",
-            "bank_name" => "required|max:125",
-            "bank_reg_cellphone" => "required|numeric",
+            "bank_card" => "between:16,19",
+            "bank_name" => "between:1,30",
+            "bank_reg_cellphone" => "regex:/^1[0-9]{10}$/",
+        ], [
+            "bank_card.between" => "请填写正确的银行卡号",
+            "bank_name.between" => "请填写银行名称",
+            "bank_reg_cellphone.regex" => "请填写正确的银行预留手机号"
         ]);
 
         $ret = $this->userData->storeBankCard($request->user(), $request->all());
-        return $ret ? response()->json([], REST_CREATE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_CREATE_POST, "message" => "添加失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "add error", "message" => "添加失败"]);
     }
 
     /**
@@ -42,14 +69,18 @@ class UserDataController extends Controller
     public function updateBankCard(Request $request)
     {
         $this->validate($request, [
-            "bank_card" => "required|between:16,19",
-            "bank_name" => "required|max:125",
-            "bank_reg_cellphone" => "required|numeric",
+            "bank_card" => "between:16,19",
+            "bank_name" => "between:1,30",
+            "bank_reg_cellphone" => "regex:/^1[0-9]{10}$/",
+        ], [
+            "bank_card.between" => "请填写正确的银行卡号",
+            "bank_name.between" => "请填写银行名称",
+            "bank_reg_cellphone.regex" => "请填写正确的银行预留手机号"
         ]);
 
         $ret = $this->userData->updateBankCard($request->user(), $request->get("id"), $request->all());
-        return $ret ? response()->json([], REST_UPDATE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_UPDATE_POST, "message" => "更新失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "update error", "message" => "更新失败"]);
     }
 
     /**
@@ -59,8 +90,8 @@ class UserDataController extends Controller
     public function deleteBankCard(Request $request)
     {
         $ret = $this->userData->deleteBankCard($request->user(), $request->id);
-        return $ret ? response()->json([], REST_DELETE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_DELETE_POST, "message" => "删除失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "delete error", "message" => "删除失败"]);
     }
 
     /**
@@ -71,12 +102,14 @@ class UserDataController extends Controller
     public function updateNickname(Request $request)
     {
         $this->validate($request, [
-            "nick_name" => "required|between:1,20",
+            "nick_name" => "between:1,20",
+        ], [
+            "nick_name.between" => "新昵称格式应该为1-20字符"
         ]);
 
         $ret = $this->userData->updateNickname($request->user(), $request->get("nick_name"));
-        return $ret ? response()->json([], REST_UPDATE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_UPDATE_POST, "message" => "修改失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "update error", "message" => "修改失败"]);
     }
 
     /**
@@ -89,11 +122,14 @@ class UserDataController extends Controller
         $this->validate($request, [
             "real_name" => "required|between:1,20",
             "id_card" => "required|between:15,18"
+        ], [
+            "real_name.between" => "请填写正确的真实姓名",
+            "id_card.between" => "请填写正确格式的身份证号码"
         ]);
 
         $ret = $this->userData->storeCetification($request->user(), $request->get("real_name"), $request->get("id_card"));
-        return $ret ? response()->json([], REST_CREATE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_CREATE_POST, "message" => "设置失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "set error", "message" => "设置失败"]);
     }
 
     /**
@@ -105,13 +141,15 @@ class UserDataController extends Controller
     public function storeWithdrawPassword(Request $request)
     {
         $this->validate($request, [
-            "withdraw_pw" => "required|between:6,20"
+            "withdraw_pw" => "between:6,20"
+        ], [
+            "withdraw_pw.between" => "密码长度应为6-20位"
         ]);
 
         $ret = $this->userData->storeWithdrawPassword($request->user(), $request->get("withdraw_pw"));
 
-        return $ret ? response()->json([], REST_CREATE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_CREATE_POST, "message" => "设置失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "set error", "message" => "设置失败"]);
     }
 
     /**
@@ -122,14 +160,17 @@ class UserDataController extends Controller
     public function updateWithdrawPassword(Request $request)
     {
         $this->validate($request, [
-            "old_withdraw_pw" => "required|between:6,20",
-            "withdraw_pw" => "required|between:6,20",
+            "old_withdraw_pw" => "between:6,20",
+            "withdraw_pw" => "between:6,20",
+        ], [
+            "old_withdraw_pw.between" => "旧密码长度应为6-20位",
+            "withdraw_pw.between" => "新密码长度应为6-20位",
         ]);
 
         $ret = $this->userData->updateWithdrawPassword($request->user(), $request->get("old_withdraw_pw"),
             $request->get("withdraw_pw"));
-        return $ret ? response()->json([], REST_UPDATE_SUCCESS) :
-            response()->json(["error" => FAIL_TO_UPDATE_POST, "message" => "修改失败"]);
+        return $ret ? response()->json([]) :
+            response()->json(["error" => "update error", "message" => "修改失败"]);
     }
 
     /**

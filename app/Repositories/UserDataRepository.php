@@ -13,6 +13,30 @@ class UserDataRepository extends BaseRepository
     }
 
     /**
+     * 银行卡信息列表
+     * @param $user
+     * @return mixed
+     */
+    public function bankCards($user)
+    {
+        $ret = CustBankCard::where("cust_id", $user->id)
+            ->get();
+        return $ret;
+    }
+
+    /**
+     * 获取银行卡详情
+     * @param $user
+     * @param $id
+     * @return mixed
+     */
+    public function getBankCard($user, $id)
+    {
+        $ret = CustBankCard::where("cust_id", $user->id)->where("id", $id)->first();
+        return $ret;
+    }
+
+    /**
      * 创建银行卡
      * @param $user
      * @param $data

@@ -18,6 +18,10 @@ Route::group([
 ], function () {
     Route::get("/foo", "Api\FooController@say");
 
+    Route::post("/register", "Api\RegisterController@register");
+
+    Route::post("/bankCards", "Api\UserDataController@bankCards");
+    Route::post("/getBankCard", "Api\UserDataController@getBankCard");
     Route::post("/createBankCard", "Api\UserDataController@storeBankCard");
     Route::post("/updateBankCard", "Api\UserDataController@updateBankCard");
     Route::post("/deleteBankCard", "Api\UserDataController@deleteBankCard");
