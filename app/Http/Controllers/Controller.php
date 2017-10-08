@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Gregwar\Captcha\PhraseBuilder;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -42,7 +43,7 @@ class Controller extends BaseController
         $builder = new CaptchaBuilder();
         $builder->build();
         $cacheKey = self::CAPTCHA_PREFIX . $captchaId;
-        Cache::store(self::CAPTCHA_CACHE)->put($cacheKey, $builder->getPhrase(), 10);
+        Cache::store(self::CAPTCHA_CACHE)->put($cacheKey, $builder->getPhrase(), 5);
         return $builder->inline();
     }
 

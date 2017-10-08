@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class FooController extends Controller
+class UserController extends Controller
 {
     public function __construct()
     {
         $this->middleware("auth:api");
     }
 
-    public function say(Request $request)
+    public function info()
     {
-        var_dump("hello world");
+        $user = Auth::user();
+        return $user;
     }
+
+
 }

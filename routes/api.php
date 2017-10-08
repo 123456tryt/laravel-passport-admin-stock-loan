@@ -16,19 +16,13 @@ Route::group([
     'prefix' => 'v1',
     'middleware' => ['api']
 ], function () {
-    Route::get("/foo", "Api\FooController@say");
-
-    Route::post("/createBankCard", "Api\UserDataController@storeBankCard");
-    Route::post("/updateBankCard", "Api\UserDataController@updateBankCard");
-    Route::post("/deleteBankCard", "Api\UserDataController@deleteBankCard");
-
-    Route::post("/updateNickname", "Api\UserDataController@updateNickname");
-
-    Route::post("/createCertification", "Api\UserDataController@storeCetification");
-
-    Route::post("/createWithdrawPassword", "Api\UserDataController@storeWithdrawPassword");
-    Route::post("/updateWithdrawPassword", "Api\UserDataController@updateWithdrawPassword");
 
     Route::post("/createCaptcha", "Api\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");
+
+    //根据不同认证的用户来获取菜单
+    Route::post("/navMenus", "Api\NavMenuController@getMenu");
+    Route::post("/userInfo", "Api\UserController@info");
+
+
 });
