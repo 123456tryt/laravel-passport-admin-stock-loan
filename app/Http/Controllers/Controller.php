@@ -54,7 +54,7 @@ class Controller extends BaseController
      * @param \Illuminate\Http\Request|null $request 请求 用于debug
      * @return \Illuminate\Http\JsonResponse  json返回
      */
-    static function jsonReturn(array $data = [], int $code_status = self::CODE_SUCCESS, string $message = '', \Illuminate\Http\Request $request = null)
+    static function jsonReturn(array $data = [], int $code_status = self::CODE_SUCCESS, string $message = '', \Illuminate\Http\Request $request = null, int $httpStatusCode = 200)
     {
         $json['status'] = $code_status;
         $json['data'] = $data;
@@ -63,7 +63,7 @@ class Controller extends BaseController
         if ($request && $is_debug) {
             $json['debug'] = $request ? ($request->all()) : [];
         }
-        return response()->json($json);
+        return response()->json($json, $httpStatusCode);
     }
 
 }

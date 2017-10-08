@@ -11,6 +11,28 @@ use Laravel\Passport\HasApiTokens;
  *
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Client[] $clients
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
+ * @property int $id 主键 员工ID【id】
+ * @property int|null $agent_id 所属代理商ID
+ * @property string|null $email 员工邮箱
+ * @property string|null $phone 员工手机【emp_cellphone】
+ * @property string|null $name 员工姓名【emp_name】
+ * @property string|null $password 登录密码【passwod】
+ * @property int|null $role_id 关联到角色表s_system_role
+ * @property int|null $is_lock 是否锁定【is_lock】
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereAgentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereIsLock($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRoleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  */
 class User extends Authenticatable
 {
@@ -38,6 +60,17 @@ class User extends Authenticatable
     public function findForPassport($username) {
         return $this->where('phone', $username)->first();
     }
+
+    /**
+     * 登陆用的所属的代理机构
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function agent()
+    {
+        return $this->belongsTo('App\Http\Model\Agent', 'agent_id', 'id');
+    }
+
+
 
 
 }
