@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Model\RecCode;
+use Lcobucci\JWT\Parser;
 
 if (!function_exists("createRecCode")) {
     function createRecCode($length = 10)
@@ -44,5 +45,25 @@ if (!function_exists("apiLogin")) {
         );
 
         return \Route::dispatch($proxy);
+    }
+}
+
+if (!function_exists("parsePassportAuthorization")) {
+    function parsePassportAuthorization($request)
+    {
+        $authorization = $request->header("Authorization");
+        $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $authorization));
+        try {
+            $token = (new Parser())->parse($jwt);
+            $data = [
+                "sub" => $token->getClaim("sub"),
+                "jti" => $token->getClaim("jti"),
+                //要其他数据自己取
+            ];
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return $data;
     }
 }

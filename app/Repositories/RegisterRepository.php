@@ -46,7 +46,7 @@ class RegisterRepository extends BaseRepository
     private function make($data)
     {
         $info = [
-            "cellphone" => $data["cellphone"],
+            CUSTOMER_USERNAME_FIELD => $data["cellphone"],
             "password" => bcrypt($data["password"]),
             "nick_name" => $data["nick_name"],
             "reg_source" => $data["reg_source"],
@@ -119,15 +119,15 @@ class RegisterRepository extends BaseRepository
             "direct_cust_id" => $directCust,
             "direct_agent_id" => $directAgent,
             "agent1" => $agentList[0],
-            "agent2" => isset($agentList[1]) ? $agentList[1] : 0,
-            "agent3" => isset($agentList[2]) ? $agentList[2] : 0,
-            "agent4" => isset($agentList[3]) ? $agentList[3] : 0,
-            "agent5" => isset($agentList[4]) ? $agentList[4] : 0,
+            "agent2" => $agentList[1] ?? 0,
+            "agent3" => $agentList[2] ?? 0,
+            "agent4" => $agentList[3] ?? 0,
+            "agent5" => $agentList[4] ?? 0,
             "direct_emp_id" => $emp,
             "belong_to_agent" => $directAgent,
-            "cust1" => isset($custList[0]) ? $custList[0] : 0,
-            "cust2" => isset($custList[1]) ? $custList[1] : 0,
-            "cust3" => isset($custList[2]) ? $custList[2] : 0,
+            "cust1" => $custList[0] ?? 0,
+            "cust2" => $custList[1] ?? 0,
+            "cust3" => $custList[2] ?? 0,
         ]);
 
         return $directAgent;

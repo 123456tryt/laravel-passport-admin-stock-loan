@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Repositories\RegisterRepository;
 
+/**
+ * 注册
+ * Class RegisterController
+ * @package App\Http\Controllers\Api
+ */
 class RegisterController extends Controller
 {
     private $register = null;

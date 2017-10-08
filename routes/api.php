@@ -21,6 +21,8 @@ Route::group([
     Route::post("/getUserInfo", "Api\UserDataController@getUserInfo");
 
     Route::post("/register", "Api\RegisterController@register");
+    Route::post("/login", "Api\LoginController@login");
+    Route::post("/logout", "Api\LoginController@logout")->middleware("auth:api");
 
     Route::post("/bankCards", "Api\UserDataController@bankCards");
     Route::post("/getBankCard", "Api\UserDataController@getBankCard");

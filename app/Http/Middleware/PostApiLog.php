@@ -21,7 +21,6 @@ class PostApiLog
         if ($request->isMethod("post")) {
             $url = $request->getUri();
             $parameter = $request->all();
-            $authorization = $request->header("Authorization");
             $data = [
                 "cust_id" => 0,
                 "url" => $url,
@@ -30,13 +29,9 @@ class PostApiLog
                 "parameter" => json_encode($parameter),
             ];
             //记录用户id
-            $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $authorization));
-            if ($jwt) {
-                try {
-                    $token = (new Parser())->parse($jwt);
-                    $data["cust_id"] = $token->getClaim("sub");
-                } catch (\Exception $e) {
-                }
+            $jwtInfo = parsePassportAuthorization($request);
+            if ($jwtInfo) {
+                $data["cust_id"] = $jwtInfo["sub"];
             }
 
             Redis::command("RPUSH", ["postApiLog", serialize($data)]);

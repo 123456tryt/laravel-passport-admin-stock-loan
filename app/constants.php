@@ -23,3 +23,6 @@ define('FAIL_TO_TOGGLE_PUBLISH', 1006);
 //UserData
 define('ORIGIN_PASSWORD_ERROR', 2001);
 
+//客户账号字段
+define("CUSTOMER_USERNAME_FIELD", "cellphone");
+
