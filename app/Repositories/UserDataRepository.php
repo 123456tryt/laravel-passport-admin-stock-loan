@@ -12,6 +12,28 @@ class UserDataRepository extends BaseRepository
         return "App\\User";
     }
 
+    public function getUserInfo($user)
+    {
+        $userInfo = [
+            "cust_id" => $user->id,
+            "nick_name" => $user->nick_name,
+            "has_set_withdraw_password" => $user->withdraw_pw ? 1 : 0,
+            "real_name" => $user->real_name,
+            "cust_rec_code" => $user->cust_rec_code,
+            "bar_code" => $user->bar_code,
+            "pc_adv_url" => $user->pc_adv_url,
+            "phone_adv_url" => $user->phone_adv_url,
+            "cust_capital_amount" => $user->cust_capital_amount,
+            "is_cash_forbidden" => $user->is_cash_forbidden,
+            "is_charge_forbidden" => $user->is_charge_forbidden,
+            "is_stock_finance_forbidden" => $user->is_stock_finance_forbidden,
+        ];
+
+        //TODO 根据需求新增
+
+        return $userInfo;
+    }
+
     /**
      * 银行卡信息列表
      * @param $user

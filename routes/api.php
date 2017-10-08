@@ -18,6 +18,8 @@ Route::group([
 ], function () {
     Route::get("/foo", "Api\FooController@say");
 
+    Route::post("/getUserInfo", "Api\UserDataController@getUserInfo");
+
     Route::post("/register", "Api\RegisterController@register");
 
     Route::post("/bankCards", "Api\UserDataController@bankCards");

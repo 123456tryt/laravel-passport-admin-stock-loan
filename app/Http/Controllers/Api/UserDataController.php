@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Repositories\UserDataRepository;
 
+/**
+ * 用户资料
+ * Class UserDataController
+ * @package App\Http\Controllers\Api
+ */
 class UserDataController extends Controller
 {
     private $userData = null;
@@ -15,6 +20,16 @@ class UserDataController extends Controller
         $this->middleware("auth:api");
 
         $this->userData = $userData;
+    }
+
+    /**
+     * 获取用户信息
+     */
+    public function getUserInfo(Request $request)
+    {
+        $ret = $this->userData->getUserInfo($request->user());
+        return $ret ? response()->json($ret) :
+            response()->json(["error" => "query error", "message" => "查询失败"]);
     }
 
     /**
