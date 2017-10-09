@@ -6,6 +6,7 @@ namespace App\Http\Model;
 class Agent extends Base
 {
     protected $table = "a_agent";
+    protected $guarded = ['id', 'create_time', 'updated_time'];
 
 
     /**
@@ -17,5 +18,6 @@ class Agent extends Base
     {
         return $this->hasMany('App\User', 'agent_id', 'id');
     }
+
 
 }

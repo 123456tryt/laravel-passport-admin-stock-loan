@@ -14,6 +14,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        //开启 sql 语句打印
+        if (config('app.debug')) {
+            \DB::enableQueryLog();
+        }
     }
 
     /**
@@ -27,7 +31,5 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment() !== 'production') {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
-
-        //
     }
 }

@@ -25,4 +25,9 @@ Route::group([
     Route::post("/userInfo", "Api\UserController@info");
 
 
+    //代理商 创建
+    Route::post("/agentCreate", "Api\AgentController@createAgent");
+    //代理商下拉 搜索
+    Route::post("/agentSearch", "Api\AgentController@search");
+
 });

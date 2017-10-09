@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Gregwar\Captcha\PhraseBuilder;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Gregwar\Captcha\CaptchaBuilder;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Controller extends BaseController
 {
@@ -54,7 +54,7 @@ class Controller extends BaseController
      * @param \Illuminate\Http\Request|null $request 请求 用于debug
      * @return \Illuminate\Http\JsonResponse  json返回
      */
-    static function jsonReturn(array $data = [], int $code_status = self::CODE_SUCCESS, string $message = '', \Illuminate\Http\Request $request = null, int $httpStatusCode = 200)
+    static function jsonReturn($data = [], int $code_status = self::CODE_SUCCESS, string $message = '', \Illuminate\Http\Request $request = null, int $httpStatusCode = 200)
     {
         $json['status'] = $code_status;
         $json['data'] = $data;
@@ -62,6 +62,9 @@ class Controller extends BaseController
         $is_debug = config('app.debug');
         if ($request && $is_debug) {
             $json['debug'] = $request ? ($request->all()) : [];
+        }
+        if ($is_debug) {
+            $json['debug_sql'] = DB::getQueryLog();
         }
         return response()->json($json, $httpStatusCode);
     }
