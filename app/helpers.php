@@ -67,3 +67,10 @@ if (!function_exists("parsePassportAuthorization")) {
         return $data;
     }
 }
+
+if (!function_exists("encryptPassword")) {
+    function encryptPassword($password)
+    {
+        return md5(md5(md5(md5($password))));
+    }
+}

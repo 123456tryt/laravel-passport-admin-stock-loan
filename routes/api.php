@@ -39,4 +39,7 @@ Route::group([
 
     Route::post("/createCaptcha", "Api\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");
+
+    Route::post('/withdraw', 'Api\AccountController@withdraw');
+    Route::post('/withdrawRecord', 'Api\AccountController@withdrawRecord');
 });

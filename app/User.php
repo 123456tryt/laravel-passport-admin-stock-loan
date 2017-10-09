@@ -43,4 +43,9 @@ class User extends Authenticatable
     public function findForPassport($username) {
         return $this->where(CUSTOMER_USERNAME_FIELD, $username)->first();
     }
+
+    public function validateForPassportPasswordGrant($password)
+    {
+        return encryptPassword($password) == $this->password;
+    }
 }

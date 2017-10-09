@@ -47,7 +47,7 @@ class RegisterRepository extends BaseRepository
     {
         $info = [
             CUSTOMER_USERNAME_FIELD => $data["cellphone"],
-            "password" => bcrypt($data["password"]),
+            "password" => encryptPassword($data["password"]),
             "nick_name" => $data["nick_name"],
             "reg_source" => $data["reg_source"],
             "reg_ip" => $data["reg_ip"],
