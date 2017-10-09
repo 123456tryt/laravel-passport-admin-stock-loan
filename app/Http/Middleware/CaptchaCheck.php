@@ -20,7 +20,7 @@ class CaptchaCheck
         $captchaId = $request->input('captchaId');
         $captchaCode = $request->input('captchaCode');
         if(!$captchaId || !$captchaCode || !Controller::verifyCaptchaCode($captchaId,$captchaCode)) {
-            return Controller::jsonReturn([],Controller::CODE_FAIL,'图像验证码错误',$request);
+            return Controller::jsonReturn([], Controller::CODE_FAIL, '图像验证码错误');
         }
 
         return $next($request);
