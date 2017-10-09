@@ -27,21 +27,23 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        $this->validate($request, [
-            "cellphone" => ["regex:/^1[0-9]{10}$/"],
-            "nick_name" => "between:1,20",
-            "password" => "between:6,20",
+        $validator = \Validator::make($request->all(), [
+            "cellphone" => ["required", "regex:/^1[0-9]{10}$/", "unique:u_customer,cellphone"],
+            "nick_name" => "required|between:1,20",
+            "password" => "required|between:6,20",
         ], [
+            "cellphone.required" => "手机号码不能为空",
+            "nick_name.required" => "昵称不能为空",
+            "password.required" => "密码不能为空",
             "cellphone.regex" => "请填写正确的手机号码",
+            "cellphone.unique" => "手机号码已经被注册",
             "nick_name.between" => "昵称格式应该为1-20字符",
             "password.between" => "密码长度应为6-20位"
         ]);
 
-        $this->validate($request, [
-            "cellphone" => "unique:u_customer,cellphone",
-        ], [
-            "cellphone.unique" => "手机号已被注册"
-        ]);
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
 
         $data = $request->only(["cellphone", "nick_name", "password", "recCode"]);
         $data = array_merge($data, [
@@ -54,10 +56,11 @@ class RegisterController extends Controller
         }
 
         $ret = $this->register->register($data);
-        if (!$ret) response()->json(["error" => "register error", "message" => "注册失败"]);
+        if (!$ret) return parent::jsonReturn([], parent::CODE_FAIL, "注册失败");
 
         //调用登录
-        return apiLogin($data["cellphone"], $data["password"]);
+        $loginRet = apiLogin($data["cellphone"], $data["password"]);
+        return parent::jsonReturn($loginRet, parent::CODE_SUCCESS, "注册成功");
     }
 
 }

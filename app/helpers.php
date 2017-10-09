@@ -44,7 +44,11 @@ if (!function_exists("apiLogin")) {
             'POST'
         );
 
-        return \Route::dispatch($proxy);
+        $ret = json_decode(\Route::dispatch($proxy)->getContent(), true);
+        if ($ret && isset($ret['access_token'])) {
+            return $ret;
+        }
+        return false;
     }
 }
 

@@ -26,7 +26,7 @@ class AccountController extends Controller
     {
         $user = $request->user();
 
-        $this->validate($request, [
+        $validator = \Validator::make($request->all(), [
             'cash_amount' => 'required|numeric|min:2',
             'bankcard_id' => 'required|numeric|min:1',
             'withdraw_pw' => 'required|between:6,20'
@@ -40,22 +40,27 @@ class AccountController extends Controller
             'withdraw_pw.between' => '提款密码格式不合法',
         ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
         //TODO:是否有提款时间限制
         if ($user->withdraw_pw != $request->get('withdraw_pw')) {
-            return response()->json(['error' => 'password error', 'message' => '提现密码错误']);
+            return parent::jsonReturn([], parent::CODE_FAIL, '提现密码错误');
         }
 
         if ($user->is_cash_forbidden) {
-            return response()->json(['error' => 'forbidden', 'message' => '用户暂时无法提现']);
+            return parent::jsonReturn([], parent::CODE_FAIL, '用户暂时无法提现');
         }
 
         if ($request->get('cash_amount') > $user->cust_capital_amount) {
-            return response()->json(['error' => 'Insufficient balance', 'message' => '提款金额不能大于用户余额']);
+            return parent::jsonReturn([], parent::CODE_FAIL, '提款金额不能大于用户余额');
         }
 
         $ret = $this->account->withDraw($user, $request->only(['cash_amount', 'bankcard_id',
             'withdraw_pw', 'cust_remark']));
-        return $ret ? response()->json([]) : response()->json(['error' => 'set error', 'message' => '提交失败']);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "提交成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, '提交失败');
     }
 
     /**
@@ -66,6 +71,7 @@ class AccountController extends Controller
     public function withdrawRecord(Request $request)
     {
         $ret = $this->account->withdrawRecord($request->user());
-        return response()->json($ret);
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, "查询失败");
     }
 }

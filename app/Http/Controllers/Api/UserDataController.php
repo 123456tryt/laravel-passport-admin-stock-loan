@@ -28,8 +28,8 @@ class UserDataController extends Controller
     public function getUserInfo(Request $request)
     {
         $ret = $this->userData->getUserInfo($request->user());
-        return $ret ? response()->json($ret) :
-            response()->json(["error" => "query error", "message" => "查询失败"]);
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, "查询错误");
     }
 
     /**
@@ -39,8 +39,9 @@ class UserDataController extends Controller
      */
     public function bankCards(Request $request)
     {
-        $list = $this->userData->bankCards($request->user());
-        return response()->json(["data" => $list]);
+        $ret = $this->userData->bankCards($request->user());
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, "查询错误");
     }
 
     /**
@@ -51,8 +52,8 @@ class UserDataController extends Controller
     public function getBankCard(Request $request)
     {
         $ret = $this->userData->GetBankCard($request->user(), $request->get("id"));
-        return $ret ? response()->json($ret) :
-            response()->json(["error" => "add error", "message" => "查询失败"]);
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, "查询错误");
     }
 
     /**
@@ -62,19 +63,26 @@ class UserDataController extends Controller
      */
     public function storeBankCard(Request $request)
     {
-        $this->validate($request, [
-            "bank_card" => "between:16,19",
-            "bank_name" => "between:1,30",
-            "bank_reg_cellphone" => "regex:/^1[0-9]{10}$/",
+        $validator = \Validator::make($request->all(), [
+            "bank_card" => "required|between:16,19",
+            "bank_name" => "required|between:1,30",
+            "bank_reg_cellphone" => ["required", "regex:/^1[0-9]{10}$/"],
         ], [
+            "bank_card.required" => "银行卡号不能为空",
+            "bank_name.required" => "银行名不能为空",
+            "bank_reg_cellphone.required" => "银行预留手机号不能为空",
             "bank_card.between" => "请填写正确的银行卡号",
-            "bank_name.between" => "请填写银行名称",
+            "bank_name.between" => "请填写正确的银行名称",
             "bank_reg_cellphone.regex" => "请填写正确的银行预留手机号"
         ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
         $ret = $this->userData->storeBankCard($request->user(), $request->all());
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "add error", "message" => "添加失败"]);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "添加成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "添加失败");
     }
 
     /**
@@ -83,19 +91,26 @@ class UserDataController extends Controller
      */
     public function updateBankCard(Request $request)
     {
-        $this->validate($request, [
-            "bank_card" => "between:16,19",
-            "bank_name" => "between:1,30",
-            "bank_reg_cellphone" => "regex:/^1[0-9]{10}$/",
+        $validator = \Validator::make($request->all(), [
+            "bank_card" => "required|between:16,19",
+            "bank_name" => "required|between:1,30",
+            "bank_reg_cellphone" => ["required", "regex:/^1[0-9]{10}$/"],
         ], [
+            "bank_card.required" => "银行卡号不能为空",
+            "bank_name.required" => "银行名不能为空",
+            "bank_reg_cellphone.required" => "银行预留手机号不能为空",
             "bank_card.between" => "请填写正确的银行卡号",
-            "bank_name.between" => "请填写银行名称",
+            "bank_name.between" => "请填写正确的银行名称",
             "bank_reg_cellphone.regex" => "请填写正确的银行预留手机号"
         ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
         $ret = $this->userData->updateBankCard($request->user(), $request->get("id"), $request->all());
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "update error", "message" => "更新失败"]);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
 
     /**
@@ -105,8 +120,8 @@ class UserDataController extends Controller
     public function deleteBankCard(Request $request)
     {
         $ret = $this->userData->deleteBankCard($request->user(), $request->id);
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "delete error", "message" => "删除失败"]);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "删除成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "删除失败");
     }
 
     /**
@@ -116,15 +131,20 @@ class UserDataController extends Controller
      */
     public function updateNickname(Request $request)
     {
-        $this->validate($request, [
-            "nick_name" => "between:1,20",
+        $validator = \Validator::make($request->all(), [
+            "nick_name" => "required|between:1,20",
         ], [
-            "nick_name.between" => "新昵称格式应该为1-20字符"
+            "nick_name.required" => "新昵称不能为空",
+            "nick_name.between" => "新昵称格式应该为1-20字符",
         ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
         $ret = $this->userData->updateNickname($request->user(), $request->get("nick_name"));
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "update error", "message" => "修改失败"]);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
 
     /**
@@ -134,17 +154,23 @@ class UserDataController extends Controller
      */
     public function storeCetification(Request $request)
     {
-        $this->validate($request, [
+        $validator = \Validator::make($request->all(), [
             "real_name" => "required|between:1,20",
             "id_card" => "required|between:15,18"
         ], [
+            "real_name.required" => "真实姓名不能为空",
+            "id_card.required" => "身份证不能为空",
             "real_name.between" => "请填写正确的真实姓名",
             "id_card.between" => "请填写正确格式的身份证号码"
         ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
         $ret = $this->userData->storeCetification($request->user(), $request->get("real_name"), $request->get("id_card"));
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "set error", "message" => "设置失败"]);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "提交成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "提交失败");
     }
 
     /**
@@ -155,16 +181,20 @@ class UserDataController extends Controller
      */
     public function storeWithdrawPassword(Request $request)
     {
-        $this->validate($request, [
-            "withdraw_pw" => "between:6,20"
+        $validator = \Validator::make($request->all(), [
+            "withdraw_pw" => "required|between:6,20"
         ], [
+            "withdraw_pw.required" => "密码不能为空",
             "withdraw_pw.between" => "密码长度应为6-20位"
         ]);
 
-        $ret = $this->userData->storeWithdrawPassword($request->user(), $request->get("withdraw_pw"));
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
 
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "set error", "message" => "设置失败"]);
+        $ret = $this->userData->storeWithdrawPassword($request->user(), $request->get("withdraw_pw"));
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "设置成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "设置失败");
     }
 
     /**
@@ -174,18 +204,24 @@ class UserDataController extends Controller
      */
     public function updateWithdrawPassword(Request $request)
     {
-        $this->validate($request, [
-            "old_withdraw_pw" => "between:6,20",
-            "withdraw_pw" => "between:6,20",
+        $validator = \Validator::make($request->all(), [
+            "old_withdraw_pw" => "required|between:6,20",
+            "withdraw_pw" => "required|between:6,20",
         ], [
+            "old_withdraw_pw.required" => "旧密码不能为空",
+            "withdraw_pw.required" => "新密码不能为空",
             "old_withdraw_pw.between" => "旧密码长度应为6-20位",
             "withdraw_pw.between" => "新密码长度应为6-20位",
         ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
         $ret = $this->userData->updateWithdrawPassword($request->user(), $request->get("old_withdraw_pw"),
             $request->get("withdraw_pw"));
-        return $ret ? response()->json([]) :
-            response()->json(["error" => "update error", "message" => "修改失败"]);
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
 
     /**

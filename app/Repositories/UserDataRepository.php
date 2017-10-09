@@ -43,7 +43,7 @@ class UserDataRepository extends BaseRepository
     {
         $ret = CustBankCard::where("cust_id", $user->id)
             ->get();
-        return $ret;
+        return $ret ? $ret->toArray() : false;
     }
 
     /**
@@ -55,7 +55,7 @@ class UserDataRepository extends BaseRepository
     public function getBankCard($user, $id)
     {
         $ret = CustBankCard::where("cust_id", $user->id)->where("id", $id)->first();
-        return $ret;
+        return $ret ? $ret->toArray() : false;
     }
 
     /**

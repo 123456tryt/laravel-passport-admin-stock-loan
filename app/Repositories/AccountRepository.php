@@ -36,6 +36,7 @@ class AccountRepository extends BaseRepository
      */
     public function withdrawRecord($user)
     {
-        return CashFlow::where('cust_id', $user->id)->get(['id', 'cash_amount', 'apply_time', 'cash_status']);
+        $ret = CashFlow::where('cust_id', $user->id)->get(['id', 'cash_amount', 'apply_time', 'cash_status']);
+        return $ret ? $ret->toArray() : false;
     }
 }
