@@ -31,7 +31,13 @@ Route::group([
     Route::post("/agentSearch", "Api\AgentController@search");
 
 
-    //代理商下拉 搜索
+    //代理商下拉 搜索/列表
     Route::get("/agentList", "Api\AgentController@list");
+
+    //代理商详细信息
+    Route::post("/agentInfo", "Api\AgentController@info");
+
+    //代理商详细信息
+    Route::post("/agentUpdate", "Api\AgentController@update");
 
 });

@@ -53,13 +53,36 @@ class AgentController extends Controller
         return self::jsonReturn($list);
     }
 
-    public function register()
+    /**
+     * 代理商的信息信息 配置 附加信息
+     * @return string
+     */
+    public function info(Request $request)
     {
+        //代理商基本信息
+        $basic = Agent::find($request->id);
+        //代理商配置信息
 
-        return "hello world";
+        //代理商附加信息
+
+        return self::jsonReturn(compact('basic'));
     }
 
+    /**
+     * 代理商的信息信息 配置 附加信息  编辑
+     * @return string
+     */
+    public function update(Request $request)
+    {
 
+        return $request->all();
+    }
+
+    /**
+     * 代理商列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function list(Request $request)
     {
         $page = $request->input('page', 1);
