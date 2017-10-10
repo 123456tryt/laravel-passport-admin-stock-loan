@@ -21,7 +21,7 @@ Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead �
 - PHP Mbstring 扩展
 - PHP Tokenizer 扩展
 - PHP XML 扩展
-
+- PHP `Redis` 扩展
 ## 环境
 
 - mysql 版本5.7 数据库地址:10.10.1.101:3306 用户名:yingli 密码:yingli
@@ -37,8 +37,9 @@ Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead �
 - phpstorm安装相应的断点调试工具
 
 ## 第三方composer包
+- [gregwar/captcha](https://packagist.org/packages/gregwar/captcha-bundle)
+- [phpoffice/phpexcel 文档](https://github.com/PHPOffice/PHPExcel/wiki/User-documentation)
 - [Laravel 的 API 认证系统 Passport](https://d.laravel-china.org/docs/5.5/passport)
-- [predis](https://github.com/nrk/predis) `composer require predis/predis`
 
 
 ## Apache 跨域 vhost.conf
