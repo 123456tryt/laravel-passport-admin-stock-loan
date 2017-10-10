@@ -58,7 +58,6 @@ Laravel 框架对系统有一些要求。所有这些要求 Laravel Homestead �
 ```
 ## nginx 跨域 enable-php-cors.conf
 ```
-<VirtualHost *:80>
 location ~ [^/]\.php(/|$)
 {
     try_files $uri =404;
@@ -97,6 +96,5 @@ location ~ [^/]\.php(/|$)
         add_header 'Access-Control-Expose-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization';
      }
 }
-</VirtualHost>
 
 ```
