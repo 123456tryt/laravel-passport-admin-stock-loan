@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    const PAGE_SIZE = 30;
 
     const CAPTCHA_PREFIX = "captcha_";
     const CAPTCHA_CACHE = "redis";
@@ -59,8 +60,7 @@ class Controller extends BaseController
         $json['status'] = $code_status;
         $json['data'] = $data;
         $json['msg'] = $message;
-        $is_debug = config('app.debug');
-        if ($is_debug) {
+        if (config('app.debug')) {
             $json['debug'] = $_REQUEST;
             $json['debug_sql'] = DB::getQueryLog();
         }

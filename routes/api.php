@@ -30,4 +30,8 @@ Route::group([
     //代理商下拉 搜索
     Route::post("/agentSearch", "Api\AgentController@search");
 
+
+    //代理商下拉 搜索
+    Route::get("/agentList", "Api\AgentController@list");
+
 });
