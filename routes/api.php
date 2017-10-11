@@ -20,6 +20,8 @@ Route::group([
 
     Route::post("/getUserInfo", "Api\UserDataController@getUserInfo");
 
+    Route::post("/getIndexData", "Api\OthersController@getIndexData");
+
     Route::post("/register", "Api\RegisterController@register");
     Route::post("/login", "Api\LoginController@login");
     Route::post("/logout", "Api\LoginController@logout")->middleware("auth:api");
@@ -42,4 +44,8 @@ Route::group([
 
     Route::post('/withdraw', 'Api\AccountController@withdraw');
     Route::post('/withdrawRecord', 'Api\AccountController@withdrawRecord');
+
+    Route::post('/getShareCount', 'Api\ShareController@getShareCount');
+    Route::post('/getPromotionUsers', 'Api\ShareController@getPromotionUsers');
+    Route::post('/getPromotionPercentages', 'Api\ShareController@getPromotionPercentages');
 });

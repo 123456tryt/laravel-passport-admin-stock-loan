@@ -111,7 +111,8 @@ class RegisterRepository extends BaseRepository
             }
         }
 
-        array_unshift($agentList, $this->getDefaultAgent());
+        $defaultAgent = getDefaultAgent();
+        array_unshift($agentList, $defaultAgent ? $defaultAgent->id : 0);
         $directAgent = (int)end($agentList);
         $directCust = (int)end($custList);
         MemberAgentRelation::create([
@@ -159,13 +160,4 @@ class RegisterRepository extends BaseRepository
         }
     }
 
-    /**
-     * 获取默认的代理id
-     * @return mixed
-     */
-    private function getDefaultAgent()
-    {
-        $defaultAgent = Agent::where("agent_level", 1)->first();
-        return $defaultAgent->id;
-    }
 }

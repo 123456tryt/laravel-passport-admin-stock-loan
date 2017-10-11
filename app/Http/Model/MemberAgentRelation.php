@@ -11,4 +11,10 @@ class MemberAgentRelation extends Base
     protected $fillable = ["cust_id", "direct_cust_id", "direct_agent_id", "agent1", "agent2", "agent3", "agent4",
         "agent4", "agent5", "direct_emp_id", "belong_to_agent", "cust1", "cust2", "cust3"];
 
+    public function cust()
+    {
+        return $this->belongsTo('App\User', 'cust_id');
+    }
+
+
 }

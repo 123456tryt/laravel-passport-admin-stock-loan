@@ -2,6 +2,7 @@
 
 use App\Http\Model\RecCode;
 use Lcobucci\JWT\Parser;
+use App\Http\Model\Agent;
 
 if (!function_exists("createRecCode")) {
     function createRecCode($length = 10)
@@ -76,5 +77,13 @@ if (!function_exists("encryptPassword")) {
     function encryptPassword($password)
     {
         return md5(md5(md5(md5($password))));
+    }
+}
+
+if (!function_exists("getDefaultAgent")) {
+    function getDefaultAgent()
+    {
+        $defaultAgent = Agent::where("agent_level", 1)->first();
+        return $defaultAgent;
     }
 }

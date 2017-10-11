@@ -56,11 +56,8 @@ class RegisterController extends Controller
         }
 
         $ret = $this->register->register($data);
-        if (!$ret) return parent::jsonReturn([], parent::CODE_FAIL, "注册失败");
-
-        //调用登录
-        $loginRet = apiLogin($data["cellphone"], $data["password"]);
-        return parent::jsonReturn($loginRet, parent::CODE_SUCCESS, "注册成功");
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "注册成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "注册失败");
     }
 
 }

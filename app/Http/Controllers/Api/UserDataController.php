@@ -40,7 +40,7 @@ class UserDataController extends Controller
     public function bankCards(Request $request)
     {
         $ret = $this->userData->bankCards($request->user());
-        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+        return $ret !== flase ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
             parent::jsonReturn([], parent::CODE_FAIL, "查询错误");
     }
 
