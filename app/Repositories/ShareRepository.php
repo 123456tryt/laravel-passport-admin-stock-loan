@@ -10,6 +10,7 @@ use App\Http\Model\StockFinanceInterestPercentage;
 class ShareRepository extends BaseRepository
 {
     const PROMOTION_TYPE = 8;
+    const PAGE_SIZE = 15;
 
     public function model()
     {
@@ -41,8 +42,9 @@ class ShareRepository extends BaseRepository
      */
     public function getPromotionUsers($user, $level)
     {
-        $custs = MemberAgentRelation::where("cust{$level}", $user->id)->orderBy(MemberAgentRelation::CREATED_AT, "desc")
-            ->get(["cust_id"]);
+        $paginate = MemberAgentRelation::where("cust{$level}", $user->id)->orderBy(MemberAgentRelation::CREATED_AT, "desc")
+            ->select(["cust_id"])->paginate(self::PAGE_SIZE);
+        $custs = $paginate->getCollection();
         $data = [];
         foreach ($custs as $cust) {
             $cust = $cust->cust;
@@ -51,7 +53,9 @@ class ShareRepository extends BaseRepository
                     "registerTime" => $cust->created_time];
             }
         }
-        return $data;
+        $paginate = $paginate->toArray();
+        $paginate["data"] = $data;
+        return $paginate;
     }
 
     /**
@@ -63,8 +67,10 @@ class ShareRepository extends BaseRepository
     public function getPromotionPercentages($user, $level)
     {
         $incomeField = "cust{$level}_interests";
-        $percentages = StockFinanceInterestPercentage::where("cust{$level}_id", $user->id)
-            ->orderBy(MemberAgentRelation::CREATED_AT, "desc")->get(["cust_id", "cust{$level}_interests"]);
+        $paginate = StockFinanceInterestPercentage::where("cust{$level}_id", $user->id)
+            ->orderBy(MemberAgentRelation::CREATED_AT, "desc")->select(["cust_id", "cust{$level}_interests"])
+            ->paginate(self::PAGE_SIZE);
+        $percentages = $paginate->getCollection();
         $data = [];
         foreach ($percentages as $percentage) {
             $data[] = [
@@ -74,8 +80,9 @@ class ShareRepository extends BaseRepository
                 "expenses" => 0,
             ];
         }
-        return $data;
+        $paginate = $paginate->toArray();
+        $paginate["data"] = $data;
+        return $paginate;
     }
-
 
 }
