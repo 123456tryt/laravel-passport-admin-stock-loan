@@ -61,7 +61,7 @@ class Controller extends BaseController
         $json['data'] = $data;
         $json['msg'] = $message;
         if (config('app.debug')) {
-            $json['debug'] = $_REQUEST;
+            $json['debug'] = $_SERVER;
             $json['debug_sql'] = DB::getQueryLog();
         }
         return response()->json($json, $httpStatusCode);

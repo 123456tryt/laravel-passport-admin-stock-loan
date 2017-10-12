@@ -37,7 +37,7 @@ use Laravel\Passport\HasApiTokens;
 class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
-
+    const RoleAdmin = 1;
     static function encryptPassword($password)
     {
         return md5(md5(md5(md5($password))));

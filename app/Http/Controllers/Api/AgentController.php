@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Model\Agent;
+use App\Http\Model\AgentInfo;
 use App\Http\Model\AgentProfitRateConfig;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Mockery\Exception;
+
 /**
  * Class AgentController 代理商
  * @package App\Http\Controllers\Api
@@ -24,6 +27,7 @@ class AgentController extends Controller
         $validator = \Validator::make($request->all(), [
             'bank_account' => 'required|unique:a_agent',
             'agent_name' => 'required|unique:a_agent',
+            'agent_number' => 'required|unique:a_agent',
             'owner_name' => 'required|unique:a_agent',
             'phone' => 'required|unique:a_agent',
             'phone' => 'required|unique:s_system_user',
@@ -141,12 +145,17 @@ class AgentController extends Controller
     public function info(Request $request)
     {
         //代理商基本信息
-        $basic = Agent::find($request->id);
+        $agent_id = $request->input('id');
+        $basic = Agent::find($agent_id);
         //代理商配置信息
-
+        $employee_id = 0;
+        $config = AgentProfitRateConfig::where(compact('agent_id', 'employee_id'))->get();
         //代理商附加信息
+        $info = AgentInfo::find($agent_id);
+        //代理商管理员
+        $user = User::where(['agent_id' => $agent_id, 'role_id' => User::RoleAdmin])->first();
 
-        return self::jsonReturn(compact('basic'));
+        return self::jsonReturn(compact('basic', 'info', 'config', 'user'));
     }
 
     /**
@@ -182,6 +191,64 @@ class AgentController extends Controller
         });
 
         return self::jsonReturn($list);
+    }
+
+    public function changeAgentAdminUserPassword(Request $request)
+    {
+        $password = $request->input('password');
+        $confirm_password = $request->input('confirm_password');
+        $agent_id = $request->input('agent_id');
+        $role_id = $request->input('role_id');
+        $id = $request->input('id');
+
+
+        if ($password != $confirm_password) {
+            return self::jsonReturn([], self::CODE_FAIL, '两次输入密码不一样');
+        }
+
+        try {
+            $pp = bcrypt($password);
+            User::where(compact('id', 'agent_id', 'role_id'))->update(['password' => $pp]);
+            return self::jsonReturn([], self::CODE_SUCCESS, '修改密码成功');
+
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            return self::jsonReturn([], self::CODE_FAIL, $message);
+        }
+
+
+    }
+
+    public function updateAgentBasic(Request $request)
+    {
+//        $validator = \Validator::make($request->all(), [
+//            'bank_account' => 'required|unique:a_agent',
+//            'agent_name' => 'required|unique:a_agent',
+//            'agent_number' => 'required|unique:a_agent',
+//            'owner_name' => 'required|unique:a_agent',
+//            'phone' => 'required|unique:a_agent',
+//
+//        ], [
+//            'agent_number.unique' => "代理商编号不能重复",
+//            'agent_name.unique' => "代理商名称不能重复",
+//            'bank_account.unique' => "提现银行卡号重复",
+//            'phone.unique' => "联系人手机号码已注册",
+//            'owner_name.unique' => "代理商联系人姓名重复",
+//
+//        ]);
+//        if ($validator->fails()) {
+//            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+//        }
+
+        try {
+            //todo::修改归属关系表
+            $agent = Agent::find($request->id);
+            $agent->update($request->except('id'));
+        } catch (\Exception $eee) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $eee->getMessage());
+
+        }
+        return self::jsonReturn($agent, self::CODE_SUCCESS, '修改代理商基本信息成功');
     }
 
 
