@@ -126,7 +126,6 @@ class AgentController extends Controller
                 //没有搜索条件就显示一级代理商
                 //$data = $query->whereAgentLevel(1)->get();
                 $data = $query->whereAgentLevel(1)->get();
-
             }
 
             return $data;
@@ -168,14 +167,14 @@ class AgentController extends Controller
     public function list(Request $request)
     {
         $page = $request->input('page', 1);
-        $name = $request->input('name');
+        $agent_name = $request->input('agent_name');
 
-        $cacke_key = "agent_list__{$page}_search_{$name}";
+        $cacke_key = "agent_list__{$page}_search_{$agent_name}";
 
-        $list = \Cache::remember($cacke_key, 1, function () use ($name) {
+        $list = \Cache::remember($cacke_key, 1, function () use ($agent_name) {
             $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->limit(self::PAGE_SIZE);
-            if ($name) {
-                $data = $query->where('name', 'like', "%$name%")->paginate(self::PAGE_SIZE);
+            if ($agent_name) {
+                $data = $query->where('agent_name', 'like', "%$agent_name%")->paginate(self::PAGE_SIZE);
             } else {
                 $data = $query->paginate(self::PAGE_SIZE);
             }
