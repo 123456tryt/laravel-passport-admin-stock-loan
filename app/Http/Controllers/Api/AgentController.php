@@ -22,6 +22,9 @@ class AgentController extends Controller
         $this->middleware("auth:api")->except(['search']);
     }
 
+    /*
+     * 创建代理商
+     */
     public function createAgent(Request $request)
     {
         $validator = \Validator::make($request->all(), [
@@ -117,6 +120,11 @@ class AgentController extends Controller
 
     }
 
+    /**
+     * 下拉列表搜索代理商
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function search(Request $request)
     {
         $agent_name = $request->input('agent_name');
@@ -151,22 +159,13 @@ class AgentController extends Controller
         $employee_id = 0;
         $config = AgentProfitRateConfig::where(compact('agent_id', 'employee_id'))->get();
         //代理商附加信息
-        $info = AgentInfo::find($agent_id);
+        $info = AgentInfo::firstOrNew(['id' => $agent_id]);
         //代理商管理员
         $user = User::where(['agent_id' => $agent_id, 'role_id' => User::RoleAdmin])->first();
 
         return self::jsonReturn(compact('basic', 'info', 'config', 'user'));
     }
 
-    /**
-     * 代理商的信息信息 配置 附加信息  编辑
-     * @return string
-     */
-    public function update(Request $request)
-    {
-
-        return $request->all();
-    }
 
     /**
      * 代理商列表
@@ -193,6 +192,11 @@ class AgentController extends Controller
         return self::jsonReturn($list);
     }
 
+    /**
+     * 修改代理商的管理员密码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function changeAgentAdminUserPassword(Request $request)
     {
         $password = $request->input('password');
@@ -219,6 +223,11 @@ class AgentController extends Controller
 
     }
 
+    /**
+     * 修改a_agent信息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateAgentBasic(Request $request)
     {
 //        $validator = \Validator::make($request->all(), [
@@ -242,14 +251,52 @@ class AgentController extends Controller
 
         try {
             //todo::修改归属关系表
-            $agent = Agent::find($request->id);
-            $agent->update($request->except('id'));
+            $agent = Agent::find($request->id)->fill($request->except('id'));
+            $code = $agent->save();
+            return self::jsonReturn($agent, $code, '修改代理商基本信息成功');
+
         } catch (\Exception $eee) {
             return parent::jsonReturn([], parent::CODE_FAIL, $eee->getMessage());
 
         }
-        return self::jsonReturn($agent, self::CODE_SUCCESS, '修改代理商基本信息成功');
     }
 
+    /**
+     * 修改a_agent_extra_info 表信息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateAgentInfo(Request $request)
+    {
+//        $validator = \Validator::make($request->all(), [
+//            'bank_account' => 'required|unique:a_agent',
+//            'agent_name' => 'required|unique:a_agent',
+//            'agent_number' => 'required|unique:a_agent',
+//            'owner_name' => 'required|unique:a_agent',
+//            'phone' => 'required|unique:a_agent',
+//
+//        ], [
+//            'agent_number.unique' => "代理商编号不能重复",
+//            'agent_name.unique' => "代理商名称不能重复",
+//            'bank_account.unique' => "提现银行卡号重复",
+//            'phone.unique' => "联系人手机号码已注册",
+//            'owner_name.unique' => "代理商联系人姓名重复",
+//
+//        ]);
+//        if ($validator->fails()) {
+//            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+//        }
+
+        try {
+            //todo::修改归属关系表
+            $agentInfo = AgentInfo::find($request->id)->fill($request->except('id'));
+            $code = $agentInfo->save();
+            return self::jsonReturn($agentInfo, $code, '修改代理商附加信息信息成功');
+
+        } catch (\Exception $eee) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $eee->getMessage());
+
+        }
+    }
 
 }

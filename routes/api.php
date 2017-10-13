@@ -37,14 +37,16 @@ Route::group([
     //代理商详细信息
     Route::post("/agentInfo", "Api\AgentController@info");
 
-    //代理商详细信息
-    Route::post("/agentUpdate", "Api\AgentController@update");
+
 
 
     //修改代理商管理员密码
     Route::post("/agentChangeAdminPassword", "Api\AgentController@changeAgentAdminUserPassword");
 
-    //updateAgentBasic
+    //修改代理商基本信息
     Route::post("/agentChangeBasic", "Api\AgentController@updateAgentBasic");
+
+    //修改代理附加信息
+    Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");
 
 });
