@@ -4,6 +4,9 @@ use App\Http\Model\RecCode;
 use Lcobucci\JWT\Parser;
 use App\Http\Model\Agent;
 
+/**
+ * 创建推荐码
+ */
 if (!function_exists("createRecCode")) {
     function createRecCode($length = 10)
     {
@@ -18,6 +21,9 @@ if (!function_exists("createRecCode")) {
     }
 }
 
+/**
+ * 获取ip信息，调淘宝ip接口
+ */
 if (!function_exists("getIpInfo")) {
     function getIpInfo($ip)
     {
@@ -28,6 +34,9 @@ if (!function_exists("getIpInfo")) {
     }
 }
 
+/**
+ * 登录
+ */
 if (!function_exists("apiLogin")) {
     function apiLogin($username, $password)
     {
@@ -53,6 +62,9 @@ if (!function_exists("apiLogin")) {
     }
 }
 
+/**
+ * 解析登录token
+ */
 if (!function_exists("parsePassportAuthorization")) {
     function parsePassportAuthorization($request)
     {
@@ -73,6 +85,9 @@ if (!function_exists("parsePassportAuthorization")) {
     }
 }
 
+/**
+ * 密码加密
+ */
 if (!function_exists("encryptPassword")) {
     function encryptPassword($password)
     {
@@ -80,6 +95,9 @@ if (!function_exists("encryptPassword")) {
     }
 }
 
+/**
+ * 获取默认代理
+ */
 if (!function_exists("getDefaultAgent")) {
     function getDefaultAgent()
     {
@@ -88,6 +106,9 @@ if (!function_exists("getDefaultAgent")) {
     }
 }
 
+/**
+ * 获取请求当前贴牌代理
+ */
 if (!function_exists("getAgent")) {
     function getAgent()
     {

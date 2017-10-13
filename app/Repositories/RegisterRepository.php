@@ -7,6 +7,7 @@ use App\Http\Model\AgentEmpPercentageSetting;
 use App\Http\Model\MemberAgentRelation;
 use App\Http\Model\MemberFeeRate;
 use App\Http\Model\RecCode;
+use App\User;
 use Illuminate\Support\Facades\DB;
 use App\Http\Model\AgentPercentageSetting;
 
@@ -87,7 +88,7 @@ class RegisterRepository extends Base
                             $agentList[] = $relationRecord->{$t};
                         }
                     }
-                    //假设一个用户只有一个上级用户时，这个用户是该用户的三级客户
+                    //假设一个用户只有一个上级用户时，这个用户是该用户的一级客户
                     $custList = [$codeRecord->user_id, $relationRecord->cust1];
                     $emp = $relationRecord->direct_emp_id;
                 }
@@ -213,6 +214,14 @@ class RegisterRepository extends Base
         MemberFeeRate::create($feeRate0);
         MemberFeeRate::create($feeRate1);
         MemberFeeRate::create($feeRate2);
+    }
+
+    public function getBackPassword($phone, $password)
+    {
+        $user = User::where("cellphone", $phone)->first();
+        if (!$user) return false;
+
+        return $user->update(["password" => encryptPassword($password)]);
     }
 
     /**

@@ -10,6 +10,7 @@ class SmsRepository extends Base
     const VERIFY_CODE_INVALID_MINUTES = 10;
     const VERIFY_CODE_EXPIRE_MINUTES = 1;
 
+    //发送验证码
     public function sendVerify($phone, $agent = null, $remark = "")
     {
         $sendRecord = MsgCheck::where("cellphone", $phone)->orderBy("create_time", "desc")->first();
@@ -49,17 +50,19 @@ class SmsRepository extends Base
         return MsgCheck::create($data);
     }
 
+    //检测验证码
     public function checkVerify($phone, $code)
     {
-        $sendRecord = MsgCheck::where("cellphone", $phone)->orderBy("create_time", "desc")->first();
+        $sendRecord = MsgCheck::where("cellphone", $phone)->orderBy("id", "desc")->first();
         if (!$sendRecord || $sendRecord->check_code != $code ||
-            strtotime($sendRecord->create_time) + self::VERIFY_CODE_INVALID_MINUTES * 60 < time()) {
+            strtotime($sendRecord->invalid_time) < time()) {
             return false;
         }
 
         return true;
     }
 
+    //创建验证码
     private function createCode()
     {
         $str = "0123456789";

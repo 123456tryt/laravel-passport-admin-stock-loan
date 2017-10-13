@@ -23,7 +23,9 @@ Route::group([
     Route::post("/getIndexData", "Api\OthersController@getIndexData");
 
     Route::post("/register", "Api\RegisterController@register");
+    Route::post("/getBackPassword", "Api\RegisterController@getBackPassword");
     Route::post("/getRegisterSms", "Api\RegisterController@sendSms")->middleware("App\Http\Middleware\CaptchaCheck");
+    Route::post("/getGetBackSms", "Api\RegisterController@sendGetBackSms")->middleware("App\Http\Middleware\CaptchaCheck");
     Route::post("/login", "Api\LoginController@login");
     Route::post("/logout", "Api\LoginController@logout")->middleware("auth:api");
 
@@ -32,6 +34,9 @@ Route::group([
     Route::post("/createBankCard", "Api\UserDataController@storeBankCard");
     Route::post("/updateBankCard", "Api\UserDataController@updateBankCard");
     Route::post("/deleteBankCard", "Api\UserDataController@deleteBankCard");
+    Route::post("/updatePhone", "Api\UserDataController@updatePhone");
+    Route::post("/updatePassword", "Api\UserDataController@updatePassword");
+    Route::post("/getBackWithdrawPassword", "Api\UserDataController@getBackWithdrawPassword");
     Route::post("/getSms", "Api\UserDataController@sendSms")->middleware("App\Http\Middleware\CaptchaCheck");
 
     Route::post("/updateNickname", "Api\UserDataController@updateNickname");

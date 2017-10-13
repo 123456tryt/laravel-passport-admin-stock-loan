@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Http\Model\CashFlow;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\DB;
 
 class AccountRepository extends Base
 {
@@ -14,13 +16,25 @@ class AccountRepository extends Base
      */
     public function withdraw($user, $data)
     {
-        $data = array_merge($data, [
-            'apply_time' => date('Y-m-d H:i:s'),
-            'cash_status' => 0,
-            'cust_id' => $user->id,
-        ]);
+        DB::beginTransaction();
 
-        return CashFlow::create($data);
+        try {
+            $data = array_merge($data, [
+                'apply_time' => date('Y-m-d H:i:s'),
+                'cash_status' => 0,
+                'cust_id' => $user->id,
+            ]);
+            $ret1 = CashFlow::create($data);
+
+            $ret2 = $user->update(["cust_capital_amount" => ($user->cust_capital_amount - $data["cash_amount"])]);
+            if ($ret1 && $ret2) {
+                DB::commit();
+                return true;
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return false;
+        }
     }
 
     /**

@@ -20,12 +20,11 @@ class LoginController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             "username" => ["required", "regex:/^1[0-9]{10}$/"],
-            "password" => "required|between:6,20"
+            "password" => "required"
         ], [
             "username.required" => "手机号不能为空",
             "password.required" => "密码不能为空",
             "username.regex" => "手机号格式不合法",
-            "password.between" => "请输入正确的密码"
         ]);
 
         if ($validator->fails()) {

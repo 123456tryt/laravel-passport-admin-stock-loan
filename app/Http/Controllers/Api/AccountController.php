@@ -44,8 +44,7 @@ class AccountController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
         }
 
-        //TODO:是否有提款时间限制
-        if ($user->withdraw_pw != $request->get('withdraw_pw')) {
+        if ($user->withdraw_pw != encryptPassword($request->get('withdraw_pw'))) {
             return parent::jsonReturn([], parent::CODE_FAIL, '提现密码错误');
         }
 

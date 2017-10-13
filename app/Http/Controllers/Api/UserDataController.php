@@ -227,6 +227,11 @@ class UserDataController extends Controller
             parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
 
+    /**
+     * 发送短信（修改手机、找回提款密码、修改登录密码）
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function sendSms(Request $request)
     {
         $user = $request->user();
@@ -236,17 +241,24 @@ class UserDataController extends Controller
             parent::jsonReturn([], parent::CODE_FAIL, $this->sms->getErrorMsg() ?: "发送错误");
     }
 
+    /**
+     * 更新手机号
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updatePhone(Request $request)
     {
         $user = $request->user();
         $validator = \Validator::make($request->all(), [
             "cellphone" => ["required", "regex:/^1[0-9]{10}$/", "unique:u_customer,cellphone"],
             "oldPhoneCode" => "required",
+            "phoneCode" => "required",
         ], [
             "cellphone.required" => "手机号码不能为空",
             "cellphone.regex" => "请填写正确的手机号码",
             "cellphone.unique" => "新手机号码已经被注册",
             "oldPhoneCode.required" => "原手机验证码不能为空",
+            "phoneCode.required" => "手机验证码不能为空",
         ]);
 
         if ($validator->fails()) {
@@ -261,33 +273,72 @@ class UserDataController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, "原手机验证码错误");
         }
 
-        if (!$this->sms->checkVerify($user->cellphone, $request->get("oldPhoneCode"))) {
+        if (!$this->sms->checkVerify($request->get("cellphone"), $request->get("phoneCode"))) {
             return parent::jsonReturn([], parent::CODE_FAIL, "手机验证码错误");
         }
 
-//        $this->userData->updatePhone($user, $request->only([""]));
-
+        $ret = $this->userData->updatePhone($user, $request->get("cellphone"));
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
 
-    public function updatePassword()
+    /**
+     * 更新密码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePassword(Request $request)
     {
+        $user = $request->user();
+        $validator = \Validator::make($request->all(), [
+            "password" => ["required", "between:6,20"],
+            "phoneCode" => "required",
+        ], [
+            "password.required" => "密码不能为空",
+            "password.between" => "密码长度应为6-20位",
+            "phoneCode.required" => "手机验证码不能为空",
+        ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        if (!$this->sms->checkVerify($user->cellphone, $request->get("phoneCode"))) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "手机验证码错误");
+        }
+
+        $ret = $this->userData->updatePassword($user, $request->get("password"));
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
 
-    public function getBackWithdrawPassword()
+    /**
+     * 找回提款密码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBackWithdrawPassword(Request $request)
     {
+        $user = $request->user();
+        $validator = \Validator::make($request->all(), [
+            "withdraw_pw" => ["required", "between:6,20"],
+            "phoneCode" => "required",
+        ], [
+            "withdraw_pw.required" => "提款密码不能为空",
+            "withdraw_pw.between" => "提款密码长度应为6-20位",
+            "phoneCode.required" => "手机验证码不能为空",
+        ]);
 
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        if (!$this->sms->checkVerify($user->cellphone, $request->get("phoneCode"))) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "手机验证码错误");
+        }
+
+        $ret = $this->userData->getBackWithdrawPassword($user, $request->get("password"));
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "找回成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, "找回失败");
     }
-
-    /**
-     * 手机绑定
-     */
-
-    /**
-     * 登录密码
-     */
-
-    /**
-     * 忘记提款密码
-     */
 }

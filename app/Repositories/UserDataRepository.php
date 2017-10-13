@@ -136,7 +136,7 @@ class UserDataRepository extends Base
             return false;
         }
 
-        return $user->update(["withdraw_pw" => $withDrawPassword]);
+        return $user->update(["withdraw_pw" => encryptPassword($withDrawPassword)]);
     }
 
     /**
@@ -152,6 +152,39 @@ class UserDataRepository extends Base
             return false;
         }
 
-        return $user->update(["withdraw_pw" => $withDrawPassword]);
+        return $user->update(["withdraw_pw" => encryptPassword($withDrawPassword)]);
+    }
+
+    /**
+     * 更新手机
+     * @param $user
+     * @param $newPhone
+     * @return mixed
+     */
+    public function updatePhone($user, $newPhone)
+    {
+        return $user->update(["cellphone" => $newPhone]);
+    }
+
+    /**
+     * 更新密码
+     * @param $user
+     * @param $password
+     * @return mixed
+     */
+    public function updatePassword($user, $password)
+    {
+        return $user->update(["password" => encryptPassword($password)]);
+    }
+
+    /**
+     * 找回提款密码
+     * @param $user
+     * @param $password
+     * @return mixed
+     */
+    public function getBackWithdrawPassword($user, $password)
+    {
+        return $user->update(["withdraw_pw" => encryptPassword($password)]);
     }
 }
