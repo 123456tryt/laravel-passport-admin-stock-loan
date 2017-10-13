@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\SmsRepository;
 use Illuminate\Http\Request;
 use App\Repositories\RegisterRepository;
 
@@ -14,10 +15,12 @@ use App\Repositories\RegisterRepository;
 class RegisterController extends Controller
 {
     private $register = null;
+    private $sms = null;
 
-    public function __construct(RegisterRepository $register)
+    public function __construct(RegisterRepository $register, SmsRepository $sms)
     {
         $this->register = $register;
+        $this->sms = $sms;
     }
 
     /**
@@ -31,6 +34,7 @@ class RegisterController extends Controller
             "cellphone" => ["required", "regex:/^1[0-9]{10}$/", "unique:u_customer,cellphone"],
             "nick_name" => "required|between:1,20",
             "password" => "required|between:6,20",
+            "phoneCode" => "required",
         ], [
             "cellphone.required" => "手机号码不能为空",
             "nick_name.required" => "昵称不能为空",
@@ -38,11 +42,17 @@ class RegisterController extends Controller
             "cellphone.regex" => "请填写正确的手机号码",
             "cellphone.unique" => "手机号码已经被注册",
             "nick_name.between" => "昵称格式应该为1-20字符",
-            "password.between" => "密码长度应为6-20位"
+            "password.between" => "密码长度应为6-20位",
+            "phoneCode.required" => "手机验证码不能为空",
         ]);
 
         if ($validator->fails()) {
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        $checkPhoneCode = $this->sms->checkVerify($request->get("cellphone"), $request->get("phoneCode"));
+        if (!$checkPhoneCode) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "短信验证码错误");
         }
 
         $data = $request->only(["cellphone", "nick_name", "password", "recCode"]);
@@ -60,4 +70,23 @@ class RegisterController extends Controller
             parent::jsonReturn([], parent::CODE_FAIL, "注册失败");
     }
 
+    public function sendSms(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            "cellphone" => ["required", "regex:/^1[0-9]{10}$/", "unique:u_customer,cellphone"],
+        ], [
+            "cellphone.required" => "手机号不能为空",
+            "cellphone.regex" => "请填写正确的手机号码",
+            "cellphone.unique" => "该手机号已被注册",
+        ]);
+
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        $agentInfo = getAgent();
+        $ret = $this->sms->sendVerify($request->get("cellphone"), $agentInfo, "注册验证码");
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "发送成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, $this->sms->getErrorMsg() ?: "发送错误");
+    }
 }

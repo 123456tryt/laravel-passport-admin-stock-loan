@@ -3,15 +3,9 @@
 namespace App\Repositories;
 
 use App\Http\Model\CashFlow;
-use Prettus\Repository\Eloquent\BaseRepository;
 
-class AccountRepository extends BaseRepository
+class AccountRepository extends Base
 {
-    public function model()
-    {
-        return "App\\User";
-    }
-
     /**
      * 提现
      * @param $user

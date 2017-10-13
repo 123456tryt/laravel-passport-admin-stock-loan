@@ -3,21 +3,23 @@
 namespace App\Repositories;
 
 use App\Http\Model\Agent;
+use App\Http\Model\AgentEmpPercentageSetting;
 use App\Http\Model\MemberAgentRelation;
-use Prettus\Repository\Eloquent\BaseRepository;
+use App\Http\Model\MemberFeeRate;
 use App\Http\Model\RecCode;
 use Illuminate\Support\Facades\DB;
+use App\Http\Model\AgentPercentageSetting;
 
-class RegisterRepository extends BaseRepository
+class RegisterRepository extends Base
 {
     const CUSTOMER_TYPE_CODE = 0;   //客户
     const USER_TYPE_CODE = 1;   //员工
     const AGENT_TYPE_CODE = 2;  //代理
-
-    public function model()
-    {
-        return "App\\User";
-    }
+    const PERCENTAGE_TIANPEI_TYPE_CODE = 0;   //天配
+    const PERCENTAGE_YUEPEI_TYPE_CODE = 1;   //月配
+    const PERCENTAGE_FEE_TYPE_CODE = 2;   //手续费
+    const PERCENTAGE_LEVEL1_TYPE_CODE = 3;   //一级返佣
+    const PERCENTAGE_LEVEL2_TYPE_CODE = 4;   //二级返佣
 
     /**
      * 注册
@@ -31,9 +33,10 @@ class RegisterRepository extends BaseRepository
 
         $custId = $user->id;
         $recCode = $data["recCode"];
-        $directAgent = $this->setRelation($custId, $recCode);
+        $relationData = $this->setRelation($custId, $recCode);
+        $this->setFeeRate($relationData);
 
-        $this->setRecCode($user, $recCode, $directAgent);
+        $this->setRecCode($user, $recCode, $relationData["direct_agent_id"]);
 
         return true;
     }
@@ -85,7 +88,7 @@ class RegisterRepository extends BaseRepository
                         }
                     }
                     //假设一个用户只有一个上级用户时，这个用户是该用户的三级客户
-                    $custList = [$relationRecord->cust2, $relationRecord->cust3, $codeRecord->user_id];
+                    $custList = [$codeRecord->user_id, $relationRecord->cust1];
                     $emp = $relationRecord->direct_emp_id;
                 }
             } else if ($userType == self::USER_TYPE_CODE || $userType == self::AGENT_TYPE_CODE) {
@@ -114,8 +117,8 @@ class RegisterRepository extends BaseRepository
         $defaultAgent = getDefaultAgent();
         array_unshift($agentList, $defaultAgent ? $defaultAgent->id : 0);
         $directAgent = (int)end($agentList);
-        $directCust = (int)end($custList);
-        MemberAgentRelation::create([
+        $directCust = $custList[0] ?? 0;
+        $data = [
             "cust_id" => $custId,
             "direct_cust_id" => $directCust,
             "direct_agent_id" => $directAgent,
@@ -128,10 +131,88 @@ class RegisterRepository extends BaseRepository
             "belong_to_agent" => $directAgent,
             "cust1" => $custList[0] ?? 0,
             "cust2" => $custList[1] ?? 0,
-            "cust3" => $custList[2] ?? 0,
-        ]);
+        ];
+        MemberAgentRelation::create($data);
 
-        return $directAgent;
+        return $data;
+    }
+
+    /**
+     * @param $relation
+     */
+    private function setFeeRate($relation)
+    {
+        $relation = array_merge($relation, ["emp_id" => $relation["direct_emp_id"], "agent1_rate" => 100]);
+        $feeRate0 = $feeRate1 = $feeRate2 = $relation;
+        $feeRate0["type"] = 0;
+        $feeRate1["type"] = 1;
+        $feeRate2["type"] = 2;
+        //获取多个代理商分成设置记录
+        //todo 验证代理是否设置天配、月配、手续费
+        $agentPercentageSettings = AgentPercentageSetting::where(function ($query) use ($relation) {
+            for ($i = 1; $i < 5; $i++) {
+                $field = "agent" . $i;
+                if ($relation[$field] < 1) break;
+
+                $query->orWhere(["agent_id" => $field, "type" => self::PERCENTAGE_TIANPEI_TYPE_CODE])->
+                orWhere(["agent_id" => $field, "type" => self::PERCENTAGE_YUEPEI_TYPE_CODE])->
+                orWhere(["agent_id" => $field, "type" => self::PERCENTAGE_FEE_TYPE_CODE]);
+            }
+        })->get();
+        foreach ($agentPercentageSettings as $v) {
+            $type = $v->type;
+            $t = &${"feeRate" . $type};
+
+            for ($i = 1; $i < 5; $i++) {
+                if ($relation["agent{$i}"] == $v["agent_id"]) $level = $i;
+            }
+
+            if (isset($relation["agent" . ($i + 1)]) && $relation["agent" . ($i + 1)]) {
+                $t = array_merge($t, [
+                    "agent" . ($level + 1) . "_rate" => $v["percentage"],
+                ]);
+            }
+
+        }
+
+        //如果客户有推荐客户
+        if ($relation["cust1"]) {
+            $custPercentageSettings = AgentPercentageSetting::where("agent_id", $relation["direct_agent_id"])
+                ->where(function ($query) {
+                    $query->where("type", self::PERCENTAGE_LEVEL1_TYPE_CODE)
+                        ->orWhere("type", self::PERCENTAGE_LEVEL2_TYPE_CODE);
+                })->get();
+
+            foreach ($custPercentageSettings as $v) {
+                $type = $v->type;
+                if ($type == self::PERCENTAGE_LEVEL1_TYPE_CODE && $relation["cust1"]) {
+                    $feeRate0["cust1_rate"] = $feeRate1["cust1_rate"] = $feeRate2["cust1_rate"] = $v["percentage"];
+                } else if ($type == self::PERCENTAGE_LEVEL2_TYPE_CODE && $relation["cust1"]) {
+                    $feeRate0["cust2_rate"] = $feeRate1["cust2_rate"] = $feeRate2["cust2_rate"] = $v["percentage"];
+                }
+            }
+        }
+
+        //如果用户有推荐员工
+        if ($relation["direct_emp_id"]) {
+            $agentEmpPercentageSettings = AgentEmpPercentageSetting::where("user_id", $relation["direct_emp_id"])->
+            where(function ($query) {
+                $query->where("type", self::PERCENTAGE_TIANPEI_TYPE_CODE)->orWhere("type",
+                    self::PERCENTAGE_YUEPEI_TYPE_CODE)->orWhere("type", self::PERCENTAGE_FEE_TYPE_CODE);
+            })->get();
+
+            foreach ($agentEmpPercentageSettings as $v) {
+                $type = $v->type;
+                $t = &${"feeRate" . $type};
+                $t = array_merge($t, [
+                    "emp_rate" => $v["percentage"],
+                ]);
+            }
+        }
+
+        MemberFeeRate::create($feeRate0);
+        MemberFeeRate::create($feeRate1);
+        MemberFeeRate::create($feeRate2);
     }
 
     /**
@@ -154,8 +235,8 @@ class RegisterRepository extends BaseRepository
                 "cust_rec_code" => $code,
                 "rec_code" => $recCode,
                 "bar_code" => "",     //TODO:根据直属代理商公众号生成关注二维码
-                "pc_adv_url" => "",
-                "phone_adv_url" => "",
+                "pc_adv_url" => PC_SITE_URL . "/register.html?code={$recCode}",
+                "phone_adv_url" => PC_SITE_URL . "/register.html?code={$recCode}",
             ]);
         }
     }

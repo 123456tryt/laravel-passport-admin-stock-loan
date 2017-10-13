@@ -7,15 +7,10 @@ use Prettus\Repository\Eloquent\BaseRepository;
 use App\Http\Model\CustAccountFlow;
 use App\Http\Model\StockFinanceInterestPercentage;
 
-class ShareRepository extends BaseRepository
+class ShareRepository extends Base
 {
     const PROMOTION_TYPE = 8;
     const PAGE_SIZE = 15;
-
-    public function model()
-    {
-        return 'App\\User';
-    }
 
     /**
      * 获取推广统计

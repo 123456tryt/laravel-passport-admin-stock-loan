@@ -3,15 +3,9 @@
 namespace App\Repositories;
 
 use App\Http\Model\AgentExtraInfo;
-use Prettus\Repository\Eloquent\BaseRepository;
 
-class OthersRepository extends BaseRepository
+class OthersRepository extends Base
 {
-    public function model()
-    {
-        return 'App\\User';
-    }
-
     /**
      * 获取首页数据
      * @param $id

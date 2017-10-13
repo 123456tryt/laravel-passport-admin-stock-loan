@@ -23,6 +23,7 @@ Route::group([
     Route::post("/getIndexData", "Api\OthersController@getIndexData");
 
     Route::post("/register", "Api\RegisterController@register");
+    Route::post("/getRegisterSms", "Api\RegisterController@sendSms")->middleware("App\Http\Middleware\CaptchaCheck");
     Route::post("/login", "Api\LoginController@login");
     Route::post("/logout", "Api\LoginController@logout")->middleware("auth:api");
 
@@ -31,6 +32,7 @@ Route::group([
     Route::post("/createBankCard", "Api\UserDataController@storeBankCard");
     Route::post("/updateBankCard", "Api\UserDataController@updateBankCard");
     Route::post("/deleteBankCard", "Api\UserDataController@deleteBankCard");
+    Route::post("/getSms", "Api\UserDataController@sendSms")->middleware("App\Http\Middleware\CaptchaCheck");
 
     Route::post("/updateNickname", "Api\UserDataController@updateNickname");
 
@@ -48,4 +50,6 @@ Route::group([
     Route::post('/getShareCount', 'Api\ShareController@getShareCount');
     Route::post('/getPromotionUsers', 'Api\ShareController@getPromotionUsers');
     Route::post('/getPromotionPercentages', 'Api\ShareController@getPromotionPercentages');
+
+    Route::post('/getFundsDetails', 'Api\FundsDetailController@getFundsDetails');
 });

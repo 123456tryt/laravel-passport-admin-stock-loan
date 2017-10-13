@@ -2,16 +2,10 @@
 
 namespace App\Repositories;
 
-use Prettus\Repository\Eloquent\BaseRepository;
 use App\Http\Model\CustBankCard;
 
-class UserDataRepository extends BaseRepository
+class UserDataRepository extends Base
 {
-    public function model()
-    {
-        return "App\\User";
-    }
-
     public function getUserInfo($user)
     {
         $userInfo = [

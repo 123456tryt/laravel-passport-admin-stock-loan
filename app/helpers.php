@@ -87,3 +87,12 @@ if (!function_exists("getDefaultAgent")) {
         return $defaultAgent;
     }
 }
+
+if (!function_exists("getAgent")) {
+    function getAgent()
+    {
+        $host = request()->header("Host");
+        $ret = \App\Http\Model\AgentExtraInfo::where("web_domain", $host)->orWhere("mobile_domain", $host)->first();
+        return $ret;
+    }
+}

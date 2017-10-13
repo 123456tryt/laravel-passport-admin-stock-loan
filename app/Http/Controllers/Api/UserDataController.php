@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\SmsRepository;
 use Illuminate\Http\Request;
 use App\Repositories\UserDataRepository;
 
@@ -14,12 +15,14 @@ use App\Repositories\UserDataRepository;
 class UserDataController extends Controller
 {
     private $userData = null;
+    private $sms = null;
 
-    public function __construct(UserDataRepository $userData)
+    public function __construct(UserDataRepository $userData, SmsRepository $sms)
     {
         $this->middleware("auth:api");
 
         $this->userData = $userData;
+        $this->sms = $sms;
     }
 
     /**
@@ -222,6 +225,58 @@ class UserDataController extends Controller
             $request->get("withdraw_pw"));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
             parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
+    }
+
+    public function sendSms(Request $request)
+    {
+        $user = $request->user();
+        $agenInfo = getAgent();
+        $ret = $this->sms->sendVerify($user->cellphone, $agenInfo, "手机绑定、登录密码、找回提款密码");
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "发送成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, $this->sms->getErrorMsg() ?: "发送错误");
+    }
+
+    public function updatePhone(Request $request)
+    {
+        $user = $request->user();
+        $validator = \Validator::make($request->all(), [
+            "cellphone" => ["required", "regex:/^1[0-9]{10}$/", "unique:u_customer,cellphone"],
+            "oldPhoneCode" => "required",
+        ], [
+            "cellphone.required" => "手机号码不能为空",
+            "cellphone.regex" => "请填写正确的手机号码",
+            "cellphone.unique" => "新手机号码已经被注册",
+            "oldPhoneCode.required" => "原手机验证码不能为空",
+        ]);
+
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        if ($user->cellphone == $request->get("cellphone")) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "新手机号不能和原手机号一样");
+        }
+
+        if (!$this->sms->checkVerify($user->cellphone, $request->get("oldPhoneCode"))) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "原手机验证码错误");
+        }
+
+        if (!$this->sms->checkVerify($user->cellphone, $request->get("oldPhoneCode"))) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "手机验证码错误");
+        }
+
+//        $this->userData->updatePhone($user, $request->only([""]));
+
+    }
+
+    public function updatePassword()
+    {
+
+    }
+
+    public function getBackWithdrawPassword()
+    {
+
     }
 
     /**
