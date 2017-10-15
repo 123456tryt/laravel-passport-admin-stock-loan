@@ -56,5 +56,7 @@ Route::group([
     //代理商员工列表 分页 搜索员工
     Route::get("/employeeList", "Api\EmployeeController@list");
     Route::post("/employeeCreate", "Api\EmployeeController@create");
+    Route::post("/employeeInfo", "Api\EmployeeController@info");
+    Route::post("/employeeUpdate", "Api\EmployeeController@update");
 
 });
