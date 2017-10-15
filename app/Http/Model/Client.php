@@ -7,6 +7,6 @@ class Client extends Base
     protected $table = "u_customer";
 
     public $timestamps = false;
-    protected $fillable = ['key', 'agent_id', 'value'];
+    protected $guarded = ['id', 'created_time', 'updated_time'];
 
 }

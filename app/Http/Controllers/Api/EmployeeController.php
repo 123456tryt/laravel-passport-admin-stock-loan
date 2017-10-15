@@ -219,11 +219,5 @@ class EmployeeController extends Controller
         return self::jsonReturn($list);
     }
 
-    /**
-     * 修改代理商的管理员密码
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-
 
 }

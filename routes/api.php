@@ -59,4 +59,8 @@ Route::group([
     Route::post("/employeeInfo", "Api\EmployeeController@info");
     Route::post("/employeeUpdate", "Api\EmployeeController@update");
 
+
+    Route::get("/clientList", "Api\ClientController@list");
+
+
 });
