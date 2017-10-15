@@ -107,13 +107,25 @@ if (!function_exists("getDefaultAgent")) {
 }
 
 /**
- * 获取请求当前贴牌代理
+ * 获取请求当前代理
  */
 if (!function_exists("getAgent")) {
     function getAgent()
     {
-        $host = request()->header("Host");
-        $ret = \App\Http\Model\AgentExtraInfo::where("web_domain", $host)->orWhere("mobile_domain", $host)->first();
+        $user = request()->user();
+        $agentId = 0;
+        if ($user) {
+            $relation = \App\Http\Model\MemberAgentRelation::where("cust_id", $user->id)->first();
+            $agentId = $relation->direct_agent_id;
+        }
+
+        if ($agentId) {
+            $ret = \App\Http\Model\AgentExtraInfo::where("id", $agentId)->first();
+        } else {
+            $host = request()->header("Host");
+            $ret = \App\Http\Model\AgentExtraInfo::where("web_domain", $host)->orWhere("mobile_domain", $host)->first();
+        }
+
         return $ret;
     }
 }

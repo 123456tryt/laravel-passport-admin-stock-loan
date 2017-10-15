@@ -196,7 +196,7 @@ class RegisterRepository extends Base
 
         //如果用户有推荐员工
         if ($relation["direct_emp_id"]) {
-            $agentEmpPercentageSettings = AgentEmpPercentageSetting::where("user_id", $relation["direct_emp_id"])->
+            $agentEmpPercentageSettings = AgentEmpPercentageSetting::where("employee_id", $relation["direct_emp_id"])->
             where(function ($query) {
                 $query->where("type", self::PERCENTAGE_TIANPEI_TYPE_CODE)->orWhere("type",
                     self::PERCENTAGE_YUEPEI_TYPE_CODE)->orWhere("type", self::PERCENTAGE_FEE_TYPE_CODE);
