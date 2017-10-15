@@ -6,15 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Model\Agent;
 use App\Http\Model\AgentInfo;
 use App\Http\Model\AgentProfitRateConfig;
+use App\Http\Model\Employee;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class AgentController 代理商
+ * Class EmployeeController 代理商员工控制器
  * @package App\Http\Controllers\Api
  */
-class AgentController extends Controller
+class EmployeeController extends Controller
 {
     public function __construct()
     {
@@ -126,6 +127,7 @@ class AgentController extends Controller
      */
     public function search(Request $request)
     {
+
         $agent_name = $request->input('agent_name');
         $cacke_key = 'agent_search_list_' . $agent_name;
 
@@ -170,21 +172,21 @@ class AgentController extends Controller
 
 
     /**
-     * 代理商列表
+     * 代理商员工表
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function list(Request $request)
     {
         $page = $request->input('page', 1);
-        $agent_name = $request->input('agent_name');
+        $staff_name = $request->input('staff_name');
+        $agent_id = $request->input('agent_id');
+        $cacke_key = "employee_list_search_{$staff_name}_agent_id_{$agent_id}_page_{$page}";
 
-        $cacke_key = "agent_list__{$page}_search_{$agent_name}";
-
-        $list = \Cache::remember($cacke_key, 1, function () use ($agent_name) {
-            $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->limit(self::PAGE_SIZE);
-            if ($agent_name) {
-                $data = $query->where('agent_name', 'like', "%$agent_name%")->paginate(self::PAGE_SIZE);
+        $list = \Cache::remember($cacke_key, 1, function () use ($staff_name, $agent_id) {
+            $query = Employee::where(compact('agent_id'))->orderByDesc('updated_time')->limit(self::PAGE_SIZE);
+            if ($staff_name) {
+                $data = $query->where('employee_name', 'like', "%$staff_name%")->paginate(self::PAGE_SIZE);
             } else {
                 $data = $query->paginate(self::PAGE_SIZE);
             }
