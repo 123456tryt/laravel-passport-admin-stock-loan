@@ -155,8 +155,7 @@ class AgentController extends Controller
         $agent_id = $request->input('id');
         $basic = Agent::find($agent_id);
         //代理商配置信息s
-        $employee_id = 0;
-        $configs = AgentProfitRateConfig::where(compact('agent_id', 'employee_id'))->get();
+        $configs = AgentProfitRateConfig::where(compact('agent_id'))->get();
 
         //代理商附加信息
         $info = AgentInfo::firstOrNew(['id' => $agent_id]);
