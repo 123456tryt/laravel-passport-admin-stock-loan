@@ -67,4 +67,8 @@ Route::group([
     Route::post("/clientFlowAdd", "Api\ClientFlowController@add");
 
 
+    //ClientBankCardController
+    Route::get("/bankCardList", "Api\ClientBankCardController@list");
+    Route::post("/bankCardUpdate", "Api\ClientBankCardController@update");
+
 });
