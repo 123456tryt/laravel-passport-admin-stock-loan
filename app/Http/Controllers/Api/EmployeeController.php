@@ -202,12 +202,15 @@ class EmployeeController extends Controller
     public function list(Request $request)
     {
         $page = $request->input('page', 1);
-        $staff_name = $request->input('staff_name');
-        $agent_id = $request->input('agent_id');
+        $staff_name = $request->input('employee_name');
+        $agent_id = $request->agent_id;
         $cacke_key = "employee_list_search_{$staff_name}_agent_id_{$agent_id}_page_{$page}";
 
         $list = \Cache::remember($cacke_key, 1, function () use ($staff_name, $agent_id) {
-            $query = Employee::where(compact('agent_id'))->orderByDesc('updated_time')->limit(self::PAGE_SIZE);
+            $query = Employee::orderByDesc('updated_time')->limit(self::PAGE_SIZE);
+            if ($agent_id) {
+                $query->where(compact('agent_id'));
+            }
             if ($staff_name) {
                 $data = $query->where('employee_name', 'like', "%$staff_name%")->paginate(self::PAGE_SIZE);
             } else {
