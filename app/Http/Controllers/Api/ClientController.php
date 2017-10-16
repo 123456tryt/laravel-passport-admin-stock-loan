@@ -44,4 +44,18 @@ class ClientController extends Controller
         return self::jsonReturn($list);
     }
 
+    public function info(Request $request)
+    {
+        $client = Client::find($request->id);
+        return self::jsonReturn($client);
+    }
+
+    public function update(Request $request)
+    {
+        $client = Client::find($request->id)
+            ->fill($request->only('is_login_forbidden', 'is_cash_forbidden', 'is_charge_forbidden', 'is_stock_finance_forbidden'));
+        $client->save();
+        return self::jsonReturn($client, self::CODE_SUCCESS, '修改客户成功');
+    }
+
 }

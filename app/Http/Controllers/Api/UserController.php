@@ -16,7 +16,11 @@ class UserController extends Controller
     public function info()
     {
         $user = Auth::user();
-        return $user;
+        $user->agent;
+        $navs = [
+
+        ];
+        return compact('user', 'navs');
     }
 
 

@@ -21,7 +21,7 @@ Route::group([
     Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");
 
     //根据不同认证的用户来获取菜单
-    Route::post("/navMenus", "Api\NavMenuController@getMenu");
+    Route::post("/navMenus", "Api\NavMenuController@getMenu");//合并到用户信息里面去
     Route::post("/userInfo", "Api\UserController@info");
 
 
@@ -61,6 +61,8 @@ Route::group([
 
 
     Route::get("/clientList", "Api\ClientController@list");
+    Route::post("/clientInfo", "Api\ClientController@info");
+    Route::post("/clientUpdate", "Api\ClientController@update");
 
 
 });
