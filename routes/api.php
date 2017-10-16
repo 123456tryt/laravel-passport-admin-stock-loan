@@ -61,8 +61,10 @@ Route::group([
 
 
     Route::get("/clientList", "Api\ClientController@list");
-    Route::post("/clientInfo", "Api\ClientController@info");
     Route::post("/clientUpdate", "Api\ClientController@update");
+
+
+    Route::post("/clientFlowAdd", "Api\ClientFlowController@add");
 
 
 });
