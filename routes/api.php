@@ -51,6 +51,7 @@ Route::group([
 
     Route::post('/withdraw', 'Api\AccountController@withdraw');
     Route::post('/withdrawRecord', 'Api\AccountController@withdrawRecord');
+    Route::post('/checkBackWithdraw', 'Api\AccountController@checkBackWithdraw');
 
     Route::post('/getShareCount', 'Api\ShareController@getShareCount');
     Route::post('/getPromotionUsers', 'Api\ShareController@getPromotionUsers');

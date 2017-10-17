@@ -40,12 +40,18 @@ class User extends Authenticatable
     ];
 
     //自定义passport 登陆用户名 id 可以改成其他字段
-    public function findForPassport($username) {
+    public function findForPassport($username)
+    {
         return $this->where(CUSTOMER_USERNAME_FIELD, $username)->first();
     }
 
     public function validateForPassportPasswordGrant($password)
     {
         return encryptPassword($password) == $this->password;
+    }
+
+    public function bankCard()
+    {
+        return $this->hasMany('App\Http\Model\CustBankCard', 'cust_id');
     }
 }

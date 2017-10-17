@@ -8,6 +8,7 @@ class CashFlow extends Base
 {
     protected $table = 'u_cust_cash_flow';
 
-    protected $fillable = ["cust_id", "cash_amount", "apply_time", "cash_status", "cust_remark", "bankcard_id"];
+    protected $fillable = ["cust_id", "cash_amount", "apply_time", "cash_status", "cust_remark",
+        "bankcard_id", "bank_card"];
 
 }

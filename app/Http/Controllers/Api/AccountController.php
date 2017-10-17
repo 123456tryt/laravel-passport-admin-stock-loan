@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Model\CustBankCard;
 use Illuminate\Http\Request;
 use App\Repositories\AccountRepository;
 
@@ -72,5 +73,29 @@ class AccountController extends Controller
         $ret = $this->account->withdrawRecord($request->user());
         return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
             parent::jsonReturn([], parent::CODE_FAIL, "查询失败");
+    }
+
+    /**
+     * 撤回提现
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkBackWithdraw(Request $request)
+    {
+        $user = $request->user();
+        $validator = \Validator::make($request->all(), [
+            "id" => "required|min:1|integer"
+        ], [
+            "id.require" => "id错误",
+            "id.min" => "id错误",
+        ]);
+
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        $ret = $this->account->checkBackWithdraw($user, $request->get("id"));
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "撤销成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, '撤销失败');
     }
 }

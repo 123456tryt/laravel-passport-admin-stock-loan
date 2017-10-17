@@ -19,7 +19,7 @@ class Feige
     public function __construct($config = null)
     {
         $this->defaultSmsConfig = array_merge($this->defaultSmsConfig,
-            is_array($config) && $config["account"] ? $config : []);
+            is_array($config) && isset($config["account"]) && $config["account"] ? $config : []);
     }
 
     public function sendTemplate($phone, $content)

@@ -10,7 +10,7 @@ class FundsDetailRepository extends Base
 
     static public $fundsDetailsTypeList = [
         "全部" => [],
-        "充值提款" => [0, 1, 2],
+        "充值提款" => [0, 1, 2, 9, 10],
         "借款明细" => [3, 5, 7],
         "服务费明细" => [4],
         "利润提取" => [6]

@@ -10,6 +10,7 @@ class UserDataRepository extends Base
     {
         $userInfo = [
             "cust_id" => $user->id,
+            "cellphone" => $user->cellphone,
             "nick_name" => $user->nick_name,
             "has_set_withdraw_password" => $user->withdraw_pw ? 1 : 0,
             "real_name" => $user->real_name,
@@ -23,8 +24,10 @@ class UserDataRepository extends Base
             "is_stock_finance_forbidden" => $user->is_stock_finance_forbidden,
         ];
 
-        //TODO 根据需求新增
+        $bankCards = $user->bankCard()->get()->toArray();
+        $userInfo["bankCards"] = $bankCards;
 
+        //TODO 根据需求新增
         return $userInfo;
     }
 
