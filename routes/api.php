@@ -71,4 +71,8 @@ Route::group([
     Route::get("/bankCardList", "Api\ClientBankCardController@list");
     Route::post("/bankCardUpdate", "Api\ClientBankCardController@update");
 
+
+    Route::get("/withdrawList", "Api\ClientWithdrawController@list");
+    Route::post("/withdrawUpdate", "Api\ClientWithdrawController@update");
+
 });
