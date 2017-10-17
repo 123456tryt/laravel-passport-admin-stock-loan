@@ -49,10 +49,14 @@ class ClientBankCardController extends Controller
 
     public function update(Request $request)
     {
-        $client = ClientBankCard::find($request->id)
-            ->fill($request->only('is_login_forbidden', 'is_cash_forbidden', 'is_charge_forbidden', 'is_stock_finance_forbidden'));
-        $client->save();
-        return self::jsonReturn($client, self::CODE_SUCCESS, '修改客户成功');
+        $cardInfo = ClientBankCard::find($request->id)
+            ->fill($request->only([
+                'is_cash_bankcard',
+                'is_open_netbank',
+                'bank_name', 'bank_card', 'open_bank', 'open_district', 'open_province', 'bank_reg_cellphone'
+            ]));
+        $cardInfo->save();
+        return self::jsonReturn($cardInfo, self::CODE_SUCCESS, '修改客户成功');
     }
 
 }

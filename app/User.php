@@ -33,6 +33,11 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
+ * @property int|null $employee_id 员工ID(0)代表超级代理商
+ * @property string|null $real_name 员工姓名【emp_name】
+ * @property-read \App\Http\Model\Agent|null $agent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRealName($value)
  */
 class User extends Authenticatable
 {
