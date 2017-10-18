@@ -22,6 +22,7 @@ class UserDataRepository extends Base
             "is_cash_forbidden" => $user->is_cash_forbidden,
             "is_charge_forbidden" => $user->is_charge_forbidden,
             "is_stock_finance_forbidden" => $user->is_stock_finance_forbidden,
+            "avatar" => $user->avatar
         ];
 
         $bankCards = $user->bankCard()->get()->toArray();
@@ -151,7 +152,7 @@ class UserDataRepository extends Base
      */
     public function updateWithdrawPassword($user, $oldWithdrawPassword, $withDrawPassword)
     {
-        if ($user->withdraw_pw != $oldWithdrawPassword) {
+        if ($user->withdraw_pw != encryptPassword($oldWithdrawPassword)) {
             return false;
         }
 
@@ -189,5 +190,16 @@ class UserDataRepository extends Base
     public function getBackWithdrawPassword($user, $password)
     {
         return $user->update(["withdraw_pw" => encryptPassword($password)]);
+    }
+
+    /**
+     * 头像上传
+     * @param $user
+     * @param $avatarUrl
+     * @return mixed
+     */
+    public function uploadAvatar($user, $avatarUrl)
+    {
+        return $user->update(["avatar" => $avatarUrl]);
     }
 }

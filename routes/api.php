@@ -38,10 +38,9 @@ Route::group([
     Route::post("/updatePassword", "Api\UserDataController@updatePassword");
     Route::post("/getBackWithdrawPassword", "Api\UserDataController@getBackWithdrawPassword");
     Route::post("/getSms", "Api\UserDataController@sendSms")->middleware("App\Http\Middleware\CaptchaCheck");
-
     Route::post("/updateNickname", "Api\UserDataController@updateNickname");
-
     Route::post("/createCertification", "Api\UserDataController@storeCetification");
+    Route::post("/uploadAvatar", "Api\UserDataController@uploadAvatar");
 
     Route::post("/createWithdrawPassword", "Api\UserDataController@storeWithdrawPassword");
     Route::post("/updateWithdrawPassword", "Api\UserDataController@updateWithdrawPassword");

@@ -341,4 +341,39 @@ class UserDataController extends Controller
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "找回成功") :
             parent::jsonReturn([], parent::CODE_FAIL, "找回失败");
     }
+
+    /**
+     * 头像上传
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadAvatar(Request $request)
+    {
+        $user = $request->user();
+        if ($request->isMethod('post')) {
+            $file = $request->file('avatar');
+            // 文件是否上传成功
+            if ($file && $file->isValid()) {
+                // 获取文件相关信息
+                $originalName = $file->getClientOriginalName(); // 文件原名
+                $ext = $file->getClientOriginalExtension();     // 扩展名
+                $realPath = $file->getRealPath();   //临时文件的绝对路径
+                $type = $file->getClientMimeType();     // image/jpeg
+
+                // 上传文件
+                $filename = date('Y-m-d-H-i-s') . '-' . uniqid() . '.' . $ext;
+                // 使用我们新建的uploads本地存储空间（目录）
+                $bool = \Storage::disk('uploads')->put($filename, file_get_contents($realPath));
+
+                if ($bool) {
+                    $avatarUrl = PC_SITE_URL . "storage/uploads/{$filename}";
+                    $ret = $this->userData->uploadAvatar($user, $avatarUrl);
+                    return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "上传成功") :
+                        parent::jsonReturn([], parent::CODE_FAIL, "上传失败");
+                }
+            }
+        }
+
+        return parent::jsonReturn([], parent::CODE_FAIL, "上传失败");
+    }
 }
