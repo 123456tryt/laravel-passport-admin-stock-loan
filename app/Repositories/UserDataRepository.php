@@ -20,6 +20,7 @@ class UserDataRepository extends Base
             "phone_adv_url" => $user->phone_adv_url,
             "cust_capital_amount" => $user->cust_capital_amount,
             "is_cash_forbidden" => $user->is_cash_forbidden,
+            "is_login_forbidden" => $user->is_login_forbidden,
             "is_charge_forbidden" => $user->is_charge_forbidden,
             "is_stock_finance_forbidden" => $user->is_stock_finance_forbidden,
             "avatar" => $user->avatar

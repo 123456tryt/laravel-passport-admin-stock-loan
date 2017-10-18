@@ -42,6 +42,8 @@ Route::group([
     Route::post("/createCertification", "Api\UserDataController@storeCetification");
     Route::post("/uploadAvatar", "Api\UserDataController@uploadAvatar");
 
+    Route::post("/offlineTransfer", "Api\RechargeController@offlineTransfer");
+
     Route::post("/createWithdrawPassword", "Api\UserDataController@storeWithdrawPassword");
     Route::post("/updateWithdrawPassword", "Api\UserDataController@updateWithdrawPassword");
 
@@ -51,6 +53,7 @@ Route::group([
     Route::post('/withdraw', 'Api\AccountController@withdraw');
     Route::post('/withdrawRecord', 'Api\AccountController@withdrawRecord');
     Route::post('/checkBackWithdraw', 'Api\AccountController@checkBackWithdraw');
+    Route::post('/getAccountCount', 'Api\AccountController@getCount');
 
     Route::post('/getShareCount', 'Api\ShareController@getShareCount');
     Route::post('/getPromotionUsers', 'Api\ShareController@getPromotionUsers');

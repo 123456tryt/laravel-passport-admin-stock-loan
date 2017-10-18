@@ -337,7 +337,7 @@ class UserDataController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, "手机验证码错误");
         }
 
-        $ret = $this->userData->getBackWithdrawPassword($user, $request->get("password"));
+        $ret = $this->userData->getBackWithdrawPassword($user, $request->get("withdraw_pw"));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "找回成功") :
             parent::jsonReturn([], parent::CODE_FAIL, "找回失败");
     }

@@ -22,6 +22,7 @@ class ShareRepository extends Base
         $data = [];
         $data["promotionMoneyCount"] = CustAccountFlow::where("cust_id", $user->id)->
         where("flow_type", self::PROMOTION_TYPE)->sum("amount_of_account");
+        $data["promotionMoneyCount"] = sprintf("%.2f", $data["promotionMoneyCount"]);
 
         //TODO:假设一级推荐人为最近的
         $data["promotionUserCount"] = MemberAgentRelation::where("cust2", $user->id)->

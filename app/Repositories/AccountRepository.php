@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Http\Model\CashFlow;
 use App\Http\Model\CustBankCard;
+use App\Http\Model\StockFinancing;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
 
@@ -79,5 +80,33 @@ class AccountRepository extends Base
             DB::rollback();
             return false;
         }
+    }
+
+    public function getCount($user)
+    {
+        $data = [
+            "cash" => $user->cust_capital_amount,
+            "freeze_cash" => 0.00,
+            "securitiesNetWorth" => 0,
+        ];
+
+        $list = StockFinancing::where("cust_id", $user->id)->whereIn("status", [1, 2, 3])->get();
+        foreach ($list as $v) {
+            $data["securitiesNetWorth"] += (float)$v->init_caution_money + (float)$v->post_finance_caution_money +
+                (float)$v->post_add_caution_money;
+        }
+
+        $totalAssets = $data["cash"] + $data["securitiesNetWorth"];
+        $data = $data + [
+                "totalAssets" => $totalAssets,
+                "securitiesNetWorthRate" => $data["securitiesNetWorth"] / $totalAssets * 100,
+                "cashRate" => $user->cust_capital_amount / $totalAssets * 100,
+            ];
+
+        foreach ($data as $k => $v) {
+            $data[$k] = sprintf("%.2f", $v);
+        }
+
+        return $data;
     }
 }

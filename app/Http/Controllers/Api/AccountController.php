@@ -57,6 +57,10 @@ class AccountController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, '提款金额不能大于用户余额');
         }
 
+        if (!$user->real_name || !$user->id_card) {
+            return parent::jsonReturn([], parent::CODE_FAIL, '请先实名认证才能提现');
+        }
+
         $ret = $this->account->withDraw($user, $request->only(['cash_amount', 'bankcard_id',
             'withdraw_pw', 'cust_remark']));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "提交成功") :
@@ -97,5 +101,13 @@ class AccountController extends Controller
         $ret = $this->account->checkBackWithdraw($user, $request->get("id"));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "撤销成功") :
             parent::jsonReturn([], parent::CODE_FAIL, '撤销失败');
+    }
+
+    public function getCount(Request $request)
+    {
+        $user = $request->user();
+        $ret = $this->account->getCount($user);
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "获取成功") :
+            parent::jsonReturn([], parent::CODE_FAIL, '获取失败');
     }
 }
