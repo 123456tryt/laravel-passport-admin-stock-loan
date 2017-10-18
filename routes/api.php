@@ -76,4 +76,8 @@ Route::group([
     Route::post("/getSystemAgentConfigs", "Api\SystemController@agentConfigs");
     Route::post("/updateSystemAgentConfigs", "Api\SystemController@agentConfigsUpdate");
 
+
+    Route::post("/stockFeeList", "Api\StockFeeConfigController@list");
+    Route::post("/stockFeeUpdateOrCreate", "Api\StockFeeConfigController@updateOrCreate");
+
 });
