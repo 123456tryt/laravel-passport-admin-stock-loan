@@ -3,7 +3,7 @@
 namespace App\Http\Model;
 
 /**
- * App\Http\Model\SysConfig
+ * App\Http\Model\SystemConfigConfig
  *
  * @property int $id 主键【id】
  * @property int|null $agent_id 代理商ID (agent_id + key)唯一 agent_id=1 代表默认配置
@@ -23,11 +23,11 @@ namespace App\Http\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Http\Model\SysConfig whereValue($value)
  * @mixin \Eloquent
  */
-class SysConfig extends Base
+class SystemConfigConfig extends Base
 {
     protected $table = "s_system_params";
 
     public $timestamps = false;
-    protected $fillable = ['key', 'agent_id', 'value'];
+    protected $guards = ['id'];
 
 }

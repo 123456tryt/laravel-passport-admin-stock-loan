@@ -19,9 +19,7 @@ Route::group([
 
     Route::post("/createCaptcha", "Api\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Api\CaptchaController@verifyCaptcha");
-
-    //根据不同认证的用户来获取菜单
-    Route::post("/navMenus", "Api\NavMenuController@getMenu");//合并到用户信息里面去
+    //获取认证用户信息
     Route::post("/userInfo", "Api\UserController@info");
 
 
@@ -74,5 +72,8 @@ Route::group([
 
     Route::get("/withdrawList", "Api\ClientWithdrawController@list");
     Route::post("/withdrawUpdate", "Api\ClientWithdrawController@update");
+
+    Route::post("/getSystemAgentConfigs", "Api\SystemController@agentConfigs");
+    Route::post("/updateSystemAgentConfigs", "Api\SystemController@agentConfigsUpdate");
 
 });
