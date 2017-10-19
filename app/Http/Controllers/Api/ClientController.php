@@ -37,7 +37,7 @@ class ClientController extends Controller
         $cacke_key = "client_search={$keyword}_agentID_{$agent_id}_page_{$page}";
 
         $list = \Cache::remember($cacke_key, 1, function () use ($keyword, $agent_id) {
-            $query = Client::orderByDesc('updated_time');
+            $query = Client::orderByDesc('updated_time')->with('relation');
             if ($keyword) {
                 $query = $query->orWhere('nick_name', 'like', "%$keyword%")
                     ->orWhere('cellphone', 'like', "%$keyword%")
