@@ -42,6 +42,7 @@ namespace App\Http\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Http\Model\Agent whereRemark($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Http\Model\Agent whereUpdatedTime($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Http\Model\Employee[] $employees
  */
 class Agent extends Base
 {
@@ -59,5 +60,9 @@ class Agent extends Base
         return $this->hasMany('App\User', 'agent_id', 'id');
     }
 
+    public function employees()
+    {
 
+        return $this->hasMany('\App\Http\Model\Employee', 'agent_id', 'id');
+    }
 }

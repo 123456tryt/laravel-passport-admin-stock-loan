@@ -172,4 +172,11 @@ class ClientController extends Controller
 
     }
 
+
+    public function getSwapClientHeritSelectorList(Request $request)
+    {
+        $agent_list = Agent::where(['is_locked' => 0])->with('employees')->get();
+        return parent::jsonReturn($agent_list);
+    }
+
 }

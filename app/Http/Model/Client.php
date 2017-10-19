@@ -52,6 +52,8 @@ namespace App\Http\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Http\Model\Client whereUpdatedTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Http\Model\Client whereWithdrawPw($value)
  * @mixin \Eloquent
+ * @property string|null $avatar 用户头像
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Http\Model\Client whereAvatar($value)
  */
 class Client extends Base
 {

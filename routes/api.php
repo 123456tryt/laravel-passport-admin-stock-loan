@@ -60,7 +60,8 @@ Route::group([
 
     Route::get("/clientList", "Api\ClientController@list");
     Route::post("/clientUpdate", "Api\ClientController@update");
-
+    //getSwapClientHeritSelectorList
+    Route::post("/agentEmployeeSelectorList", "Api\ClientController@getSwapClientHeritSelectorList");
 
     Route::post("/clientFlowAdd", "Api\ClientFlowController@add");
 
