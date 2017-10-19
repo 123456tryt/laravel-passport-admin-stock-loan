@@ -8,9 +8,9 @@ use App\Http\Model\Agent;
  * 创建推荐码
  */
 if (!function_exists("createRecCode")) {
-    function createRecCode($length = 10)
+    function createRecCode($length = 6)
     {
-        $str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $str = "0123456789";
         $count = strlen($str);
 
         $code = "";
@@ -127,5 +127,13 @@ if (!function_exists("getAgent")) {
         }
 
         return $ret;
+    }
+}
+
+if (!function_exists("half_replace")) {
+    function half_replace($str)
+    {
+        $len = strlen($str) / 2;
+        return substr_replace($str, str_repeat('*', $len), ceil(($len) / 2), $len);
     }
 }

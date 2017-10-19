@@ -129,7 +129,7 @@ class RegisterRepository extends Base
             "agent4" => $agentList[3] ?? 0,
             "agent5" => $agentList[4] ?? 0,
             "direct_emp_id" => $emp,
-            "belong_to_agent" => $directAgent,
+            "belong_to_agent" => $directAgent && $emp ? $directAgent : 0,
             "cust1" => $custList[0] ?? 0,
             "cust2" => $custList[1] ?? 0,
         ];
@@ -244,8 +244,8 @@ class RegisterRepository extends Base
                 "cust_rec_code" => $code,
                 "rec_code" => $recCode,
                 "bar_code" => "",     //TODO:根据直属代理商公众号生成关注二维码
-                "pc_adv_url" => PC_SITE_URL . "/register.html?code={$recCode}",
-                "phone_adv_url" => PC_SITE_URL . "/register.html?code={$recCode}",
+                "pc_adv_url" => FONT_END_URL . "#/register?code={$recCode}",
+                "phone_adv_url" => FONT_END_URL . "#/register?code={$recCode}",
             ]);
         }
     }

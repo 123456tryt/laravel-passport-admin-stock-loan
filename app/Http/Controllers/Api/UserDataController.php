@@ -69,14 +69,20 @@ class UserDataController extends Controller
         $validator = \Validator::make($request->all(), [
             "bank_card" => "required|between:16,19",
             "bank_name" => "required|between:1,30",
-            "bank_reg_cellphone" => ["required", "regex:/^1[0-9]{10}$/"],
+            "open_province" => "required|min:1",
+            "open_district" => "required|min:1",
+            "open_bank" => "required|min:1",
         ], [
             "bank_card.required" => "银行卡号不能为空",
             "bank_name.required" => "银行名不能为空",
-            "bank_reg_cellphone.required" => "银行预留手机号不能为空",
             "bank_card.between" => "请填写正确的银行卡号",
             "bank_name.between" => "请填写正确的银行名称",
-            "bank_reg_cellphone.regex" => "请填写正确的银行预留手机号"
+            "open_province.required" => "开户所在省不能为空",
+            "open_province.min" => "开户所在省不能为空",
+            "open_district.required" => "开户所在市不能为空",
+            "open_district.min" => "开户所在市不能为空",
+            "open_bank.required" => "分行信息不能为空",
+            "open_bank.min" => "分行信息不能为空",
         ]);
 
         if ($validator->fails()) {
@@ -97,14 +103,20 @@ class UserDataController extends Controller
         $validator = \Validator::make($request->all(), [
             "bank_card" => "required|between:16,19",
             "bank_name" => "required|between:1,30",
-            "bank_reg_cellphone" => ["required", "regex:/^1[0-9]{10}$/"],
+            "open_province" => "required|min:1",
+            "open_district" => "required|min:1",
+            "open_bank" => "required|min:1",
         ], [
             "bank_card.required" => "银行卡号不能为空",
             "bank_name.required" => "银行名不能为空",
-            "bank_reg_cellphone.required" => "银行预留手机号不能为空",
             "bank_card.between" => "请填写正确的银行卡号",
             "bank_name.between" => "请填写正确的银行名称",
-            "bank_reg_cellphone.regex" => "请填写正确的银行预留手机号"
+            "open_province.required" => "开户所在省不能为空",
+            "open_province.min" => "开户所在省不能为空",
+            "open_district.required" => "开户所在市不能为空",
+            "open_district.min" => "开户所在市不能为空",
+            "open_bank.required" => "分行信息不能为空",
+            "open_bank.min" => "分行信息不能为空",
         ]);
 
         if ($validator->fails()) {
@@ -237,7 +249,7 @@ class UserDataController extends Controller
         $user = $request->user();
         $agenInfo = getAgent();
         $ret = $this->sms->sendVerify($user->cellphone, $agenInfo, "手机绑定、登录密码、找回提款密码");
-        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "发送成功") :
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "短信验证码获取成功") :
             parent::jsonReturn([], parent::CODE_FAIL, $this->sms->getErrorMsg() ?: "发送错误");
     }
 

@@ -125,7 +125,7 @@ class RegisterController extends Controller
 
         $agentInfo = getAgent();
         $ret = $this->sms->sendVerify($request->get("cellphone"), $agentInfo, "注册验证码、找回密码验证码");
-        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "发送成功") :
+        return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "短信验证码获取成功") :
             parent::jsonReturn([], parent::CODE_FAIL, $this->sms->getErrorMsg() ?: "发送错误");
     }
 

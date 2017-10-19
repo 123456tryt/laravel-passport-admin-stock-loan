@@ -10,7 +10,7 @@ class UserDataRepository extends Base
     {
         $userInfo = [
             "cust_id" => $user->id,
-            "cellphone" => $user->cellphone,
+            "cellphone" => half_replace($user->cellphone),
             "nick_name" => $user->nick_name,
             "has_set_withdraw_password" => $user->withdraw_pw ? 1 : 0,
             "real_name" => $user->real_name,
@@ -18,7 +18,7 @@ class UserDataRepository extends Base
             "bar_code" => $user->bar_code,
             "pc_adv_url" => $user->pc_adv_url,
             "phone_adv_url" => $user->phone_adv_url,
-            "cust_capital_amount" => $user->cust_capital_amount,
+            "cust_capital_amount" => sprintf("%.2f", $user->cust_capital_amount),
             "is_cash_forbidden" => $user->is_cash_forbidden,
             "is_login_forbidden" => $user->is_login_forbidden,
             "is_charge_forbidden" => $user->is_charge_forbidden,
@@ -27,6 +27,9 @@ class UserDataRepository extends Base
         ];
 
         $bankCards = $user->bankCard()->get()->toArray();
+        array_walk($bankCards, function ($v, $k) use (&$bankCards) {
+            $bankCards[$k]["bank_card"] = half_replace($v["bank_card"]);
+        });
         $userInfo["bankCards"] = $bankCards;
 
         //TODO 根据需求新增

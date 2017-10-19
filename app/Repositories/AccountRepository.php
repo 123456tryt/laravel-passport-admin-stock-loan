@@ -50,7 +50,13 @@ class AccountRepository extends Base
     {
         $ret = CashFlow::where('cust_id', $user->id)->orderBy("apply_time", "desc")
             ->get(['id', 'cash_amount', 'created_time', 'cash_status', "bank_card"]);
-        return $ret ? $ret->toArray() : false;
+        if ($ret) {
+            $ret = $ret->toArray();
+            array_walk($ret, function ($v, $k) use (&$ret) {
+                $ret[$k]["bank_card"] = half_replace($v["bank_card"]);
+            });
+        }
+        return $ret;
     }
 
     /**
@@ -97,11 +103,12 @@ class AccountRepository extends Base
         }
 
         $totalAssets = $data["cash"] + $data["securitiesNetWorth"];
-        $data = $data + [
+        $t = $totalAssets == 0 ? 1 : $totalAssets;
+        $data = array_merge($data, [
                 "totalAssets" => $totalAssets,
-                "securitiesNetWorthRate" => $data["securitiesNetWorth"] / $totalAssets * 100,
-                "cashRate" => $user->cust_capital_amount / $totalAssets * 100,
-            ];
+            "securitiesNetWorthRate" => $data["securitiesNetWorth"] / $t * 100,
+            "cashRate" => $user->cust_capital_amount / $t * 100,
+        ]);
 
         foreach ($data as $k => $v) {
             $data[$k] = sprintf("%.2f", $v);

@@ -45,8 +45,9 @@ class ShareRepository extends Base
         foreach ($custs as $cust) {
             $cust = $cust->cust;
             if ($cust) {
-                $data[] = ["nickname" => $cust->nick_name, "cellphone" => $cust->cellphone,
-                    "registerTime" => $cust->created_time];
+                $time = ((array)$cust->created_time)["date"];
+                $data[] = ["nickname" => half_replace($cust->nick_name), "cellphone" => half_replace($cust->cellphone),
+                    "registerTime" => substr($time, 0, strpos($time, "."))];
             }
         }
         $paginate = $paginate->toArray();
