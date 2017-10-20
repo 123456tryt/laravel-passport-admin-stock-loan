@@ -71,15 +71,6 @@ class ClientController extends Controller
         $direct_agent_id = $request->input('swapAgentId');
         $direct_employee_id = $request->input('swapEmployeeId', 0);
 
-        //a.检验代理商和员工关系是否合法
-        $employee = null;
-        if ($direct_employee_id) {
-            $employee = Employee::where(['id' => $direct_agent_id, 'agent_id' => $direct_agent_id, 'is_forbid' => 0])->first();
-        }
-        if (!$employee && $direct_employee_id) {
-            return parent::jsonReturn([], parent::CODE_FAIL, '员工不属于这个代理商或员工已被禁用');
-        }
-        $ghost_client_id = 1;
 
         $clientRelation = ClientAgentEmployeeRelation::where(['id' => $client_relation_id, 'cust_id' => $client_id])->first();
         //清空之前代理商的关系
@@ -101,21 +92,11 @@ class ClientController extends Controller
             $breaker++;//保险起见 防止无限递归
         }
         //填充直属代理商
-        $clientRelation->direct_cust_id = $direct_agent_id;
+        $clientRelation->direct_agent_id = $direct_agent_id;
 
-        if ($clientRelation->cust1) {
-            $clientRelation->cust1 = $ghost_client_id;
-        }
 
-        if ($clientRelation->cust2) {
-            $clientRelation->cust2 = $ghost_client_id;
-        }
-
-        if ($clientRelation->cust3) {
-            $clientRelation->cust3 = $ghost_client_id;
-        }
-
-        //填充员工直属代理商
+        //a.检验代理商和员工关系是否合法
+        $employee = Employee::where(['id' => $direct_employee_id, 'agent_id' => $direct_agent_id, 'is_forbid' => 0])->first();
         if ($employee) {
             $clientRelation->belong_to_agent = $employee->agent_id;
             $clientRelation->direct_emp_id = $employee->id;
@@ -123,6 +104,20 @@ class ClientController extends Controller
             $clientRelation->belong_to_agent = null;
             $clientRelation->direct_emp_id = null;
         }
+
+        //客户关系全部都提换成僵尸客户
+        $ghost_client_id = 1;
+        $clientRelation->direct_cust_id = $ghost_client_id;
+        if ($clientRelation->cust1) {
+            $clientRelation->cust1 = $ghost_client_id;
+        }
+        if ($clientRelation->cust2) {
+            $clientRelation->cust2 = $ghost_client_id;
+        }
+        if ($clientRelation->cust3) {
+            $clientRelation->cust3 = $ghost_client_id;
+        }
+
 //        DB::beginTransaction();
 //        try {
             /**
@@ -130,7 +125,7 @@ class ClientController extends Controller
              */
             //一个客户产生3分成数据
             //分成比例设置
-            foreach ([1, 2, 3] as $type) {
+        foreach ([0, 1, 2] as $type) {
                 $feeRate = ClientFeeRate::firstOrNew(['cust_id' => $client_id, 'type' => $type]);
                 //遍历1~5级代理并设置分成
                 foreach ([1, 2, 3, 4, 5] as $level) {
