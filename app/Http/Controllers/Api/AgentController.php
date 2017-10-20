@@ -295,20 +295,22 @@ class AgentController extends Controller
             $id = $request->input('day_id');
             $type = 0;
             $percentage = $request->input('day_percentage');
+            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrInsert(compact('agent_id', 'id', 'type'), compact('percentage'));
 
             $id = $request->input('month_id');
             $type = 1;
             $percentage = $request->input('day_percentage');
+            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrInsert(compact('agent_id', 'id', 'type'), compact('percentage'));
 
             $id = $request->input('commission_id');
             $type = 2;
             $percentage = $request->input('commission_percentage');
+            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrInsert(compact('agent_id', 'id', 'type'), compact('percentage'));
 
             return self::jsonReturn([], self::CODE_SUCCESS, '修改代理商分成配置成功');
-
         } catch (\Exception $eee) {
             return parent::jsonReturn([], parent::CODE_FAIL, $eee->getMessage());
 

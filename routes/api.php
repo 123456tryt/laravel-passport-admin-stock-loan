@@ -88,4 +88,10 @@ Route::group([
     Route::post("/stockFeeList", "Api\StockFeeConfigController@list");
     Route::post("/stockFeeUpdateOrCreate", "Api\StockFeeConfigController@updateOrCreate");
 
+
+    //客户充值列表
+    Route::get("/clientRechargeList", "Api\ClientRechargeController@list");
+
+
+
 });
