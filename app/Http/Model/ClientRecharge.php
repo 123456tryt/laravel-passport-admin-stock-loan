@@ -10,7 +10,6 @@ class ClientRecharge extends Base
 {
     protected $guarded = ['id', 'created_time', 'updated_time'];
     protected $table = "u_cust_recharge";
-    public $timestamps = false;
 
     public function client()
     {

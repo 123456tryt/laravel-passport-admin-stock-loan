@@ -67,10 +67,11 @@ Route::group([
     Route::post("/swapClientHeritRelation", "Api\ClientController@changeClientAgentEmployeeRelations");
 
 
+    //用户账户余额调整
+    Route::post("/clientAcountFlowAdjust", "Api\ClientFlowController@clientAcountFlowAdjust");
 
 
 
-    Route::post("/clientFlowAdd", "Api\ClientFlowController@add");
 
 
     //ClientBankCardController
@@ -92,6 +93,7 @@ Route::group([
     //客户充值列表
     Route::get("/clientRechargeList", "Api\ClientRechargeController@list");
 
-
+    //用户账户充值
+    Route::post("/clientAcountRecharge", "Api\ClientRechargeController@clientAcountRecharge");
 
 });
