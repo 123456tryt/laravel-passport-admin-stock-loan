@@ -97,4 +97,20 @@ Route::group([
     //用户账户充值
     Route::post("/clientAcountRecharge", "Api\ClientRechargeController@clientAcountRecharge");
 
+
+    //系统设置
+    Route::post("/SystemParams", "Api\FinancingManage\SystemParamsController@index");
+    Route::post("/SystemParam/update", "Api\FinancingManage\SystemParamsController@updateSelf");
+    Route::post("/SystemParam/update/{id}", "Api\FinancingManage\SystemParamsController@update");
+    Route::post("/SystemParam", "Api\FinancingManage\SystemParamsController@showSelf");
+    Route::post("/SystemParam/{id}", "Api\FinancingManage\SystemParamsController@show");
+
+    //股票配资产品
+    Route::post("/StockFinanceProducts", "Api\FinancingManage\StockFinanceProductController@index");
+    Route::post("/StockFinanceProduct/update", "Api\FinancingManage\StockFinanceProductController@updateSelf");
+    Route::post("/StockFinanceProduct/update/{id}", "Api\FinancingManage\StockFinanceProductController@update");
+    Route::post("/StockFinanceProduct", "Api\FinancingManage\StockFinanceProductController@showSelf");
+    Route::post("/StockFinanceProduct/{id}", "Api\FinancingManage\StockFinanceProductController@show");
+
+
 });
