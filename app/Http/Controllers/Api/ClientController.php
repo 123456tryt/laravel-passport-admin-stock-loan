@@ -66,10 +66,10 @@ class ClientController extends Controller
         $user = \Auth::user();
         //TODO::验证客户是否有权限修改归属关系
 
-        $client_relation_id = $request->input('id');
-        $client_id = $request->input('client_id');
-        $direct_agent_id = $request->input('agent_Id');
-        $direct_employee_id = $request->input('employee_id', 0);
+        $client_relation_id = $request->input('relationId');
+        $client_id = $request->input('clientId');
+        $direct_agent_id = $request->input('swapAgentId');
+        $direct_employee_id = $request->input('swapEmployeeId', 0);
 
         //a.检验代理商和员工关系是否合法
         $employee = null;
@@ -121,15 +121,15 @@ class ClientController extends Controller
             $clientRelation->belong_to_agent = null;
             $clientRelation->direct_emp_id = null;
         }
-        DB::beginTransaction();
-        try {
+//        DB::beginTransaction();
+//        try {
             /**
              * 一下代码设置修改分成比例
              */
             //一个客户产生3分成数据
             //分成比例设置
             foreach ([1, 2, 3] as $type) {
-                $feeRate = ClientFeeRate::where(['cust_id' => $client_id, 'type' => $type])->first();
+                $feeRate = ClientFeeRate::firstOrNew(['cust_id' => $client_id, 'type' => $type]);
                 //遍历1~5级代理并设置分成
                 foreach ([1, 2, 3, 4, 5] as $level) {
                     $pName = "agent{$level}";
@@ -157,18 +157,19 @@ class ClientController extends Controller
                     $clientPropertyRateName = "cust{$foo}_rate";
 
                     $feeRate->$clientPropertyName = $clientRelation->$clientPropertyName;
-                    $feeRate->$clientPropertyRateName = $rateConfig->percentage;
+                    $feeRate->$clientPropertyRateName = $rateConfig ? $rateConfig->percentage : 0;
                 }
 
                 $feeRate->save();
             }
             //保存修改的数据
             $clientRelation->save();
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return self::jsonReturn([], self::CODE_FAIL, '');
-        }
+        return self::jsonReturn();
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//            return self::jsonReturn([], self::CODE_FAIL, $e->getMessage());
+//        }
 
     }
 

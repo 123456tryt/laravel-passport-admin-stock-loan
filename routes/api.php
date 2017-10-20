@@ -63,6 +63,13 @@ Route::group([
     //getSwapClientHeritSelectorList
     Route::post("/agentEmployeeSelectorList", "Api\ClientController@getSwapClientHeritSelectorList");
 
+    //changeClientAgentEmployeeRelations
+    Route::post("/swapClientHeritRelation", "Api\ClientController@changeClientAgentEmployeeRelations");
+
+
+
+
+
     Route::post("/clientFlowAdd", "Api\ClientFlowController@add");
 
 
