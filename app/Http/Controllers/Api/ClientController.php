@@ -76,7 +76,7 @@ class ClientController extends Controller
         if ($direct_employee_id) {
             $employee = Employee::where(['id' => $direct_agent_id, 'agent_id' => $direct_agent_id, 'is_forbid' => 0])->first();
         }
-        if (!$employee) {
+        if (!$employee && $direct_employee_id) {
             return parent::jsonReturn([], parent::CODE_FAIL, '员工不属于这个代理商或员工已被禁用');
         }
         $ghost_client_id = 1;
@@ -92,11 +92,13 @@ class ClientController extends Controller
         //递归设置代理商的层级
         //这一级代理商不存在就设置为0
         $agent_id = $direct_agent_id;
-        while ($agent_id) {
-            $someAgent = Agent::find($direct_agent_id);
+        $breaker = 0;
+        while ($agent_id && $breaker < 5) {
+            $someAgent = Agent::find($agent_id);
             $key = "agent{$someAgent->agent_level}";
             $clientRelation->$key = $someAgent->id;
             $agent_id = $someAgent->parent_id;
+            $breaker++;//保险起见 防止无限递归
         }
         //填充直属代理商
         $clientRelation->direct_cust_id = $direct_agent_id;
