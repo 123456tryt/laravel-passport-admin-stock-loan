@@ -27,4 +27,14 @@ class Agent extends Base
 
         return $this->hasMany('\App\Http\Model\Employee', 'agent_id', 'id');
     }
+
+    public function parent()
+    {
+        return $this->hasOne('\App\Http\Model\Agent', 'id', 'parent_id');
+    }
+
+    public function info()
+    {
+        return $this->hasOne('\App\Http\Model\AgentInfo', 'id', 'id');
+    }
 }

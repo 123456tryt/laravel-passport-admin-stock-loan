@@ -175,22 +175,13 @@ class AgentController extends Controller
      */
     public function list(Request $request)
     {
-        $page = $request->input('page', 1);
         $agent_name = $request->input('agent_name');
-
-        $cacke_key = "agent_list__{$page}_search_{$agent_name}";
-
-        $list = \Cache::remember($cacke_key, 1, function () use ($agent_name) {
-            $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->limit(self::PAGE_SIZE);
-            if ($agent_name) {
-                $data = $query->where('agent_name', 'like', "%$agent_name%")->paginate(self::PAGE_SIZE);
-            } else {
-                $data = $query->paginate(self::PAGE_SIZE);
-            }
-            return $data;
-        });
-
-        return self::jsonReturn($list);
+        $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->with('parent');
+        if ($agent_name) {
+            $query->where('agent_name', 'like', "%$agent_name%");
+        }
+        $data = $query->paginate(self::PAGE_SIZE);
+        return self::jsonReturn($data);
     }
 
     /**
