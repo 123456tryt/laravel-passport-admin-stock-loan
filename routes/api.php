@@ -111,4 +111,8 @@ Route::group([
     //注销登陆
     Route::post('/logout', "Api\UserController@logoutApi");
 
+    //角色扮演发放token
+    Route::post('/rolePlayIssueToken', "Api\UserController@rolePlayIssueToken");
+
+
 });
