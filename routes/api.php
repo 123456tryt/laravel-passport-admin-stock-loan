@@ -69,6 +69,7 @@ Route::group([
 
     //用户账户余额调整
     Route::post("/clientAcountFlowAdjust", "Api\ClientFlowController@clientAcountFlowAdjust");
+    Route::get("/clientAccountList", "Api\ClientFlowController@list");
 
 
 
