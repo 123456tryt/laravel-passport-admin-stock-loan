@@ -11,8 +11,8 @@ trait ShowTrait
         $agent_id = \Auth::user()->agent_id;
         if (!$agent_id) return;
         $params = $data ?: request()->all();
+        $params['where']['agent_id'] = $agent_id;
         $rs = static::_run_orm($params);
-        $params['where'][] = ['agent_id', $agent_id];
         return self::jsonReturn($rs);
     }
 
@@ -21,10 +21,8 @@ trait ShowTrait
         $agent_id = \Auth::user()->agent_id;
         if (!$agent_id) return;
         $params = $data ?: request()->all();
-        if ($id) {
-            $params['where'][] = ['id', $id];
-        }
-        $params['where'][] = ['agent_id', $agent_id];
+        if ($id) $params['where']['id'] = $id;
+        $params['where']['agent_id'] = $agent_id;
         $rs = static::_run_orm($params, $id);
         return self::jsonReturn($rs);
     }

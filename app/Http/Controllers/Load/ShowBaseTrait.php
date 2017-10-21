@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Load;
 trait ShowBaseTrait
 {
     //常用过滤参数
-    static protected $base_params = ['field', 'where', 'whereIn', 'has', 'count', 'order', 'offset', 'limit', 'load'];
+    static protected $base_params = ['field', 'where', 'search', 'whereIn', 'has', 'count', 'order', 'offset', 'limit', 'load'];
     //load懒惰式加载路径参数
     static protected $load_paths = [];
     //已处理的load_path;
@@ -183,7 +183,20 @@ trait ShowBaseTrait
     private static function _filter_orm_1($params, $Model, $model_name)
     {
         //where过滤
-        if (!empty($params['where'])) $Model->where($params['where']);
+        if (!empty($params['where'])) {
+            foreach ($params['where'] as $k => $v) {
+                $where[] = [$k, $v];
+            }
+            if (!empty($where)) $Model->where($where);
+        }
+        //where like过滤
+        if (!empty($params['search'])) {
+            foreach ($params['search'] as $k => $v) {
+                if ($v === null) continue;
+                $search[] = [$k, 'like', '%' . $v . '%'];
+            }
+            if (!empty($search)) $Model->where($search);
+        }
         //whereIn过滤
         if (!empty($params['whereIn'])) $Model->whereIn($params['whereIn'][0], $params['whereIn'][1]);
         //whereMust过滤
