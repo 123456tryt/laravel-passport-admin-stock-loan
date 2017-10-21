@@ -108,5 +108,7 @@ Route::group([
     Route::post("/StockFinanceProduct/update/{id?}", "Api\FinancingManage\StockFinanceProductController@update");
     Route::post("/StockFinanceProduct/{id?}", "Api\FinancingManage\StockFinanceProductController@show");
 
+    //注销登陆
+    Route::post('/logout', "Api\UserController@logoutApi");
 
 });

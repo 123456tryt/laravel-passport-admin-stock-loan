@@ -24,4 +24,13 @@ class UserController extends Controller
     }
 
 
+    /**
+     * 注销登陆
+     */
+    public function logoutApi()
+    {
+        if (Auth::check()) {
+            Auth::user()->AauthAcessToken()->delete();
+        }
+    }
 }
