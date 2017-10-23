@@ -43,7 +43,7 @@ class RechargeController extends Controller
         }
 
         $ret = $this->recharge->offlineTransfer($request->user(), $request->only(["amount_of_account",
-            "transfet_type", "cust_remark"]));
+            "transfer_type", "cust_remark"]));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "提交成功") :
             parent::jsonReturn([], parent::CODE_FAIL, "提交失败");
     }

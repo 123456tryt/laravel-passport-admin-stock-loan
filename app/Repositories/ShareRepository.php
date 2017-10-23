@@ -9,7 +9,7 @@ use App\Http\Model\StockFinanceInterestPercentage;
 
 class ShareRepository extends Base
 {
-    const PROMOTION_TYPE = 8;
+    const PROMOTION_TYPE = 9;
     const PAGE_SIZE = 15;
 
     /**
@@ -45,7 +45,10 @@ class ShareRepository extends Base
         foreach ($custs as $cust) {
             $cust = $cust->cust;
             if ($cust) {
-                $time = ((array)$cust->created_time)["date"];
+                $time = "";
+                if ($cust->created_time) {
+                    $time = ((array)$cust->created_time)["date"];
+                }
                 $data[] = ["nickname" => half_replace($cust->nick_name), "cellphone" => half_replace($cust->cellphone),
                     "registerTime" => substr($time, 0, strpos($time, "."))];
             }

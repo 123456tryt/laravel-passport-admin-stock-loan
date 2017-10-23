@@ -15,6 +15,7 @@ use App\Repositories\RegisterRepository;
  */
 class RegisterController extends Controller
 {
+    static $password_reg = "/^[\w\?%&=\-_]{6,20}$/";
     private $register = null;
     private $sms = null;
 
@@ -34,7 +35,7 @@ class RegisterController extends Controller
         $validator = \Validator::make($request->all(), [
             "cellphone" => ["required", "regex:/^1[0-9]{10}$/", "unique:u_customer,cellphone"],
             "nick_name" => "between:0,20",
-            "password" => "required|between:6,20",
+            "password" => ["required", "regex:" . self::$password_reg],
             "phoneCode" => "required",
         ], [
             "cellphone.required" => "手机号码不能为空",
@@ -42,7 +43,7 @@ class RegisterController extends Controller
             "cellphone.regex" => "请填写正确的手机号码",
             "cellphone.unique" => "手机号码已经被注册",
             "nick_name.between" => "昵称格式应该为1-20字符",
-            "password.between" => "密码长度应为6-20位",
+            "password.regex" => "密码应为6-20位数字或字符或特殊符号组成",
             "phoneCode.required" => "手机验证码不能为空",
         ]);
 
@@ -79,13 +80,13 @@ class RegisterController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             "cellphone" => ["required", "regex:/^1[0-9]{10}$/"],
-            "password" => "required|between:6,20",
+            "password" => ["required", "regex:" . self::$password_reg],
             "phoneCode" => "required",
         ], [
             "cellphone.required" => "手机号码不能为空",
             "password.required" => "密码不能为空",
             "cellphone.regex" => "请填写正确的手机号码",
-            "password.between" => "密码长度应为6-20位",
+            "password.regex" => "密码应为6-20位数字或字符或特殊符号组成",
             "phoneCode.required" => "手机验证码不能为空",
         ]);
 

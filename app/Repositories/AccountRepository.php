@@ -48,7 +48,7 @@ class AccountRepository extends Base
      */
     public function withdrawRecord($user)
     {
-        $ret = CashFlow::where('cust_id', $user->id)->orderBy("apply_time", "desc")
+        $ret = CashFlow::where('cust_id', $user->id)->orderBy("created_time", "desc")
             ->get(['id', 'cash_amount', 'created_time', 'cash_status', "bank_card"]);
         if ($ret) {
             $ret = $ret->toArray();
@@ -91,21 +91,22 @@ class AccountRepository extends Base
     public function getCount($user)
     {
         $data = [
-            "cash" => $user->cust_capital_amount,
-            "freeze_cash" => 0.00,
-            "securitiesNetWorth" => 0,
+            "cash" => $user->cust_capital_amount,       //可用资金
+            "freeze_cash" => 0.00,                  //冻结资金
+            "securitiesNetWorth" => 0,              //证券净值 合约总资产+盈亏
         ];
 
         $list = StockFinancing::where("cust_id", $user->id)->whereIn("status", [1, 2, 3])->get();
         foreach ($list as $v) {
-            $data["securitiesNetWorth"] += (float)$v->init_caution_money + (float)$v->post_finance_caution_money +
+            $data["freeze_cash"] += (float)$v->init_caution_money + (float)$v->post_finance_caution_money +
                 (float)$v->post_add_caution_money;
         }
+        $data["securitiesNetWorth"] = $data["freeze_cash"]; //TODO:计算股票净值
 
         $totalAssets = $data["cash"] + $data["securitiesNetWorth"];
-        $t = $totalAssets == 0 ? 1 : $totalAssets;
+        $t = $totalAssets == 0 ? 1 : $totalAssets;  //分母为0
         $data = array_merge($data, [
-                "totalAssets" => $totalAssets,
+            "totalAssets" => $totalAssets,              //我的资产
             "securitiesNetWorthRate" => $data["securitiesNetWorth"] / $t * 100,
             "cashRate" => $user->cust_capital_amount / $t * 100,
         ]);

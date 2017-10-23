@@ -33,7 +33,7 @@ class RegisterRepository extends Base
         if (!$user) return false;
 
         $custId = $user->id;
-        $recCode = $data["recCode"];
+        $recCode = $data["recCode"] ?? "";
         $relationData = $this->setRelation($custId, $recCode);
         $this->setFeeRate($relationData);
 
@@ -244,8 +244,8 @@ class RegisterRepository extends Base
                 "cust_rec_code" => $code,
                 "rec_code" => $recCode,
                 "bar_code" => "",     //TODO:根据直属代理商公众号生成关注二维码
-                "pc_adv_url" => FONT_END_URL . "#/register?code={$recCode}",
-                "phone_adv_url" => FONT_END_URL . "#/register?code={$recCode}",
+                "pc_adv_url" => FONT_END_URL . "#/register?code={$code}",
+                "phone_adv_url" => FONT_END_URL . "#/register?code={$code}",
             ]);
         }
     }

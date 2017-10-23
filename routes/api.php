@@ -60,4 +60,16 @@ Route::group([
     Route::post('/getPromotionPercentages', 'Api\ShareController@getPromotionPercentages');
 
     Route::post('/getFundsDetails', 'Api\FundsDetailController@getFundsDetails');
+
+    Route::post('/getProducts', 'Api\StockFinanceController@getProducts');
+    Route::post('/getStockFinances', 'Api\StockFinanceController@getStockFinances')->middleware("auth:api");
+    Route::post('/getStockFinance', 'Api\StockFinanceController@getStockFinance')->middleware("auth:api");
+    Route::post('/stockFinance', 'Api\StockFinanceController@stockFinance')->middleware("auth:api");
+    Route::post('/postFinanceCautionMoney', 'Api\StockFinanceController@postFinanceCautionMoney')->middleware("auth:api");
+    Route::post('/postAddCautionMoney', 'Api\StockFinanceController@postAddCautionMoney')->middleware("auth:api");
+    Route::post('/modifyAutoSupplyCautionMoney', 'Api\StockFinanceController@modifyAutoSupplyCautionMoney')->middleware("auth:api");
+    Route::post('/getAllowMaxExtractProfit', 'Api\StockFinanceController@getAllowMaxExtractProfit')->middleware("auth:api");
+    Route::post('/extractProfit', 'Api\StockFinanceController@extractProfit')->middleware("auth:api");
+    Route::post('/settleup', 'Api\StockFinanceController@settleup')->middleware("auth:api");
+    Route::post('/getContract', 'Api\StockFinanceController@getContract');
 });

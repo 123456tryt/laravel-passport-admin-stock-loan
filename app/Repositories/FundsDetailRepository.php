@@ -9,11 +9,11 @@ class FundsDetailRepository extends Base
     const PAGE_SIZE = 15;
 
     static public $fundsDetailsTypeList = [
-        "全部" => [0, 1, 2, 3, 4, 5, 6, 7, 9, 10],
-        "充值提款" => [0, 1, 2, 9, 10],
-        "借款明细" => [3, 5, 7],
-        "服务费明细" => [4],
-        "利润提取" => [6]
+        "全部" => [0, 1, 2, 3, 4, 5, 6, 7, 10, 11],
+        "充值提款" => [0, 1, 2, 3, 10, 11],
+        "借款明细" => [4, 6, 8],
+        "服务费明细" => [5],
+        "利润提取" => [7]
     ];
 
     static public $typeList = [
@@ -41,6 +41,7 @@ class FundsDetailRepository extends Base
         $data = $fundsDetail["data"];
         foreach ($data as $k => $v) {
             $data[$k]["flow_type"] = self::$typeList[$v["flow_type"]] ?? $v["flow_type"];
+            $data[$k]["remark"] = str_limit($v["remark"], $limit = 20, $end = '...');
         }
         $fundsDetail["data"] = $data;
 

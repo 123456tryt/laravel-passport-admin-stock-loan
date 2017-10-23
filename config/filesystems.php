@@ -66,6 +66,10 @@ return [
             'driver' => 'local',
             'root' => storage_path('uploads'),
         ],
+        'contracts' => [
+            'driver' => 'local',
+            'root' => storage_path('contracts'),
+        ],
 
     ],
 

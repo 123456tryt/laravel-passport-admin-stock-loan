@@ -89,7 +89,8 @@ class UserDataController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
         }
 
-        $ret = $this->userData->storeBankCard($request->user(), $request->all());
+        $ret = $this->userData->storeBankCard($request->user(), $request->only(["bank_card", "bank_name", "open_province",
+            "open_district", "open_bank"]));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "添加成功") :
             parent::jsonReturn([], parent::CODE_FAIL, "添加失败");
     }
@@ -123,7 +124,8 @@ class UserDataController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
         }
 
-        $ret = $this->userData->updateBankCard($request->user(), $request->get("id"), $request->all());
+        $ret = $this->userData->updateBankCard($request->user(), $request->get("id"), $request->only(["bank_card",
+            "bank_name", "open_province", "open_district", "open_bank"]));
         return $ret ? parent::jsonReturn([], parent::CODE_SUCCESS, "修改成功") :
             parent::jsonReturn([], parent::CODE_FAIL, "修改失败");
     }
@@ -303,11 +305,11 @@ class UserDataController extends Controller
     {
         $user = $request->user();
         $validator = \Validator::make($request->all(), [
-            "password" => ["required", "between:6,20"],
+            "password" => ["required", "regex:" . RegisterController::$password_reg],
             "phoneCode" => "required",
         ], [
             "password.required" => "密码不能为空",
-            "password.between" => "密码长度应为6-20位",
+            "password.regex" => "密码应为1-20位数字或字符或特殊符号组成",
             "phoneCode.required" => "手机验证码不能为空",
         ]);
 

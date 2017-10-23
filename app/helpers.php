@@ -3,6 +3,7 @@
 use App\Http\Model\RecCode;
 use Lcobucci\JWT\Parser;
 use App\Http\Model\Agent;
+use Illuminate\Support\Facades\Redis;
 
 /**
  * 创建推荐码
@@ -101,13 +102,15 @@ if (!function_exists("encryptPassword")) {
 if (!function_exists("getDefaultAgent")) {
     function getDefaultAgent()
     {
-        $defaultAgent = Agent::where("agent_level", 1)->first();
+        //TODO: 以后会多个一级代理
+        $defaultAgent = \DB::table("a_agent")->leftJoin("a_agent_extra_info", "a_agent.id", "=", "a_agent_extra_info.id")
+            ->where("a_agent.agent_level", 1)->first();
         return $defaultAgent;
     }
 }
 
 /**
- * 获取请求当前代理
+ * 获取请求当前代理(只区分独立代理商、一级代理商)
  */
 if (!function_exists("getAgent")) {
     function getAgent()
@@ -120,20 +123,127 @@ if (!function_exists("getAgent")) {
         }
 
         if ($agentId) {
-            $ret = \App\Http\Model\AgentExtraInfo::where("id", $agentId)->first();
+            $ret = \DB::table("a_agent")->leftJoin("a_agent_extra_info", "a_agent.id", "=", "a_agent_extra_info.id")
+                ->where("a_agent.id", $agentId)->where("a_agent.is_independent", 1)->first();
         } else {
             $host = request()->header("Host");
-            $ret = \App\Http\Model\AgentExtraInfo::where("web_domain", $host)->orWhere("mobile_domain", $host)->first();
+            $ret = \DB::table("a_agent")->leftJoin("a_agent_extra_info", "a_agent.id", "=", "a_agent_extra_info.id")
+                ->where("a_agent.is_independent", 1)->where("a_agent_extra_info.web_domain", $host)
+                ->orWhere("a_agent_extra_info.mobile_domain", $host)->first();
+        }
+
+        if (!$ret) {
+            $ret = getDefaultAgent();
         }
 
         return $ret;
     }
 }
 
+/**
+ * 隐藏字符串中间部分
+ */
 if (!function_exists("half_replace")) {
     function half_replace($str)
     {
-        $len = strlen($str) / 2;
-        return substr_replace($str, str_repeat('*', $len), ceil(($len) / 2), $len);
+        $len = ceil(mb_strlen($str, "utf8") / 2);
+        $prefix = mb_substr($str, 0, ceil($len / 2), "utf8");
+        $suffix = mb_substr($str, $len + ceil($len / 2), null, "utf8");
+        return $prefix . str_repeat("*", $len) . $suffix;
+    }
+}
+
+if (!function_exists("getStockInfo")) {
+    function getStockInfo($code)
+    {
+        $name = "stockmarket";
+        $keys = Redis::hkeys($name);
+        $keyList = [];
+        foreach ($keys as $v) {
+            if (strpos($v, (string)$code) !== false) $keyList[] = $v;
+        }
+        $dataList = $keyList ? Redis::hmGet($name, $keyList) : [];
+        $newData = [];
+        array_walk($dataList, function ($v, $k) use (&$newData) {
+            if ($t = json_decode($v)) $newData[] = $t;
+        });
+        return $newData;
+    }
+}
+
+if (!function_exists("requestJava")) {
+    function requestJava($url, $data)
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = $url . "?" . http_build_query($data);
+        $res = $client->request("GET", $url);
+        $res = json_decode($res->getBody(), true);
+        return $res;
+    }
+}
+
+if (!function_exists("num_to_rmb")) {
+    function num_to_rmb($num)
+    {
+        $c1 = "零壹贰叁肆伍陆柒捌玖";
+        $c2 = "分角元拾佰仟万拾佰仟亿";
+        //精确到分后面就不要了，所以只留两个小数位
+        $num = round($num, 2);
+        //将数字转化为整数
+        $num = $num * 100;
+        if (strlen($num) > 10) {
+            return "金额太大，请检查";
+        }
+        $i = 0;
+        $c = "";
+        while (1) {
+            if ($i == 0) {
+                //获取最后一位数字
+                $n = substr($num, strlen($num) - 1, 1);
+            } else {
+                $n = $num % 10;
+            }
+            //每次将最后一位数字转化为中文
+            $p1 = substr($c1, 3 * $n, 3);
+            $p2 = substr($c2, 3 * $i, 3);
+            if ($n != '0' || ($n == '0' && ($p2 == '亿' || $p2 == '万' || $p2 == '元'))) {
+                $c = $p1 . $p2 . $c;
+            } else {
+                $c = $p1 . $c;
+            }
+            $i = $i + 1;
+            //去掉数字最后一位了
+            $num = $num / 10;
+            $num = (int)$num;
+            //结束循环
+            if ($num == 0) {
+                break;
+            }
+        }
+        $j = 0;
+        $slen = strlen($c);
+        while ($j < $slen) {
+            //utf8一个汉字相当3个字符
+            $m = substr($c, $j, 6);
+            //处理数字中很多0的情况,每次循环去掉一个汉字“零”
+            if ($m == '零元' || $m == '零万' || $m == '零亿' || $m == '零零') {
+                $left = substr($c, 0, $j);
+                $right = substr($c, $j + 3);
+                $c = $left . $right;
+                $j = $j - 3;
+                $slen = $slen - 3;
+            }
+            $j = $j + 3;
+        }
+        //这个是为了去掉类似23.0中最后一个“零”字
+        if (substr($c, strlen($c) - 3, 3) == '零') {
+            $c = substr($c, 0, strlen($c) - 3);
+        }
+        //将处理的汉字加上“整”
+        if (empty($c)) {
+            return "零元整";
+        } else {
+            return $c . "整";
+        }
     }
 }
