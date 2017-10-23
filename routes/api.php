@@ -87,10 +87,6 @@ Route::group([
     Route::post("/updateSystemAgentConfigs", "Api\SystemController@agentConfigsUpdate");
 
 
-    Route::post("/stockFeeList", "Api\StockFeeConfigController@list");
-    Route::post("/stockFeeUpdateOrCreate", "Api\StockFeeConfigController@updateOrCreate");
-
-
     //客户充值列表
     Route::get("/clientRechargeList", "Api\ClientRechargeController@list");
 
@@ -99,14 +95,28 @@ Route::group([
 
 
     //系统设置
-    Route::post("/SystemParams", "Api\FinancingManage\SystemParamsController@index");
-    Route::post("/SystemParam/update/{id?}", "Api\FinancingManage\SystemParamsController@update");
-    Route::post("/SystemParam/{id?}", "Api\FinancingManage\SystemParamsController@show");
+    Route::post("/systemParams", "Api\FinancingManage\SystemParamsController@index");
+    Route::post("/systemParam/update/{id?}", "Api\FinancingManage\SystemParamsController@update");
+    Route::post("/systemParam/{id?}", "Api\FinancingManage\SystemParamsController@show");
 
     //股票配资产品
-    Route::post("/StockFinanceProducts", "Api\FinancingManage\StockFinanceProductController@index");
-    Route::post("/StockFinanceProduct/update/{id?}", "Api\FinancingManage\StockFinanceProductController@update");
-    Route::post("/StockFinanceProduct/{id?}", "Api\FinancingManage\StockFinanceProductController@show");
+    Route::post("/stockFinanceProduct/update/{id}", "Api\FinancingManage\StockFinanceProductController@update");
+    Route::post("/stockFinanceProduct/destroy/{id}", "Api\FinancingManage\StockFinanceProductController@destroy");
+    Route::post("/stockFinanceProducts", "Api\FinancingManage\StockFinanceProductController@index");
+    Route::post("/stockFinanceProduct/store", "Api\FinancingManage\StockFinanceProductController@store");
+    Route::post("/stockFinanceProduct/{id}", "Api\FinancingManage\StockFinanceProductController@show");
+    //股票信息
+    Route::post("/stockInfo/update/{id}", "Api\FinancingManage\StockInfoController@update");
+    Route::post("/stockInfo/destroy/{id}", "Api\FinancingManage\StockInfoController@destroy");
+    Route::post("/stockInfos", "Api\FinancingManage\StockInfoController@index");
+    Route::post("/stockInfo/store", "Api\FinancingManage\StockInfoController@store");
+    Route::post("/stockInfo/{id}", "Api\FinancingManage\StockInfoController@show");
+    //费用标准
+    Route::post("/stockFee/update/{id}", "Api\FinancingManage\StockFeeController@update");
+    Route::post("/stockFee/destroy/{id}", "Api\FinancingManage\StockFeeController@destroy");
+    Route::post("/stockFees", "Api\FinancingManage\StockFeeController@index");
+    Route::post("/stockFee/store", "Api\FinancingManage\StockFeeController@store");
+    Route::post("/stockFee/{id}", "Api\FinancingManage\StockFeeController@show");
 
     //注销登陆
     Route::post('/logout', "Api\UserController@logoutApi");

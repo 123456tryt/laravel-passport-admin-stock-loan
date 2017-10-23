@@ -11,7 +11,10 @@ trait ShowTrait
         $agent_id = \Auth::user()->agent_id;
         if (!$agent_id) return;
         $params = $data ?: request()->all();
-        $params['where']['agent_id'] = $agent_id;
+        $keyWord = config('select.' . static::$model_name . '.keyWord');
+        if ($keyWord == 'agent_id') {
+            $params['where']['agent_id'] = $agent_id;
+        }
         $rs = static::_run_orm($params);
         return self::jsonReturn($rs);
     }
@@ -22,7 +25,10 @@ trait ShowTrait
         if (!$agent_id) return;
         $params = $data ?: request()->all();
         if ($id) $params['where']['id'] = $id;
-        $params['where']['agent_id'] = $agent_id;
+        $keyWord = config('select.' . static::$model_name . '.keyWord');
+        if ($keyWord == 'agent_id') {
+            $params['where']['agent_id'] = $agent_id;
+        }
         $rs = static::_run_orm($params, $id);
         return self::jsonReturn($rs);
     }
