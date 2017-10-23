@@ -7,7 +7,9 @@ use App\Http\Model\Agent;
 use App\Http\Model\AgentInfo;
 use App\Http\Model\AgentProfitRateConfig;
 use App\User;
+use function foo\func;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,6 +18,9 @@ use Illuminate\Support\Facades\DB;
  */
 class AgentController extends Controller
 {
+
+    const AgentSelectorListCackeKey = 'agent.selector.list.cache.key';
+
     public function __construct()
     {
         $this->middleware("auth:api")->except(['search']);
@@ -26,10 +31,11 @@ class AgentController extends Controller
      */
     public function createAgent(Request $request)
     {
+
         $validator = \Validator::make($request->all(), [
             'bank_account' => 'required|unique:a_agent',
             'agent_name' => 'required|unique:a_agent',
-            'agent_number' => 'required|unique:a_agent',
+            //'agent_number' => 'required|unique:a_agent',
             'owner_name' => 'required|unique:a_agent',
             'phone' => 'required|unique:a_agent',
             'phone' => 'required|unique:s_system_user',
@@ -47,6 +53,7 @@ class AgentController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
         }
 
+        Cache::delete(self::AgentSelectorListCackeKey);
 
         $msg = '';
         DB::beginTransaction();
@@ -75,26 +82,26 @@ class AgentController extends Controller
             //天配
             $rateWhere = [
                 'agent_id' => $agent_id,
-                'employee_id' => 0,
                 'type' => AgentProfitRateConfig::TypeDay,
             ];
             $percentage = $request->input('day_percentage');
+            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrCreate($rateWhere, compact('percentage'));
             //月配
             $rateWhere = [
                 'agent_id' => $agent_id,
-                'employee_id' => 0,
                 'type' => AgentProfitRateConfig::TypeMonth,
             ];
             $percentage = $request->input('month_percentage');
+            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrCreate($rateWhere, compact('percentage'));
             //佣金oen
             $rateWhere = [
                 'agent_id' => $agent_id,
-                'employee_id' => 0,
                 'type' => AgentProfitRateConfig::TypeCommissionOne
             ];
             $percentage = $request->input('commission_percentage');
+            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrCreate($rateWhere, compact('percentage'));
 
             //创建登陆账号
@@ -124,24 +131,14 @@ class AgentController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search(Request $request)
+    public function selectorOptionsList(Request $request)
     {
-        $agent_name = $request->input('agent_name');
-        $cacke_key = 'agent_search_list_' . $agent_name;
+        $list = Cache::rememberForever(self::AgentSelectorListCackeKey, function () {
+            return Agent::where('is_locked', '!=', 1)
+                ->orderByDesc('updated_time')->select('id', 'agent_level', 'agent_name')
+                ->get();
 
-        $list = \Cache::remember($cacke_key, 1, function () use ($agent_name) {
-            $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->limit(self::PAGE_SIZE);
-            if ($agent_name) {
-                $data = $query->where('agent_name', 'like', "%$agent_name%")->get();
-            } else {
-                //没有搜索条件就显示一级代理商
-                //$data = $query->whereAgentLevel(1)->get();
-                $data = $query->whereAgentLevel(1)->get();
-            }
-
-            return $data;
         });
-
         return self::jsonReturn($list);
     }
 
@@ -222,6 +219,7 @@ class AgentController extends Controller
      */
     public function updateAgentBasic(Request $request)
     {
+        Cache::delete(self::AgentSelectorListCackeKey);
 //        $validator = \Validator::make($request->all(), [
 //            'bank_account' => 'required|unique:a_agent',
 //            'agent_name' => 'required|unique:a_agent',
