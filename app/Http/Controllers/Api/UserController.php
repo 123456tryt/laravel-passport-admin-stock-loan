@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Model\Agent;
-use App\Http\Model\Employee;
 use App\User;
-use Carbon\Carbon;
-use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
