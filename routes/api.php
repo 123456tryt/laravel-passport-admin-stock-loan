@@ -74,7 +74,6 @@ Route::group([
 
 
 
-
     //ClientBankCardController
     Route::get("/bankCardList", "Api\ClientBankCardController@list");
     Route::post("/bankCardUpdate", "Api\ClientBankCardController@update");
@@ -82,9 +81,6 @@ Route::group([
 
     Route::get("/withdrawList", "Api\ClientWithdrawController@list");
     Route::post("/withdrawUpdate", "Api\ClientWithdrawController@update");
-
-    Route::post("/getSystemAgentConfigs", "Api\SystemController@agentConfigs");
-    Route::post("/updateSystemAgentConfigs", "Api\SystemController@agentConfigsUpdate");
 
 
     //客户充值列表
@@ -118,11 +114,10 @@ Route::group([
     Route::post("/stockFee/store", "Api\FinancingManage\StockFeeController@store");
     Route::post("/stockFee/{id}", "Api\FinancingManage\StockFeeController@show");
 
-    //注销登陆
-    Route::post('/logout', "Api\UserController@logoutApi");
-
-    //角色扮演发放token
-    Route::post('/rolePlayIssueToken', "Api\UserController@rolePlayIssueToken");
+    //管理后台用户相关
+    Route::post('/logout', "Api\UserController@logoutApi");//注销
+    Route::post('/rolePlayIssueToken', "Api\UserController@rolePlayIssueToken");//扮演用户
+    Route::get("/userList", "Api\UserController@list");//用户列表
 
 
 });
