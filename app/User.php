@@ -49,7 +49,7 @@ class User extends Authenticatable
     }
 
 
-    protected $table = "s_system_user";
+    protected $table = "a_agent_emp";
     /**
      * The attributes that are mass assignable.
      *
@@ -71,14 +71,6 @@ class User extends Authenticatable
         return $this->where('phone', $username)->first();
     }
 
-    /**
-     * 登陆用的所属的代理机构
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function agent()
-    {
-        return $this->belongsTo('App\Http\Model\Agent', 'agent_id', 'id');
-    }
 
 
     public function AauthAcessToken()
@@ -89,5 +81,10 @@ class User extends Authenticatable
     public function role()
     {
         return $this->hasOne('App\Http\Model\Role', 'id', 'role_id');
+    }
+
+    public function employee()
+    {
+        return $this->hasOne('App\Http\Model\Employee', 'id', 'employee_id');
     }
 }

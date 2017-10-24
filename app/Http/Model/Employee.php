@@ -30,11 +30,17 @@ class Employee extends Base
 {
     protected $table = "a_agent_emp";
     protected $guarded = ['id', 'create_time', 'updated_time'];
+    protected $hidden = ['password'];
 
 
-    public function user()
+    public function agent()
     {
-        return $this->hasOne('App\User', 'employee_id');
+        return $this->belongsTo('App\Http\Model\Agent');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo('App\Http\Model\Role');
     }
 
     public function percentages()

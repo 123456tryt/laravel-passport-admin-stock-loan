@@ -10,6 +10,7 @@ use App\Http\Model\Employee;
 use App\Http\Model\EmployeeProfitRateConfig;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Mockery\Exception;
@@ -31,15 +32,14 @@ class EmployeeController extends Controller
     public function create(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'name' => 'required|unique:s_system_user',//验证登陆用户名唯一
+            'name' => 'required|unique:a_agent_emp',//验证登陆用户名唯一
+            'email' => 'required|unique:a_agent_emp',//验证登陆用户名唯一
+            'phone' => 'required|unique:a_agent_emp',
             'employee_name' => 'required',
-            'agent_id' => 'required',
             'is_forbid' => [
                 'required',
                 Rule::in(['0', '1']),
             ],
-            'phone' => 'required|unique:a_agent_emp',
-            'phone' => 'required|unique:s_system_user',
         ], [
             'phone.unique' => "联系人手机号码已注册",
             'name.unique' => "登陆用户名不能重复",
@@ -50,34 +50,18 @@ class EmployeeController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
         }
 
-
         DB::beginTransaction();
         try {
-            $agent_id = $request->input('agent_id');
-            if (!Agent::find($agent_id)) {
-                throw new \Exception('非法代理商ID');
-                return;
-            }
-            $employeeData = $request->only(['agent_id', 'employee_name', 'phone', 'is_forbid', 'remark']);
+            $agent_id = Auth::user()->agent_id;
+
+            $employeeData = $request->only('employee_name', 'phone', 'is_forbid', 'remark', 'name', 'role_id', 'email');
+            $employeeData['password'] = bcrypt($request->input('password'));
+            $employeeData['agent_id'] = $agent_id;
             $employ = Employee::firstOrCreate($employeeData);
-            $employee_id = $employ->id;
-
-
-            $userData = $request->only(['phone', 'name', 'agent_id']);
-            $userData['real_name'] = $request->input('employee_name');
-            $userData['employee_id'] = $employee_id;
-            $userData['role_id'] = 2;
-            $password = bcrypt($request->input('password'));
-
-            User::firstOrCreate($userData, compact('password'));
-
-
-
 
             //创建配置
             $rateWhere = [
-                'agent_id' => $agent_id,
-                'employee_id' => $employee_id,
+                'employee_id' => $employ->id,
             ];
             //天配
 
@@ -112,16 +96,14 @@ class EmployeeController extends Controller
         $validator = \Validator::make($request->all(), [
             //'name' => 'required|unique:s_system_user',//验证登陆用户名唯一
             'employee_name' => 'required',
-            'agent_id' => 'required',
+            'id' => 'required',
             'is_forbid' => [
                 'required',
                 Rule::in(['0', '1']),
             ],
-            'phone' => 'required|unique:a_agent_emp',
-            'phone' => 'required|unique:s_system_user',
         ], [
-            'phone.unique' => "联系人手机号码已注册",
             'name.unique' => "登陆用户名不能重复",
+            'email.unique' => "登陆用户名不能重复",
             'employee_name' => '员工真实姓名不能为空',
         ]);
 
@@ -132,29 +114,19 @@ class EmployeeController extends Controller
 
         DB::beginTransaction();
         try {
-            $agent_id = $request->input('agent_id');
-            $employee_id = $request->input('employee_id');
 
-            if (!Agent::find($agent_id)) {
-                throw new \Exception('非法代理商ID');
-                return;
-            }
-            $employeeData = $request->only(['agent_id', 'employee_name', 'phone', 'is_forbid', 'remark']);
-            Employee::where('id', $request->input('employee_id'))->update($employeeData);
+            $employeeData = $request->only('employee_name', 'phone', 'is_forbid', 'remark', 'role_id', 'email');
 
-
-            $userData = $request->only(['phone', 'real_name' => $request->employee_name]);
             if (strlen($request->password) > 6) {
-                $userData['password'] = bcrypt($request->input('password'));
+                $employeeData['password'] = bcrypt($request->input('password'));
             }
+            Employee::where($request->only('id'))->update($employeeData);
 
-            User::whereId($request->user_id)->update($userData);
 
 
             //创建配置
             $rateWhere = [
-                'agent_id' => $agent_id,
-                'employee_id' => $employee_id,
+                'employee_id' => $request->id,
             ];
             //天配
 
@@ -188,8 +160,7 @@ class EmployeeController extends Controller
      */
     public function info(Request $request)
     {
-
-        $employ = Employee::with('percentages', 'user')->find($request->employee_id);
+        $employ = Employee::with('percentages')->find($request->employee_id);
         return self::jsonReturn($employ);
     }
 
@@ -201,23 +172,21 @@ class EmployeeController extends Controller
      */
     public function list(Request $request)
     {
-        $page = $request->input('page', 1);
-        $staff_name = $request->input('employee_name');
-        $agent_id = $request->agent_id;
-        $cacke_key = "employee_list_search_{$staff_name}_agent_id_{$agent_id}_page_{$page}";
+        $page_size = $request->input('size', self::PAGE_SIZE);
 
-        $list = \Cache::remember($cacke_key, 1, function () use ($staff_name, $agent_id) {
-            $query = Employee::orderByDesc('updated_time')->limit(self::PAGE_SIZE);
-            if ($agent_id) {
-                $query->where(compact('agent_id'));
-            }
-            if ($staff_name) {
-                $data = $query->where('employee_name', 'like', "%$staff_name%")->paginate(self::PAGE_SIZE);
-            } else {
-                $data = $query->paginate(self::PAGE_SIZE);
-            }
-            return $data;
-        });
+        $staff_name = $request->input('keyword');
+        $agent_id = $request->agent_id;
+
+        $query = Employee::orderByDesc('updated_time')->with('agent', 'role');
+        if ($agent_id) {
+            $query->where(compact('agent_id'));
+        }
+        if ($staff_name) {
+            $_GET['page'] = 1;
+            $query->where('employee_name', 'like', "%$staff_name%")->orWhere('phone', 'like', "%$staff_name%");
+        }
+        $list = $query->paginate($page_size);
+
 
         return self::jsonReturn($list);
     }
