@@ -66,4 +66,9 @@ class Controller extends BaseController
         return response()->json($json, $httpStatusCode);
     }
 
+
+    static function fakePaginationForRelationSubQuerySearch($list)
+    {
+        return ['data' => $list, 'current_page' => 1, 'per_page' => count($list), 'total' => count($list)];
+    }
 }

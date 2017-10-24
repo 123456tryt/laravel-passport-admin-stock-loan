@@ -44,15 +44,15 @@ class ClientFlowController extends Controller
             $query->where(compact('flow_type'));
         }
         if ($keyword) {
-            //TODO::模糊搜索条件有错误
-            $query->with(['client' => function ($subQuery) use ($keyword) {
-                $likeString = "%$keyword%";
-                $subQuery->orWhere('nick_name', 'like', $likeString)->orWhere('real_name', 'like', $likeString)->orWhere('cellphone', 'like', $likeString);
-            }]);
-        } else {
-            $query->with('client');
+            $likeString = "%$keyword%";
+            $client_ids = Client::orWhere('nick_name', 'like', $likeString)
+                ->orWhere('real_name', 'like', $likeString)
+                ->orWhere('cellphone', 'like', $likeString)
+                ->pluck('id')->all();
+            $query->whereIn('cust_id', array_values($client_ids));
+            $_GET['page'] = 1;
         }
-        $list = $query->paginate($page_size);
+        $list = $query->with('client')->paginate($page_size);
         return self::jsonReturn($list);
     }
 
