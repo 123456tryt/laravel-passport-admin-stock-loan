@@ -76,10 +76,7 @@ class UserController extends Controller
 
         $query = User::orderByDesc('created_at')->with('agent')->with('role');
         $range = $request->range;
-        $range = array_filter($range, function ($k, $value) {
-            return strlen($value) > 10;
-        }, ARRAY_FILTER_USE_BOTH);
-        if (count($range) == 2) {
+        if (count($range) == 2 && strlen($range[0]) > 10 && strlen($range[1]) > 10) {
             $from_time = Carbon::parse($range[0]);
             $to_time = Carbon::parse($range[1]);
             $query->whereBetween('created_at', [$from_time, $to_time]);
