@@ -29,28 +29,30 @@ class ClientFlowController extends Controller
     public function list(Request $request)
     {
         $keyword = $request->keyword;
-
+        $page_size = $request->input('size', self::PAGE_SIZE);
         $flow_type = $request->flow_type;
         $query = ClientFLow::orderByDesc('created_time');
 
         $range = $request->range;
-        if (count($range) === 2) {
+        if (count($range) == 2) {
             $from_time = \Carbon::parse($range[0]);
             $to_time = \Carbon::parse($range[1]);
             $query->whereBetween('created_time', [$from_time, $to_time]);
         }
+
+        if ($flow_type) {
+            $query->where(compact('flow_type'));
+        }
         if ($keyword) {
+            //TODO::模糊搜索条件有错误
             $query->with(['client' => function ($subQuery) use ($keyword) {
-                $subQuery->orWhere('nick_name', $keyword)->orWhere('real_name', $keyword)->orWhere('cellphone', $keyword);
+                $likeString = "%$keyword%";
+                $subQuery->orWhere('nick_name', 'like', $likeString)->orWhere('real_name', 'like', $likeString)->orWhere('cellphone', 'like', $likeString);
             }]);
         } else {
             $query->with('client');
         }
-        if ($flow_type) {
-            $query->where(compact('flow_type'));
-        }
-
-        $list = $query->paginate(self::PAGE_SIZE);
+        $list = $query->paginate($page_size);
         return self::jsonReturn($list);
     }
 

@@ -7,7 +7,6 @@ use App\Http\Model\Agent;
 use App\Http\Model\AgentInfo;
 use App\Http\Model\AgentProfitRateConfig;
 use App\User;
-use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +52,7 @@ class AgentController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
         }
 
-        Cache::delete(self::AgentSelectorListCackeKey);
+        Cache::forget(self::AgentSelectorListCackeKey);
 
         $msg = '';
         DB::beginTransaction();
@@ -85,7 +84,6 @@ class AgentController extends Controller
                 'type' => AgentProfitRateConfig::TypeDay,
             ];
             $percentage = $request->input('day_percentage');
-            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrCreate($rateWhere, compact('percentage'));
             //月配
             $rateWhere = [
@@ -93,7 +91,6 @@ class AgentController extends Controller
                 'type' => AgentProfitRateConfig::TypeMonth,
             ];
             $percentage = $request->input('month_percentage');
-            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrCreate($rateWhere, compact('percentage'));
             //佣金oen
             $rateWhere = [
@@ -101,7 +98,6 @@ class AgentController extends Controller
                 'type' => AgentProfitRateConfig::TypeCommissionOne
             ];
             $percentage = $request->input('commission_percentage');
-            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrCreate($rateWhere, compact('percentage'));
 
             //创建登陆账号
@@ -172,12 +168,13 @@ class AgentController extends Controller
      */
     public function list(Request $request)
     {
-        $agent_name = $request->input('agent_name');
+        $per_page = $request->input('size', self::PAGE_SIZE);
+        $agent_name = $request->input('keyword');
         $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->with('parent');
         if ($agent_name) {
             $query->where('agent_name', 'like', "%$agent_name%");
         }
-        $data = $query->paginate(self::PAGE_SIZE);
+        $data = $query->paginate($per_page);
         return self::jsonReturn($data);
     }
 
@@ -219,7 +216,7 @@ class AgentController extends Controller
      */
     public function updateAgentBasic(Request $request)
     {
-        Cache::delete(self::AgentSelectorListCackeKey);
+        Cache::forget(self::AgentSelectorListCackeKey);
 //        $validator = \Validator::make($request->all(), [
 //            'bank_account' => 'required|unique:a_agent',
 //            'agent_name' => 'required|unique:a_agent',
@@ -240,7 +237,6 @@ class AgentController extends Controller
 //        }
 
         try {
-            //todo::修改归属关系表
             $agent = Agent::find($request->id)->fill($request->except('id'));
             $code = $agent->save();
             return self::jsonReturn($agent, $code, '修改代理商基本信息成功');
@@ -284,19 +280,16 @@ class AgentController extends Controller
             $id = $request->input('day_id');
             $type = 0;
             $percentage = $request->input('day_percentage');
-            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrInsert(compact('agent_id', 'id', 'type'), compact('percentage'));
 
             $id = $request->input('month_id');
             $type = 1;
             $percentage = $request->input('day_percentage');
-            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrInsert(compact('agent_id', 'id', 'type'), compact('percentage'));
 
             $id = $request->input('commission_id');
             $type = 2;
             $percentage = $request->input('commission_percentage');
-            $percentage = intval($percentage) / 100;
             AgentProfitRateConfig::updateOrInsert(compact('agent_id', 'id', 'type'), compact('percentage'));
 
             return self::jsonReturn([], self::CODE_SUCCESS, '修改代理商分成配置成功');
