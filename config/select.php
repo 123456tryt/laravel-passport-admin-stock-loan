@@ -20,6 +20,11 @@ return [
         'whereMust' => '',
         'keyWord' => ''
     ],
+    'ParentStockFinance' => [
+        'field' => ['*'],
+        'whereMust' => '',
+        'keyWord' => ''
+    ],
     'limit_default' => 50,
     'limit_max' => 1000
 ];

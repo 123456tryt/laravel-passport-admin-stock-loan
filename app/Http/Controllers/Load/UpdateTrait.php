@@ -14,7 +14,7 @@ trait UpdateTrait
         if ($id) $where[] = ['id', $id];
         $keyWord = config('select.' . static::$model_name . '.keyWord');
         if ($keyWord == 'agent_id') {
-            $params['where']['agent_id'] = $agent_id;
+            $where[] = ['agent_id', $agent_id];
         }
         $rs = $params ? $Model->where($where)->limit(1)->update($params) : false;
         if ($rs) return self::jsonReturn([], 1, '更新成功！');

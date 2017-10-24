@@ -109,10 +109,20 @@ Route::group([
     Route::post("/stockInfo/{id}", "Api\FinancingManage\StockInfoController@show");
     //费用标准
     Route::post("/stockFee/update/{id}", "Api\FinancingManage\StockFeeController@update");
-    Route::post("/stockFee/destroy/{id}", "Api\FinancingManage\StockFeeController@destroy");
     Route::post("/stockFees", "Api\FinancingManage\StockFeeController@index");
     Route::post("/stockFee/store", "Api\FinancingManage\StockFeeController@store");
     Route::post("/stockFee/{id}", "Api\FinancingManage\StockFeeController@show");
+    //母账户管理
+    Route::post("/parentStockFinance/update/{id}", "Api\FinancingManage\ParentStockFinanceController@update");
+    Route::post("/parentStockFinances", "Api\FinancingManage\ParentStockFinanceController@index");
+    Route::post("/parentStockFinance/store", "Api\FinancingManage\ParentStockFinanceController@store");
+    Route::post("/parentStockFinance/{id}", "Api\FinancingManage\ParentStockFinanceController@show");
+
+    //资金池管理
+    Route::post("/capitalPool/update/{id}", "Api\FinancingManage\CapitalPoolController@update");
+    Route::post("/capitalPools", "Api\FinancingManage\CapitalPoolController@index");
+    Route::post("/capitalPool/store", "Api\FinancingManage\CapitalPoolController@store");
+    Route::post("/capitalPool/{id}", "Api\FinancingManage\CapitalPoolController@show");
 
     //管理后台用户相关
     Route::post('/logout', "Api\UserController@logoutApi");//注销

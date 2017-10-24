@@ -13,7 +13,7 @@ trait StoreTrait
         $Model = new $model_path;
         $keyWord = config('select.' . static::$model_name . '.keyWord');
         if ($keyWord == 'agent_id') {
-            $params['where']['agent_id'] = $agent_id;
+            $params['agent_id'] = $agent_id;
         }
         $rs = $params ? $Model->create($params) : false;
         if ($rs) return self::jsonReturn([], 1, '新增成功！');
