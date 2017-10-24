@@ -67,33 +67,4 @@ class UserController extends Controller
     }
 
 
-    public function list(Request $request)
-    {
-
-        $keyword = $request->keyword;
-        $page_size = $request->input('size', self::PAGE_SIZE);
-
-
-        $query = User::orderByDesc('created_at')->with('agent')->with('role');
-        $range = $request->range;
-        if (count($range) == 2 && strlen($range[0]) > 10 && strlen($range[1]) > 10) {
-            $from_time = Carbon::parse($range[0]);
-            $to_time = Carbon::parse($range[1]);
-            $query->whereBetween('created_at', [$from_time, $to_time]);
-        }
-        if ($keyword) {
-            $likeString = "%$keyword%";
-            $agent_dis = Agent::where('agent_name', 'like', $likeString)
-                ->pluck('id')->all();
-            $meployee_ids = Employee::where('employee_name', 'like', $likeString)
-                ->pluck('id')->all();
-            $query->whereIn('agent_id', array_values($agent_dis))
-                ->orWhereIn('employee_id', $meployee_ids)
-                ->orWhere('phone', 'like', $likeString)
-                ->orWhere('real_name', 'like', $likeString);
-            $_GET['page'] = 1;
-        }
-        $list = $query->paginate($page_size);
-        return self::jsonReturn($list);
-    }
 }

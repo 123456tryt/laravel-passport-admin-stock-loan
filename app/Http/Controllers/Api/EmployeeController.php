@@ -55,6 +55,10 @@ class EmployeeController extends Controller
             $agent_id = Auth::user()->agent_id;
 
             $employeeData = $request->only('employee_name', 'phone', 'is_forbid', 'remark', 'name', 'role_id', 'email');
+            if (!$request->email) {
+                $employeeData['email'] = $request->phone . '@yingli.com';
+            }
+            
             $employeeData['password'] = bcrypt($request->input('password'));
             $employeeData['agent_id'] = $agent_id;
             $employ = Employee::firstOrCreate($employeeData);

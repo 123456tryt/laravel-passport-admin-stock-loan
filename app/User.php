@@ -50,20 +50,7 @@ class User extends Authenticatable
 
 
     protected $table = "a_agent_emp";
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'agent_id', 'email', 'phone', 'name', 'password', 'rank', 'is_lock', 'real_name', 'role_id', 'employee_id'
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
+    protected $guarded = ['id', 'create_time', 'updated_time'];
     protected $hidden = ['password'];
 
     //自定义passport 登陆用户名 id 可以改成其他字段
@@ -78,13 +65,19 @@ class User extends Authenticatable
         return $this->hasMany('\App\OauthAccessToken');
     }
 
-    public function role()
+
+    public function agent()
     {
-        return $this->hasOne('App\Http\Model\Role', 'id', 'role_id');
+        return $this->belongsTo('App\Http\Model\Agent');
     }
 
-    public function employee()
+    public function role()
     {
-        return $this->hasOne('App\Http\Model\Employee', 'id', 'employee_id');
+        return $this->belongsTo('App\Http\Model\Role');
+    }
+
+    public function percentages()
+    {
+        return $this->hasMany('App\Http\Model\EmployeeProfitRateConfig', 'employee_id');
     }
 }
