@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Model\Agent;
 use App\Http\Model\AgentInfo;
 use App\Http\Model\AgentProfitRateConfig;
+use App\Http\Model\Employee;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -104,10 +105,14 @@ class AgentController extends Controller
             $hashedPassword = bcrypt($request->input('password'));
             $phone = $request->input('phone');
             $name = $request->input('name');
-            $userWhere = compact('name', 'agent_id');
-            $userData = ['password' => $hashedPassword, 'phone' => $phone, 'role_id' => 1, 'real_name' => $request->input('owner_name')];
+            $userWhere = compact('phone', 'agent_id');
+            $userData = [
+                'password' => $hashedPassword,
+                'phone' => $phone, 'role_id' => 1,
+                'name' => $name,
+            ];
 
-            User::updateOrCreate($userWhere, $userData);
+            Employee::updateOrCreate($userWhere, $userData);
 
 
             DB::commit();
