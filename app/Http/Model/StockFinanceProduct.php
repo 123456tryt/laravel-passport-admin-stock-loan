@@ -14,4 +14,11 @@ class StockFinanceProduct extends Base
 
     protected $dates = ['deleted_at'];
 
+    /**
+     * belongsTo代理商
+     */
+    public function agent()
+    {
+        return $this->belongsTo(Agent::Class, 'agent_id', 'id');
+    }
 }
