@@ -122,12 +122,15 @@ Route::group([
     Route::post("/parentStockFinances", "Api\System\ParentStockFinanceController@index");
     Route::post("/parentStockFinance/store", "Api\System\ParentStockFinanceController@store");
     Route::post("/parentStockFinance/{id}", "Api\System\ParentStockFinanceController@show");
-
     //资金池管理
     Route::post("/capitalPool/update/{id}", "Api\System\CapitalPoolController@update");
     Route::post("/capitalPools", "Api\System\CapitalPoolController@index");
     Route::post("/capitalPool/store", "Api\System\CapitalPoolController@store");
     Route::post("/capitalPool/{id}", "Api\System\CapitalPoolController@show");
+    //风控管理
+    Route::post("/stockFinanceRisks", "Api\System\StockFinanceRiskController@index");
+    Route::post("/stockFinanceRisk/{id}", "Api\System\StockFinanceRiskController@show");
+
 
     //管理后台用户相关
     Route::post('/logout', "Api\UserController@logoutApi");//注销
