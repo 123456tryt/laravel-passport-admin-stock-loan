@@ -94,7 +94,12 @@ Route::group([
     Route::post("/systemParams", "Api\FinancingManage\SystemParamsController@index");
     Route::post("/systemParam/update/{id?}", "Api\FinancingManage\SystemParamsController@update");
     Route::post("/systemParam/{id?}", "Api\FinancingManage\SystemParamsController@show");
-
+    //节假日维护
+    Route::post("/holidayMaintain/update/{id}", "Api\FinancingManage\HolidayMaintainController@update");
+    Route::post("/holidayMaintain/destroy/{id}", "Api\FinancingManage\HolidayMaintainController@destroy");
+    Route::post("/holidayMaintains", "Api\FinancingManage\HolidayMaintainController@index");
+    Route::post("/holidayMaintain/store", "Api\FinancingManage\HolidayMaintainController@store");
+    Route::post("/holidayMaintain/{id}", "Api\FinancingManage\HolidayMaintainController@show");
     //股票配资产品
     Route::post("/stockFinanceProduct/update/{id}", "Api\FinancingManage\StockFinanceProductController@update");
     Route::post("/stockFinanceProduct/destroy/{id}", "Api\FinancingManage\StockFinanceProductController@destroy");
