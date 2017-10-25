@@ -31,24 +31,20 @@ class ClientController extends Controller
      */
     public function list(Request $request)
     {
-        $page = $request->input('page', 1);
+        $page_size = $request->input('size', self::PAGE_SIZE);
         $keyword = $request->input('keyword');
         $agent_id = $request->input('agent_id');
-        $cacke_key = "client_search={$keyword}_agentID_{$agent_id}_page_{$page}";
 
-        $list = \Cache::remember($cacke_key, 1, function () use ($keyword, $agent_id) {
-            $query = Client::orderByDesc('updated_time')->with('relation');
-            if ($keyword) {
-                $query = $query->orWhere('nick_name', 'like', "%$keyword%")
-                    ->orWhere('cellphone', 'like', "%$keyword%")
-                    ->orWhere('id', "%$keyword%")
-                    ->orWhere('real_name', 'like', "%$keyword%");
-            }
-            $data = $query->paginate(self::PAGE_SIZE);
-            //TODO::根据关系表只显示本级以下代理商
-            return $data;
-        });
-        return self::jsonReturn($list);
+        $query = Client::orderByDesc('updated_time')->with('relation');
+        if ($keyword) {
+            $query = $query->orWhere('nick_name', 'like', "%$keyword%")
+                ->orWhere('cellphone', 'like', "%$keyword%")
+                ->orWhere('id', "%$keyword%")
+                ->orWhere('real_name', 'like', "%$keyword%");
+        }
+        $data = $query->paginate($page_size);
+        //TODO::根据关系表只显示本级以下代理商
+        return self::jsonReturn($data);
     }
 
 
@@ -120,47 +116,47 @@ class ClientController extends Controller
 
 //        DB::beginTransaction();
 //        try {
-            /**
-             * 一下代码设置修改分成比例
-             */
-            //一个客户产生3分成数据
-            //分成比例设置
+        /**
+         * 一下代码设置修改分成比例
+         */
+        //一个客户产生3分成数据
+        //分成比例设置
         foreach ([0, 1, 2] as $type) {
-                $feeRate = ClientFeeRate::firstOrNew(['cust_id' => $client_id, 'type' => $type]);
-                //遍历1~5级代理并设置分成
-                foreach ([1, 2, 3, 4, 5] as $level) {
-                    $pName = "agent{$level}";
-                    $pRateName = "agent{$level}_rate";
-                    $feeRate->$pName = $clientRelation->$pName;
-                    $rateConfig = AgentProfitRateConfig::where(['agent_id' => $clientRelation->$pName, 'type' => $type])->first();
-                    $feeRate->$pRateName = $rateConfig ? $rateConfig->percentage : 0;
-                }
-
-                //设置员工分成比例
-                $whereEmployRateConfig = ['employee_id' => $clientRelation->direct_emp_id, 'type' => $type];
-                $employFeeConfig = EmployeeProfitRateConfig::where($whereEmployRateConfig)->first();
-                $feeRate->emp_id = $employFeeConfig ? $clientRelation->direct_emp_id : 0;
-                $feeRate->emp_rate = $employFeeConfig ? $employFeeConfig->percentage : 0;
-
-
-                //设置客户邀请关系分成比例
-                //设置客户推广佣金
-                foreach ([3, 4, 5] as $clientRateType) {
-                    //提取直系代理商数据 佣金数据 配置
-                    $clientRateWhere = ['agent_id' => $clientRelation->direct_agent_id, 'type' => $clientRateType];
-                    $rateConfig = AgentProfitRateConfig::where($clientRateWhere)->first();
-                    $foo = $clientRateType - 2;
-                    $clientPropertyName = "cust{$foo}";
-                    $clientPropertyRateName = "cust{$foo}_rate";
-
-                    $feeRate->$clientPropertyName = $clientRelation->$clientPropertyName;
-                    $feeRate->$clientPropertyRateName = $rateConfig ? $rateConfig->percentage : 0;
-                }
-
-                $feeRate->save();
+            $feeRate = ClientFeeRate::firstOrNew(['cust_id' => $client_id, 'type' => $type]);
+            //遍历1~5级代理并设置分成
+            foreach ([1, 2, 3, 4, 5] as $level) {
+                $pName = "agent{$level}";
+                $pRateName = "agent{$level}_rate";
+                $feeRate->$pName = $clientRelation->$pName;
+                $rateConfig = AgentProfitRateConfig::where(['agent_id' => $clientRelation->$pName, 'type' => $type])->first();
+                $feeRate->$pRateName = $rateConfig ? $rateConfig->percentage : 0;
             }
-            //保存修改的数据
-            $clientRelation->save();
+
+            //设置员工分成比例
+            $whereEmployRateConfig = ['employee_id' => $clientRelation->direct_emp_id, 'type' => $type];
+            $employFeeConfig = EmployeeProfitRateConfig::where($whereEmployRateConfig)->first();
+            $feeRate->emp_id = $employFeeConfig ? $clientRelation->direct_emp_id : 0;
+            $feeRate->emp_rate = $employFeeConfig ? $employFeeConfig->percentage : 0;
+
+
+            //设置客户邀请关系分成比例
+            //设置客户推广佣金
+            foreach ([3, 4, 5] as $clientRateType) {
+                //提取直系代理商数据 佣金数据 配置
+                $clientRateWhere = ['agent_id' => $clientRelation->direct_agent_id, 'type' => $clientRateType];
+                $rateConfig = AgentProfitRateConfig::where($clientRateWhere)->first();
+                $foo = $clientRateType - 2;
+                $clientPropertyName = "cust{$foo}";
+                $clientPropertyRateName = "cust{$foo}_rate";
+
+                $feeRate->$clientPropertyName = $clientRelation->$clientPropertyName;
+                $feeRate->$clientPropertyRateName = $rateConfig ? $rateConfig->percentage : 0;
+            }
+
+            $feeRate->save();
+        }
+        //保存修改的数据
+        $clientRelation->save();
         return self::jsonReturn();
 //            DB::commit();
 //        } catch (\Exception $e) {

@@ -70,7 +70,7 @@ class AgentController extends Controller
                 $agent_level = 1;
             }
 
-            $data = $request->except(['password', 'confirm_password', 'login_user_name', 'day_percentage', 'month_percentage', 'commission_percentage', 'name']);
+            $data = $request->except(['password', 'confirm_password', 'day_percentage', 'month_percentage', 'commission_percentage', 'name']);
             $data['agent_level'] = $agent_level;
             //创建代理商
             $instance = Agent::create($data);
@@ -110,6 +110,7 @@ class AgentController extends Controller
                 'password' => $hashedPassword,
                 'phone' => $phone, 'role_id' => 1,
                 'name' => $name,
+                'employee_name' => $request->owner_name
             ];
 
             Employee::updateOrCreate($userWhere, $userData);

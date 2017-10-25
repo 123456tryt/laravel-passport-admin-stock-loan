@@ -25,25 +25,21 @@ class ClientBankCardController extends Controller
      */
     public function list(Request $request)
     {
-        $page = $request->input('page', 1);
         $keyword = $request->input('keyword');
+        $page_size = $request->input('size', self::PAGE_SIZE);
+
         $agent_id = $request->input('agent_id');
 
-        $cacke_key = "client_bank_card_search={$keyword}_agentID_{$agent_id}_page_{$page}";
-
-        $list = \Cache::remember($cacke_key, 1, function () use ($keyword, $agent_id) {
-            $query = ClientBankCard::orderByDesc('updated_time');
-            if ($keyword) {
-                $query = $query->orWhere('bank_reg_cellphone', 'like', "%$keyword%")
-                    ->orWhere('cust_id', '=', "$keyword")
-                    ->orWhere('open_province', 'like', "%$keyword%")
-                    ->orWhere('open_district', 'like', "%$keyword%");
-            }
-            $data = $query->paginate(self::PAGE_SIZE);
-            //TODO::根据关系表只显示本级以下代理商
-            return $data;
-        });
-        return self::jsonReturn($list);
+        $query = ClientBankCard::orderByDesc('updated_time');
+        if ($keyword) {
+            $query = $query->orWhere('bank_reg_cellphone', 'like', "%$keyword%")
+                ->orWhere('cust_id', '=', "$keyword")
+                ->orWhere('open_province', 'like', "%$keyword%")
+                ->orWhere('open_district', 'like', "%$keyword%");
+        }
+        $data = $query->paginate($page_size);
+        //TODO::根据关系表只显示本级以下代理商
+        return self::jsonReturn($data);
     }
 
 

@@ -34,7 +34,7 @@ class ClientFlowController extends Controller
         $query = ClientFLow::orderByDesc('created_time');
 
         $range = $request->range;
-        if (count($range) == 2) {
+        if (count($range) == 2 && strlen($range[0]) > 8 && strlen($range[1]) > 8) {
             $from_time = \Carbon::parse($range[0]);
             $to_time = \Carbon::parse($range[1]);
             $query->whereBetween('created_time', [$from_time, $to_time]);
