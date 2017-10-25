@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Model\AgentCashFlow;
 use App\Http\Model\Client;
 use App\Http\Model\ClientFLow;
-use App\Http\Model\ClientRecharge;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,8 +34,8 @@ class ClientFlowController extends Controller
 
         $range = $request->range;
         if (count($range) == 2 && strlen($range[0]) > 8 && strlen($range[1]) > 8) {
-            $from_time = \Carbon::parse($range[0]);
-            $to_time = \Carbon::parse($range[1]);
+            $from_time = Carbon::parse($range[0]);
+            $to_time = Carbon::parse($range[1]);
             $query->whereBetween('created_time', [$from_time, $to_time]);
         }
 
