@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api\FinancingManage;
+namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
 
-class ParentStockFinanceController extends Controller
+class CapitalPoolController extends Controller
 {
     use \App\Http\Controllers\Load\ShowTrait, \App\Http\Controllers\Load\UpdateTrait, \App\Http\Controllers\Load\StoreTrait;
 
-    public static $model_name = 'ParentStockFinance';
+    public static $model_name = 'CapitalPool';
 
     public function __construct()
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\FinancingManage;
+namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
 
