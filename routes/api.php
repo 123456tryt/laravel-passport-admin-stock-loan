@@ -116,9 +116,18 @@ Route::group([
     Route::post("/capitalPools", "Api\System\CapitalPoolController@index");
     Route::post("/capitalPool/store", "Api\System\CapitalPoolController@store");
     Route::post("/capitalPool/{id}", "Api\System\CapitalPoolController@show");
-    //风控管理
+    //风控日志管理
     Route::post("/stockFinanceRisks", "Api\System\StockFinanceRiskController@index");
     Route::post("/stockFinanceRisk/{id}", "Api\System\StockFinanceRiskController@show");
+    //除权降息管理
+    Route::post("/xrDrInfos", "Api\System\XrDrInfoController@index");
+    Route::post("/xrDrInfo/{id}", "Api\System\XrDrInfoController@show");
+    //配资记录管理
+    Route::post("/uStockFinancing", "Api\System\UStockFinancingController@index");
+    Route::post("/uStockFinancing/{id}", "Api\System\UStockFinancingController@show");
+    //子账户资金流水记录
+    Route::post("/uStockFinancingFlows", "Api\System\UStockFinancingFlowController@index");
+    Route::post("/uStockFinancingFlow/{id}", "Api\System\UStockFinancingFlowController@show");
 
 
     //管理后台用户相关

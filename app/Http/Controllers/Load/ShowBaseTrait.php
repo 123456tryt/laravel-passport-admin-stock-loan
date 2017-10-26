@@ -183,12 +183,7 @@ trait ShowBaseTrait
     private static function _filter_orm_1($params, $Model, $model_name)
     {
         //where过滤
-        if (!empty($params['where'])) {
-            foreach ($params['where'] as $k => $v) {
-                $where[] = [$k, $v];
-            }
-            if (!empty($where)) $Model->where($where);
-        }
+        if (!empty($params['where'])) $Model->where($params['where']);
         //where like过滤
         if (!empty($params['search'])) {
             foreach ($params['search'] as $k => $v) {
@@ -203,8 +198,22 @@ trait ShowBaseTrait
         if (!empty(config('select.' . $model_name . '.whereMust'))) $Model->whereRaw(config('select.' . $model_name . '.whereMust'));
         //has过滤
         if (!empty($params['has'])) {
-            foreach ($params['has'] as $has) {
-                $Model->has($has);
+            foreach ($params['has'] as $key => $has) {
+                if (!$has) $Model->has($key);
+                else {
+                    if (!empty($has['where'])) $Model->whereHas($key, function ($query) use ($has) {
+                        $query->where($has['where']);
+                    });
+                    //print_r($has['search']);
+                    if (!empty($has['search'])) {
+                        foreach ($has['search'] as $k => $v) {
+                            if (!$v) continue;
+                            $Model->whereHas($key, function ($query) use ($k, $v) {
+                                $query->where($k, 'like', '%' . $v . '%');
+                            });
+                        }
+                    }
+                }
             }
         }
         return $Model;
