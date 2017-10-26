@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Model\Client;
 use App\Http\Model\ClientBankCard;
 use Illuminate\Http\Request;
 
@@ -30,7 +29,7 @@ class ClientBankCardController extends Controller
 
         $agent_id = $request->input('agent_id');
 
-        $query = ClientBankCard::orderByDesc('updated_time');
+        $query = ClientBankCard::orderByDesc('id')->with('client');
         if ($keyword) {
             $query = $query->orWhere('bank_reg_cellphone', 'like', "%$keyword%")
                 ->orWhere('cust_id', '=', "$keyword")

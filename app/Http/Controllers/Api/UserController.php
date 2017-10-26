@@ -18,6 +18,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $user->agent;
+        $user->role;
+
         $navs = [
 
         ];

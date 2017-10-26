@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -47,9 +45,9 @@ Route::group([
     //修改代理附加信息
     Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");
 
-    //修改代理商分成比例配置
-    Route::post("/agentChangePercentage", "Api\AgentController@updateAgentPercentage");
 
+    Route::post("/agentChangePercentage", "Api\AgentController@updateAgentPercentage");//修改代理商分成比例配置
+    Route::get('/agentCommissionList', 'Api\AgentCommissionController@list');//代理商利息佣金
 
     //代理商员工列表 分页 搜索员工
     Route::get("/employeeList", "Api\EmployeeController@list");
