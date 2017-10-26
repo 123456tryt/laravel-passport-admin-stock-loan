@@ -25,7 +25,7 @@ class AgentCashController extends Controller
         //权限
         $per_page = $request->input('size', self::PAGE_SIZE);
         $keyword = $request->input('keyword');
-        $query = AgentCashFlow::orderByDesc('id');
+        $query = AgentCashFlow::orderByDesc('id')->with('agent');
         if ($keyword) {
             $agent_ids = Agent::orWhere('phone', 'like', "%$keyword%")->orWhere('agent_name', 'like', "%$keyword%")->orWhere('id', 'like', "%$keyword%")->pluck('id')->all();
             $query->whereIn('agent_id', array_values($agent_ids));
