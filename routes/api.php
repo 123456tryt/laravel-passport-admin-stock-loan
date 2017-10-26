@@ -21,33 +21,24 @@ Route::group([
     Route::post("/userInfo", "Api\UserController@info");
 
 
-    //代理商 创建
-    Route::post("/agentCreate", "Api\AgentController@createAgent");
-    //代理商下拉 搜索
-    Route::post("/agentSelectorList", "Api\AgentController@selectorOptionsList");
-
-
-    //代理商下拉 搜索/列表
-    Route::get("/agentList", "Api\AgentController@list");
-
-    //代理商详细信息
-    Route::post("/agentInfo", "Api\AgentController@info");
-
-
-
-
-    //修改代理商管理员密码
-    Route::post("/agentChangeAdminPassword", "Api\AgentController@changeAgentAdminUserPassword");
-
-    //修改代理商基本信息
-    Route::post("/agentChangeBasic", "Api\AgentController@updateAgentBasic");
-
-    //修改代理附加信息
-    Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");
-
-
+    //代理商相关
+    Route::post("/agentCreate", "Api\AgentController@createAgent");//代理商 创建
+    Route::post("/agentSelectorList", "Api\AgentController@selectorOptionsList");//代理商下拉 搜索
+    Route::get("/agentList", "Api\AgentController@list"); //代理商列表
+    Route::post("/agentInfo", "Api\AgentController@info");//代理商详细信息
+    Route::post("/agentChangeAdminPassword", "Api\AgentController@changeAgentAdminUserPassword");//修改代理商管理员密码
+    Route::post("/agentChangeBasic", "Api\AgentController@updateAgentBasic");//修改代理商基本信息
+    Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");//修改代理附加信息
     Route::post("/agentChangePercentage", "Api\AgentController@updateAgentPercentage");//修改代理商分成比例配置
+
+
+    //代理商佣金分成
     Route::get('/agentCommissionList', 'Api\AgentCommissionController@list');//代理商利息佣金
+
+    Route::get('/agentCashList', 'Api\AgentCashController@list');//代理商提现记录 for 审核
+
+
+
 
     //代理商员工列表 分页 搜索员工
     Route::get("/employeeList", "Api\EmployeeController@list");
