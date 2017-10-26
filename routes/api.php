@@ -37,7 +37,7 @@ Route::group([
 
     Route::get('/agentCashList', 'Api\AgentCashController@list');//代理商提现记录 for 审核
 
-
+    Route::post('/recommendCode', 'Api\RecommentCodeController@info');//获取代理商或者员工的推荐码
 
 
     //代理商员工列表 分页 搜索员工

@@ -7,6 +7,8 @@ use App\Http\Model\Agent;
 use App\Http\Model\AgentInfo;
 use App\Http\Model\AgentProfitRateConfig;
 use App\Http\Model\Employee;
+use App\Http\Model\RecommendCode;
+use App\Http\Model\Role;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -108,13 +110,34 @@ class AgentController extends Controller
             $userWhere = compact('phone', 'agent_id');
             $userData = [
                 'password' => $hashedPassword,
-                'phone' => $phone, 'role_id' => 1,
+                'phone' => $phone,
+                'role_id' => Role::ROLE_ADMIN_AGENT,
                 'name' => $name,
                 'employee_name' => $request->owner_name
             ];
 
             Employee::updateOrCreate($userWhere, $userData);
 
+
+            //生成推广码
+
+            $recommendWhere = [
+                'user_type' => RecommendCode::TYPE_AGENT,
+                'user_id' => $agent_id
+            ];
+            $rec_code = rand(100000, 999999);
+            //找到不重复的rec_code
+            $flag = true;
+            while ($flag) {
+                $one = RecommendCode::where(compact('rec_code'))->first();
+                if ($one) {
+                    $flag = true;
+                    $rec_code = rand(100000, 999999);
+                } else {
+                    $flag = false;
+                }
+            }
+            RecommendCode::updateOrCreate($recommendWhere, compact('rec_code'));
 
             DB::commit();
         } catch (\Exception $e) {
