@@ -309,7 +309,7 @@ class UserDataController extends Controller
             "phoneCode" => "required",
         ], [
             "password.required" => "密码不能为空",
-            "password.regex" => "密码应为1-20位数字或字符或特殊符号组成",
+            "password.regex" => "密码应为6-20位数字或字符或特殊符号组成",
             "phoneCode.required" => "手机验证码不能为空",
         ]);
 

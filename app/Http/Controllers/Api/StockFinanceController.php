@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Model\StockFinanceProducts;
 use App\Http\Model\StockFinancing;
 use App\User;
 use Illuminate\Http\Request;
@@ -120,6 +121,28 @@ class StockFinanceController extends Controller
             $this->stockFinance->makeContract($user, $request->get("productId"), $request->get("investMoney"), false,
                 $financeId);
         }
+        return isset($ret["code"]) && $ret["code"] ? parent::jsonReturn([], parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, $ret["msg"]);
+    }
+
+    public function stockFinanceOfFree(Request $request)
+    {
+        $user = $request->user();
+
+        $freeProduct = StockFinanceProducts::where("product_type", 3)->where("product_times", 20)->where("disable", 0)
+            ->first();
+        if (!$freeProduct) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "产品信息错误");
+        }
+
+        $data = [
+            "custId" => $user->id,
+            "productId" => $freeProduct->id,
+            "investMoney" => "100",
+            "autoCautionMoney" => "false",
+        ];
+
+        $ret = requestJava(self::STOCK_FINANCE_URL, $data);
         return isset($ret["code"]) && $ret["code"] ? parent::jsonReturn([], parent::CODE_SUCCESS, "success") :
             parent::jsonReturn([], parent::CODE_FAIL, $ret["msg"]);
     }

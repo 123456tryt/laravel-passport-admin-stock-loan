@@ -122,17 +122,17 @@ class RegisterRepository extends Base
         $directCust = $custList[0] ?? 0;
         $data = [
             "cust_id" => $custId,
-            "direct_cust_id" => $directCust,
-            "direct_agent_id" => $directAgent,
+            "direct_cust_id" => $directCust ?? null,
+            "direct_agent_id" => $directAgent ?? null,
             "agent1" => $agentList[0],
-            "agent2" => $agentList[1] ?? 0,
-            "agent3" => $agentList[2] ?? 0,
-            "agent4" => $agentList[3] ?? 0,
-            "agent5" => $agentList[4] ?? 0,
-            "direct_emp_id" => $emp,
-            "belong_to_agent" => $directAgent && $emp ? $directAgent : 0,
-            "cust1" => $custList[0] ?? 0,
-            "cust2" => $custList[1] ?? 0,
+            "agent2" => $agentList[1] ?? null,
+            "agent3" => $agentList[2] ?? null,
+            "agent4" => $agentList[3] ?? null,
+            "agent5" => $agentList[4] ?? null,
+            "direct_emp_id" => $emp ?? null,
+            "belong_to_agent" => $directAgent && $emp ? $directAgent : null,
+            "cust1" => $custList[0] ?? null,
+            "cust2" => $custList[1] ?? null,
         ];
         MemberAgentRelation::create($data);
 
@@ -189,7 +189,7 @@ class RegisterRepository extends Base
                 $type = $v->type;
                 if ($type == self::PERCENTAGE_LEVEL1_TYPE_CODE && $relation["cust1"]) {
                     $feeRate0["cust1_rate"] = $feeRate1["cust1_rate"] = $feeRate2["cust1_rate"] = $v["percentage"];
-                } else if ($type == self::PERCENTAGE_LEVEL2_TYPE_CODE && $relation["cust1"]) {
+                } else if ($type == self::PERCENTAGE_LEVEL2_TYPE_CODE && $relation["cust2"]) {
                     $feeRate0["cust2_rate"] = $feeRate1["cust2_rate"] = $feeRate2["cust2_rate"] = $v["percentage"];
                 }
             }
