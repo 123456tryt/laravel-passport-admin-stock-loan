@@ -1,0 +1,18 @@
+<html>
+<head>
+
+
+</head>
+<body>
+<form action="http://dev.591wmj.com/v1/redirectOauthPage" method="post">
+    <input type="hidden" value="http://dev.591wmj.com/3.html" name="url">
+</form>
+<script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+<script>
+    var storage = window.localStorage;
+    if (!storage.getItem("id")) {
+        $("form").submit();
+    }
+</script>
+</body>
+</html>
