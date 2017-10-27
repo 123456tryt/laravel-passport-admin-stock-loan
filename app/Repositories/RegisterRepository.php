@@ -10,6 +10,7 @@ use App\Http\Model\RecCode;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use App\Http\Model\AgentPercentageSetting;
+use App\Http\Controllers\Api\WechatController;
 
 class RegisterRepository extends Base
 {
@@ -239,15 +240,28 @@ class RegisterRepository extends Base
             "rec_code" => $code,
         ]);
 
+        $qrCode = self::makeQrcode($code) ?: "";
+
         if ($ret) {
             $user->update([
                 "cust_rec_code" => $code,
                 "rec_code" => $recCode,
-                "bar_code" => "",     //TODO:根据直属代理商公众号生成关注二维码
+                "bar_code" => $qrCode,     //TODO:根据直属代理商公众号生成关注二维码
                 "pc_adv_url" => FONT_END_URL . "#/register?code={$code}",
                 "phone_adv_url" => FONT_END_URL . "#/register?code={$code}",
             ]);
         }
+    }
+
+    private function makeQrCode($code)
+    {
+        $wechat = new WechatController();
+        $img = $wechat->makeQrCode($code);
+        if (!$img) return false;
+
+        $object = time() . rand(1, 99999) . $code . ".jpg";
+        $ret = ossUpload($object, $img, "qrCode");
+        return $ret;
     }
 
 }

@@ -275,7 +275,7 @@ if (!function_exists("ossUpload")) {
             return false;
         }
 
-        return $endpoint . "/" . $object;
+        return OSS_BUCKET_URL . "/" . $object;
     }
 }
 

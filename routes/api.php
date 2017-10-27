@@ -73,4 +73,6 @@ Route::group([
     Route::post('/extractProfit', 'Api\StockFinanceController@extractProfit')->middleware("auth:api");
     Route::post('/settleup', 'Api\StockFinanceController@settleup')->middleware("auth:api");
     Route::post('/getContract', 'Api\StockFinanceController@getContract');
+
+    Route::any('/wechat', 'Api\WechatController@index');
 });
