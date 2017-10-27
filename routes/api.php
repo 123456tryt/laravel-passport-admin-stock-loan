@@ -65,7 +65,6 @@ Route::group([
     Route::post('/getStockFinances', 'Api\StockFinanceController@getStockFinances')->middleware("auth:api");
     Route::post('/getStockFinance', 'Api\StockFinanceController@getStockFinance')->middleware("auth:api");
     Route::post('/stockFinance', 'Api\StockFinanceController@stockFinance')->middleware("auth:api");
-    Route::post('/stockFinanceOfFree', 'Api\StockFinanceController@stockFinanceOfFree')->middleware("auth:api");
     Route::post('/postFinanceCautionMoney', 'Api\StockFinanceController@postFinanceCautionMoney')->middleware("auth:api");
     Route::post('/postAddCautionMoney', 'Api\StockFinanceController@postAddCautionMoney')->middleware("auth:api");
     Route::post('/modifyAutoSupplyCautionMoney', 'Api\StockFinanceController@modifyAutoSupplyCautionMoney')->middleware("auth:api");

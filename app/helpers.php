@@ -4,7 +4,6 @@ use App\Http\Model\RecCode;
 use Lcobucci\JWT\Parser;
 use App\Http\Model\Agent;
 use Illuminate\Support\Facades\Redis;
-use OSS\OssClient;
 
 /**
  * 创建推荐码
@@ -248,64 +247,3 @@ if (!function_exists("num_to_rmb")) {
         }
     }
 }
-
-if (!function_exists("formatMoney")) {
-    function formatMoney($money)
-    {
-        return sprintf("%.2f", round((float)$money, 2));
-    }
-}
-
-if (!function_exists("ossUpload")) {
-    function ossUpload($object, $content, $type = "")
-    {
-        $accessKeyId = "LTAI88B5zjDXRpPq";
-        $accessKeySecret = " txb80snXCJrpBEnTupDlfd8Kbiw6k0";
-        $endpoint = OSS_END_POINT_URL;
-        $bucket = "yingli";
-        $object = $object;
-        $content = $content;
-        if ($type) {
-            $object = $type . "/" . $object;
-        }
-        try {
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-            $ossClient->putObject($bucket, $object, $content);
-        } catch (OssException $e) {
-            return false;
-        }
-
-        return OSS_BUCKET_URL . "/" . $object;
-    }
-}
-
-function caclTransactionDays($startTime, $changeDayNum)
-{
-    if ($changeDayNum == 0) return $startTime;
-
-    $changeTime = $changeDayNum * 24 * 3600;
-    //误差时间
-    $mistakeDay = ceil($changeDayNum / 3) + 30;
-    if ($changeDayNum < 0) {
-        $endTime = $startTime;
-        $startTime = $startTime - $mistakeDay * 3600 * 24;
-    } else {
-        $endTime = $startTime + $mistakeDay * 3600 * 24;
-    }
-    $date = [];
-    $tmpTime = $startTime;
-    for ($i = 0; $i < abs($changeDayNum) + $mistakeDay - 2; $i++) {
-        $date[] = date("Y-m-d", $tmpTime);
-        $tmpTime += 3600 * 24;
-    }
-    $holidays = DB::table("s_holiday_maintain")->where("holiday", ">", $date[0])
-        ->where("holiday", "<=", $date[count($date) - 1])->get();
-    foreach ($holidays as $holiday) {
-        $keys = array_keys($date, $holiday->holiday);
-        if (isset($keys[0])) unset($date[$keys[0]]);
-    }
-    $date = array_values($date);
-
-    return $changeDayNum > 0 ? $date[$changeDayNum] : $date[count($date) - 1 - abs($changeDayNum)];
-}
-

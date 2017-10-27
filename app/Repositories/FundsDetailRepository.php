@@ -9,7 +9,7 @@ class FundsDetailRepository extends Base
     const PAGE_SIZE = 15;
 
     static public $fundsDetailsTypeList = [
-        "全部" => [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11],
+        "全部" => [0, 1, 2, 3, 4, 5, 6, 7, 10, 11],
         "充值提款" => [0, 1, 2, 3, 10, 11],
         "借款明细" => [4, 6, 8],
         "服务费明细" => [5],
