@@ -74,6 +74,4 @@ Route::group([
     Route::post('/getContract', 'Api\StockFinanceController@getContract');
 
     Route::any('/wechat', 'Api\WechatController@index');
-    Route::post('/redirectOauthPage', 'Api\LoginController@redirectOauthPage');
-    Route::any('/loginFromOpenId', 'Api\LoginController@loginFromOpenId');
 });

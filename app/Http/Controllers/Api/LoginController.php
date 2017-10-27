@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\WechatRepository;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Api\WechatController;
 
 class LoginController extends Controller
 {
@@ -63,24 +61,5 @@ class LoginController extends Controller
         }
 
         return parent::jsonReturn([], parent::CODE_SUCCESS, "success");
-    }
-
-    public function redirectOauthPage(Request $request, WechatRepository $wechat)
-    {
-        $wechat = new WechatController([], $wechat);
-        $url = $request->get("url");
-        $getOpenIdUrl = PC_SITE_URL . "v1/loginFromOpenId?callbackUrl=" . $url;
-        return $wechat->redirectOauthUrl($getOpenIdUrl);
-    }
-
-    public function loginFormOpenId(Request $request, WechatRepository $wechat)
-    {
-        $url = $request->get("callbackUrl");
-
-        $wechat = new WechatController([], $wechat);
-        $userInfo = $wechat->getOauthUserInfo();
-        $openId = $userInfo->openid;
-
-
     }
 }
