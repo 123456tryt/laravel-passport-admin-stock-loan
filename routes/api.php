@@ -30,6 +30,7 @@ Route::group([
     Route::post("/agentChangeBasic", "Api\AgentController@updateAgentBasic");//修改代理商基本信息
     Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");//修改代理附加信息
     Route::post("/agentChangePercentage", "Api\AgentController@updateAgentPercentage");//修改代理商分成比例配置
+    Route::get("/agentMoneyPeakList", "Api\AgentPeakController@list");//代理商峰值
 
 
     //代理商佣金分成

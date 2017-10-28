@@ -2,6 +2,8 @@
 
 namespace App\Http\Model;
 
+use App\User;
+
 
 /**
  * App\Http\Model\Agent
@@ -19,22 +21,28 @@ class Agent extends Base
 
     public function users()
     {
-        return $this->hasMany('App\User', 'agent_id', 'id');
+        return $this->hasMany(User::Class, 'agent_id', 'id');
     }
 
     public function employees()
     {
 
-        return $this->hasMany('\App\Http\Model\Employee', 'agent_id', 'id');
+        return $this->hasMany(Employee::Class, 'agent_id', 'id');
     }
 
     public function parent()
     {
-        return $this->hasOne('\App\Http\Model\Agent', 'id', 'parent_id');
+        return $this->hasOne(self::Class, 'id', 'parent_id');
     }
 
     public function info()
     {
-        return $this->hasOne('\App\Http\Model\AgentInfo', 'id', 'id');
+        return $this->hasOne(AgentInfo::Class, 'id', 'id');
+    }
+
+    public function percentages()
+    {
+        return $this->hasMany(AgentProfitRateConfig::Class, 'agent_id', 'id');
+
     }
 }

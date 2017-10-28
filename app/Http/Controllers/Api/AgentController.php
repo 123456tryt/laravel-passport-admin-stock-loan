@@ -74,6 +74,7 @@ class AgentController extends Controller
 
             $data = $request->except(['password', 'confirm_password', 'day_percentage', 'month_percentage', 'commission_percentage', 'name']);
             $data['agent_level'] = $agent_level;
+            $data['agent_number'] = $request->input('name');
             //创建代理商
             $instance = Agent::create($data);
             //创建登陆用户
@@ -198,10 +199,14 @@ class AgentController extends Controller
     public function list(Request $request)
     {
         $per_page = $request->input('size', self::PAGE_SIZE);
-        $agent_name = $request->input('keyword');
-        $query = Agent::where('is_locked', '!=', 1)->orderByDesc('updated_time')->with('parent');
-        if ($agent_name) {
-            $query->where('agent_name', 'like', "%$agent_name%");
+        $keyword = $request->input('keyword');
+        //todo:判断权限 增加预设条件
+        $query = Agent::orderBy('is_locked', 'asc')->orderBy('created_time', 'desc')
+            ->with('parent', 'info', 'percentages');
+        if ($keyword) {
+            $query->orWhere('agent_name', 'like', "%$keyword%")
+                ->orWhere('agnet_number', 'like', "$keyword")
+                ->orWhere('id', 'like', "" % $keyword % "");
         }
         $data = $query->paginate($per_page);
         return self::jsonReturn($data);
