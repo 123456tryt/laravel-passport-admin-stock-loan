@@ -107,28 +107,41 @@ Route::group([
     Route::post("/stockFees", "Api\System\StockFeeController@index");
     Route::post("/stockFee/store", "Api\System\StockFeeController@store");
     Route::post("/stockFee/{id}", "Api\System\StockFeeController@show");
-    //母账户管理
-    Route::post("/parentStockFinance/update/{id}", "Api\System\ParentStockFinanceController@update");
-    Route::post("/parentStockFinances", "Api\System\ParentStockFinanceController@index");
-    Route::post("/parentStockFinance/store", "Api\System\ParentStockFinanceController@store");
-    Route::post("/parentStockFinance/{id}", "Api\System\ParentStockFinanceController@show");
+    //风控规则
+    Route::post("/transRistControlRule/update/{id}", "Api\System\TransRistControlRuleController@update");
+    Route::post("/transRistControlRule", "Api\System\TransRistControlRuleController@index");
+    Route::post("/transRistControlRule/store", "Api\System\TransRistControlRuleController@store");
+    Route::post("/transRistControlRule/{id}", "Api\System\TransRistControlRuleController@show");
+
+
+    //操盘账户（子账户）  /以及风控管理
+    Route::post("/uStockFinancings", "Api\System\UStockFinancingController@index");
+    Route::post("/uStockFinancing/{id}", "Api\System\UStockFinancingController@show");
+    //风控日志管理
+    Route::post("/stockFinanceRisks", "Api\System\StockFinanceRiskController@index");
+    Route::post("/stockFinanceRisk/{id}", "Api\System\StockFinanceRiskController@show");
+    //子账户流水记录（配资记录）
+    Route::post("/uStockFinancingFlows", "Api\System\UStockFinancingFlowController@index");
+    Route::post("/uStockFinancingFlow/{id}", "Api\System\UStockFinancingFlowController@show");
+    //配资付息记录
+    Route::post("/uStockFinanceInterestPercentages", "Api\System\UStockFinanceInterestPercentageController@index");
+    Route::post("/uStockFinanceInterestPercentage/{id}", "Api\System\UStockFinanceInterestPercentageController@show");
+    //业务审核（结算审核）
+    Route::post("/uStockFinanceFettleup", "Api\System\UStockFinanceFettleup@index");
+    Route::post("/uStockFinanceFettleup/{id}", "Api\System\UStockFinanceFettleup@show");
+    //除权降息管理
+    Route::post("/xrDrInfos", "Api\System\XrDrInfoController@index");
+    Route::post("/xrDrInfo/{id}", "Api\System\XrDrInfoController@show");
     //资金池管理
     Route::post("/capitalPool/update/{id}", "Api\System\CapitalPoolController@update");
     Route::post("/capitalPools", "Api\System\CapitalPoolController@index");
     Route::post("/capitalPool/store", "Api\System\CapitalPoolController@store");
     Route::post("/capitalPool/{id}", "Api\System\CapitalPoolController@show");
-    //风控日志管理
-    Route::post("/stockFinanceRisks", "Api\System\StockFinanceRiskController@index");
-    Route::post("/stockFinanceRisk/{id}", "Api\System\StockFinanceRiskController@show");
-    //除权降息管理
-    Route::post("/xrDrInfos", "Api\System\XrDrInfoController@index");
-    Route::post("/xrDrInfo/{id}", "Api\System\XrDrInfoController@show");
-    //配资记录管理
-    Route::post("/uStockFinancing", "Api\System\UStockFinancingController@index");
-    Route::post("/uStockFinancing/{id}", "Api\System\UStockFinancingController@show");
-    //子账户资金流水记录
-    Route::post("/uStockFinancingFlows", "Api\System\UStockFinancingFlowController@index");
-    Route::post("/uStockFinancingFlow/{id}", "Api\System\UStockFinancingFlowController@show");
+    //操盘母账户管理
+    Route::post("/parentStockFinance/update/{id}", "Api\System\ParentStockFinanceController@update");
+    Route::post("/parentStockFinances", "Api\System\ParentStockFinanceController@index");
+    Route::post("/parentStockFinance/store", "Api\System\ParentStockFinanceController@store");
+    Route::post("/parentStockFinance/{id}", "Api\System\ParentStockFinanceController@show");
 
 
     //管理后台用户相关
