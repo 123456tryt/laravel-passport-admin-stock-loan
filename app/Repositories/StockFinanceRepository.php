@@ -142,7 +142,7 @@ class StockFinanceRepository extends Base
                 $t["interest_charged_day"] = $stockFinance["interest_charged_day"] / self::ONE_MONTH_DAYS;
                 break;
             case 3:
-                $t["interest_charged_day"] = (strtotime($t["end_time"]) - strtotime($t["start_time"])) / 3600 / 24;
+                $t["interest_charged_day"] = (strtotime($t["end_time"]) - strtotime($t["start_time"])) / 3600 / 24 + 1;
                 break;
             default:
                 $t["interest_charged_day"] = date("Y-m-d", strtotime($stockFinance["created_time"])) == date("Y-m-d") ?

@@ -9,7 +9,6 @@ use App\Repositories\WechatRepository;
 
 class WechatController extends Controller
 {
-    private $wechat = null;
     private $app = null;
     private $config = [
         'app_id' => 'wx5fb8a69f323c231a',
@@ -17,9 +16,8 @@ class WechatController extends Controller
         'token' => 'yingli',
     ];
 
-    public function __construct($config = [], WechatRepository $wechat)
+    public function __construct($config = [])
     {
-        $this->wechat = $wechat;
         $this->config = array_merge($this->config, $config);
         $options = [
             'debug' => true,
@@ -169,13 +167,26 @@ class WechatController extends Controller
         $data["nick_name"] = $userInfo->nickname;
         $data["head_pic"] = $userInfo->headimgurl;
 
-        $this->wechat->subscribe($data);
+        $record = WexingConcern::where("open_id", $data["open_id"])->first();
+        if ($record) {
+            $record->update(array_merge($data, [
+                "is_concern" => 1,
+            ]));
+        } else {
+            WexingConcern::create($data);
+        }
         return "欢迎关注";
     }
 
     private function unSubscribe($message)
     {
         $openId = $message->FromUserName;
-        $this->wechat->unSubscribe($openId);
+        $record = WexingConcern::where("open_id", $openId)->first();
+        if ($record) {
+            $record->update([
+                "is_concern" => 0,
+                "cancel_time" => date("Y-m-d H:i:s")
+            ]);
+        }
     }
 }

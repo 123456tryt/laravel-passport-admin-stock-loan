@@ -255,7 +255,7 @@ class RegisterRepository extends Base
 
     private function makeQrCode($code)
     {
-        $wechat = new WechatController();
+        $wechat = new WechatController;
         $img = $wechat->makeQrCode($code);
         if (!$img) return false;
 

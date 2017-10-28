@@ -65,19 +65,19 @@ class LoginController extends Controller
         return parent::jsonReturn([], parent::CODE_SUCCESS, "success");
     }
 
-    public function redirectOauthPage(Request $request, WechatRepository $wechat)
+    public function redirectOauthPage(Request $request)
     {
-        $wechat = new WechatController([], $wechat);
+        $wechat = new WechatController();
         $url = $request->get("url");
         $getOpenIdUrl = PC_SITE_URL . "v1/loginFromOpenId?callbackUrl=" . $url;
         return $wechat->redirectOauthUrl($getOpenIdUrl);
     }
 
-    public function loginFormOpenId(Request $request, WechatRepository $wechat)
+    public function loginFormOpenId(Request $request)
     {
         $url = $request->get("callbackUrl");
 
-        $wechat = new WechatController([], $wechat);
+        $wechat = new WechatController;
         $userInfo = $wechat->getOauthUserInfo();
         $openId = $userInfo->openid;
 

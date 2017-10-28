@@ -93,7 +93,7 @@ class AccountRepository extends Base
         $data = [
             "cash" => $user->cust_capital_amount,       //可用资金
             "freeze_cash" => 0.00,                  //冻结资金
-            "securitiesNetWorth" => 0,              //证券净值 合约总资产+盈亏
+            "securitiesNetWorth" => 0,              //证券净值
         ];
 
         $list = StockFinancing::where("cust_id", $user->id)->whereIn("status", [1, 2, 3])->get();
@@ -101,8 +101,9 @@ class AccountRepository extends Base
             $data["freeze_cash"] += (float)$v->init_caution_money + (float)$v->post_finance_caution_money +
                 (float)$v->post_add_caution_money;
         }
-        $data["securitiesNetWorth"] = $data["freeze_cash"]; //TODO:计算股票净值
+        $data["securitiesNetWorth"] = $data["freeze_cash"]; //TODO:计算股票净值 合约总资产+盈亏
 
+        //总资产=现金+股票净值
         $totalAssets = $data["cash"] + $data["securitiesNetWorth"];
         $t = $totalAssets == 0 ? 1 : $totalAssets;  //分母为0
         $data = array_merge($data, [
@@ -111,6 +112,10 @@ class AccountRepository extends Base
             "cashRate" => $user->cust_capital_amount / $t * 100,
         ]);
 
+        $data["securitiesNetWorthRate"] = $data["securitiesNetWorthRate"] > 100 ? 100 : ($data["securitiesNetWorthRate"]
+        < 0 ? 0 : $data["securitiesNetWorthRate"]);
+        $data["cashRate"] = $data["cashRate"] > 100 ? 100 : ($data["cashRate"]
+        < 0 ? 0 : $data["cashRate"]);
         foreach ($data as $k => $v) {
             $data[$k] = sprintf("%.2f", $v);
         }

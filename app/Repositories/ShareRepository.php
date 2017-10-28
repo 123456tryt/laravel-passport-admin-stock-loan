@@ -75,7 +75,7 @@ class ShareRepository extends Base
         foreach ($percentages as $percentage) {
             $data[] = [
                 "nickname" => $user->nick_name,
-                "cellphone" => $user->cellphone,
+                "cellphone" => half_replace($user->cellphone),
                 "income" => $percentage->{$incomeField},
                 "expenses" => 0,
             ];
