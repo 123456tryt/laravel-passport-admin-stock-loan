@@ -12,7 +12,7 @@ class RechargeController extends Controller
 
     public function __construct(RechargeRepository $recharge)
     {
-        $this->middleware('auth:api');
+        $this->middleware(["auth:api", "App\Http\Middleware\UserForbidden"]);
 
         $this->recharge = $recharge;
     }

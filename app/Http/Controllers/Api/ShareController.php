@@ -12,7 +12,7 @@ class ShareController extends Controller
 
     public function __construct(ShareRepository $share)
     {
-        $this->middleware("auth:api");
+        $this->middleware(["auth:api", "App\Http\Middleware\UserForbidden"]);
         $this->share = $share;
     }
 

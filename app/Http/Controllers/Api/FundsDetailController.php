@@ -12,7 +12,7 @@ class FundsDetailController extends Controller
 
     public function __construct(FundsDetailRepository $fundsDetail)
     {
-        $this->middleware("auth:api");
+        $this->middleware(["auth:api", "App\Http\Middleware\UserForbidden"]);
 
         $this->fundsDetail = $fundsDetail;
     }

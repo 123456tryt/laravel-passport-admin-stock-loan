@@ -19,7 +19,7 @@ class UserDataController extends Controller
 
     public function __construct(UserDataRepository $userData, SmsRepository $sms)
     {
-        $this->middleware("auth:api");
+        $this->middleware(["auth:api", "App\Http\Middleware\UserForbidden"]);
 
         $this->userData = $userData;
         $this->sms = $sms;

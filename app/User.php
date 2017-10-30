@@ -46,12 +46,14 @@ class User extends Authenticatable
         return $this->where(CUSTOMER_USERNAME_FIELD, $username)->first();
     }
 
+    //验证密码
     public function validateForPassportPasswordGrant($password)
     {
-        return encryptPassword($password) == $this->password ||
-            $password == $this->password;
+        return (encryptPassword($password) == $this->password ||
+            $password == $this->password);
     }
 
+    //银行卡信息
     public function bankCard()
     {
         return $this->hasMany('App\Http\Model\CustBankCard', 'cust_id');

@@ -222,10 +222,6 @@ class StockFinanceController extends Controller
             return parent::jsonReturn([], parent::CODE_FAIL, "追配保证金必须为10的倍数");
         }
 
-        if ($user->is_stock_finance_forbidden) {
-            return parent::jsonReturn([], parent::CODE_FAIL, "用户暂时无法追加保证金");
-        }
-
         $data = [
             "custId" => $user->id,
             "id" => $request->get("id"),

@@ -13,7 +13,7 @@ class AccountController extends Controller
 
     public function __construct(AccountRepository $account)
     {
-        $this->middleware('auth:api');
+        $this->middleware(["auth:api", "App\Http\Middleware\UserForbidden"]);
 
         $this->account = $account;
     }

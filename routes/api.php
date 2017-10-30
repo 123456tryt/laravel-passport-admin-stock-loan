@@ -25,7 +25,8 @@ Route::group([
     Route::post("/getRegisterSms", "Api\RegisterController@sendSms")->middleware("App\Http\Middleware\CaptchaCheck");
     Route::post("/getGetBackSms", "Api\RegisterController@sendGetBackSms")->middleware("App\Http\Middleware\CaptchaCheck");
     Route::post("/login", "Api\LoginController@login");
-    Route::post("/logout", "Api\LoginController@logout")->middleware("auth:api");
+    Route::post("/logout", "Api\LoginController@logout")->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
 
     Route::post("/bankCards", "Api\UserDataController@bankCards");
     Route::post("/getBankCard", "Api\UserDataController@getBankCard");
@@ -60,16 +61,25 @@ Route::group([
     Route::post('/getFundsDetails', 'Api\FundsDetailController@getFundsDetails');
 
     Route::post('/getProducts', 'Api\StockFinanceController@getProducts');
-    Route::post('/getStockFinances', 'Api\StockFinanceController@getStockFinances')->middleware("auth:api");
-    Route::post('/getStockFinance', 'Api\StockFinanceController@getStockFinance')->middleware("auth:api");
-    Route::post('/stockFinance', 'Api\StockFinanceController@stockFinance')->middleware("auth:api");
-    Route::post('/stockFinanceOfFree', 'Api\StockFinanceController@stockFinanceOfFree')->middleware("auth:api");
-    Route::post('/postFinanceCautionMoney', 'Api\StockFinanceController@postFinanceCautionMoney')->middleware("auth:api");
-    Route::post('/postAddCautionMoney', 'Api\StockFinanceController@postAddCautionMoney')->middleware("auth:api");
-    Route::post('/modifyAutoSupplyCautionMoney', 'Api\StockFinanceController@modifyAutoSupplyCautionMoney')->middleware("auth:api");
-    Route::post('/getAllowMaxExtractProfit', 'Api\StockFinanceController@getAllowMaxExtractProfit')->middleware("auth:api");
+    Route::post('/getStockFinances', 'Api\StockFinanceController@getStockFinances')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
+    Route::post('/getStockFinance', 'Api\StockFinanceController@getStockFinance')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
+    Route::post('/stockFinance', 'Api\StockFinanceController@stockFinance')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
+    Route::post('/stockFinanceOfFree', 'Api\StockFinanceController@stockFinanceOfFree')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
+    Route::post('/postFinanceCautionMoney', 'Api\StockFinanceController@postFinanceCautionMoney')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");;
+    Route::post('/postAddCautionMoney', 'Api\StockFinanceController@postAddCautionMoney')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
+    Route::post('/modifyAutoSupplyCautionMoney', 'Api\StockFinanceController@modifyAutoSupplyCautionMoney')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
+    Route::post('/getAllowMaxExtractProfit', 'Api\StockFinanceController@getAllowMaxExtractProfit')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
     Route::post('/extractProfit', 'Api\StockFinanceController@extractProfit')->middleware("auth:api");
-    Route::post('/settleup', 'Api\StockFinanceController@settleup')->middleware("auth:api");
+    Route::post('/settleup', 'Api\StockFinanceController@settleup')->middleware("auth:api")
+        ->middleware("App\Http\Middleware\UserForbidden");
     Route::post('/getContract', 'Api\StockFinanceController@getContract');
 
     Route::any('/wechat', function (Request $request) {
