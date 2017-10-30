@@ -47,14 +47,12 @@ Route::group([
     Route::post("/employeeInfo", "Api\EmployeeController@info");
     Route::post("/employeeUpdate", "Api\EmployeeController@update");
 
-
-    Route::get("/clientList", "Api\ClientController@list");
-    Route::post("/clientUpdate", "Api\ClientController@update");
-    //getSwapClientHeritSelectorList
-    Route::post("/agentEmployeeSelectorList", "Api\ClientController@getSwapClientHeritSelectorList");
-
-    //changeClientAgentEmployeeRelations
-    Route::post("/swapClientHeritRelation", "Api\ClientController@changeClientAgentEmployeeRelations");
+    //客户相关
+    Route::get("/clientList", "Api\ClientController@list");//客户列表
+    Route::post("/clientInfo", "Api\ClientController@info");//客户详情
+    Route::post("/clientUpdate", "Api\ClientController@update");//客户更新
+    Route::post("/agentEmployeeSelectorList", "Api\ClientController@getSwapClientHeritSelectorList");//跟换客户关系,下拉刷新
+    Route::post("/swapClientHeritRelation", "Api\ClientController@changeClientAgentEmployeeRelations");//更改客户关系
 
 
     //用户账户余额调整

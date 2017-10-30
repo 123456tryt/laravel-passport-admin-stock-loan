@@ -12,6 +12,7 @@ use App\Http\Model\Employee;
 use App\Http\Model\EmployeeProfitRateConfig;
 use App\Http\Model\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -51,8 +52,11 @@ class ClientController extends Controller
             $clientIds = ClientAgentEmployeeRelation::where("agent{$agent_level}", $agent_id)->pluck('cust_id')->all();
             $clientIds = array_values($clientIds);
             $query->whereIn('id', $clientIds);
+            $todayCount = 0;
         } else {
             //管理员 显示全部用户
+            //计算今日新增加客户
+            $todayCount = Client::where('created_time', '>', Carbon::yesterday()->toDateString())->count();
         }
 
 
@@ -66,15 +70,27 @@ class ClientController extends Controller
 
 
         $page_size = $request->input('size', self::PAGE_SIZE);
-        $data = $query->paginate($page_size);
+        $list = $query->paginate($page_size);
+        $data = compact('todayCount', 'list');
         return self::jsonReturn($data);
     }
 
+    public function info(Request $request)
+    {
+        $client = Client::with('relation')->find($request->id);
+        return self::jsonReturn($client);
+    }
 
     public function update(Request $request)
     {
-        $client = Client::find($request->id)
-            ->fill($request->only('is_login_forbidden', 'is_cash_forbidden', 'is_charge_forbidden', 'is_stock_finance_forbidden'));
+        $formData = $request->only('is_login_forbidden', 'is_cash_forbidden', 'is_charge_forbidden', 'is_stock_finance_forbidden');
+        if (boolval($request->openid)) {
+            $formData['openid'] = '';
+        }
+        if ($request->password) {
+            $formData['password'] = bcrypt($request->password);
+        }
+        $client = Client::find($request->id)->fill($formData);
         $client->save();
         return self::jsonReturn($client, self::CODE_SUCCESS, '修改客户成功');
     }
