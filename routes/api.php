@@ -110,7 +110,7 @@ Route::group([
     Route::post("/stockFee/{id}", "Api\System\StockFeeController@show");
     //风控规则
     Route::post("/transRistControlRule/update/{id}", "Api\System\TransRistControlRuleController@update");
-    Route::post("/transRistControlRule", "Api\System\TransRistControlRuleController@index");
+    Route::post("/transRistControlRules", "Api\System\TransRistControlRuleController@index");
     Route::post("/transRistControlRule/store", "Api\System\TransRistControlRuleController@store");
     Route::post("/transRistControlRule/{id}", "Api\System\TransRistControlRuleController@show");
 

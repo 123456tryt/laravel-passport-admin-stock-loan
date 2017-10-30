@@ -24,7 +24,8 @@ class SystemParamsController extends Controller
     {
         $agent_id = \Auth::user()->agent_id;
         $rs['list'] = \DB::select(
-            'select any_value(id) as id,`key`,any_value(value)as value,any_value(remark)as remark,any_value(agent_id)as agent_id
+            'select any_value(id) as id,`key`,any_value(value)as value,any_value(remark)as remark,
+            any_value(agent_id)as agent_id,any_value(param_type)as param_type
             from(select * from s_system_params where agent_id in (0,?) group by id order by agent_id desc)a group by `key`'
             , [$agent_id]);
         return self::jsonReturn($rs);
