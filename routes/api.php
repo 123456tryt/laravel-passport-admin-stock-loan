@@ -111,7 +111,8 @@ Route::group([
     Route::post("/transRistControlRule/{id}", "Api\System\TransRistControlRuleController@show");
 
 
-    //操盘账户（子账户）  /以及风控管理
+    //操盘账户（子账户/以及风控管理）
+    Route::post("/uStockFinancing/update/{id}", "Api\System\UStockFinancingController@update");
     Route::post("/uStockFinancings", "Api\System\UStockFinancingController@index");
     Route::post("/uStockFinancing/{id}", "Api\System\UStockFinancingController@show");
     //风控日志管理

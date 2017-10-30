@@ -13,7 +13,7 @@ return [
     'StockFee' => [
         'field' => ['*'],
         'whereMust' => '',
-        'keyWord' => 'agent_id'
+        'keyWord' => ''
     ],
     'StockInfo' => [
         'field' => ['*'],
