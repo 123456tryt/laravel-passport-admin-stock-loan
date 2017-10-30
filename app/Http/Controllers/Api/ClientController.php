@@ -10,8 +10,9 @@ use App\Http\Model\ClientAgentEmployeeRelation;
 use App\Http\Model\ClientFeeRate;
 use App\Http\Model\Employee;
 use App\Http\Model\EmployeeProfitRateConfig;
+use App\Http\Model\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class ClientController 客户表
@@ -31,19 +32,41 @@ class ClientController extends Controller
      */
     public function list(Request $request)
     {
-        $page_size = $request->input('size', self::PAGE_SIZE);
-        $keyword = $request->input('keyword');
-        $agent_id = $request->input('agent_id');
+        $user = Auth::user();
 
-        $query = Client::orderByDesc('updated_time')->with('relation');
+        $query = Client::orderByDesc('created_time')->with('relation');
+
+        $selectedAgent = Agent::find($request->agent_id);
+        if ($selectedAgent) {
+            $agent_id = $selectedAgent->id;
+            $agent_level = $selectedAgent->agent_level;
+        } else {
+            $agent_id = $user->agent_id;
+            $agent_level = $user->agent->agent_level;
+        }
+
+        //代理商
+        if ($user->role_id != Role::ROLE_ADMIN_SYSTEM) {
+            //显示下级代理商的用户
+            $clientIds = ClientAgentEmployeeRelation::where("agent{$agent_level}", $agent_id)->pluck('cust_id')->all();
+            $clientIds = array_values($clientIds);
+            $query->whereIn('id', $clientIds);
+        } else {
+            //管理员 显示全部用户
+        }
+
+
+        $keyword = $request->input('keyword');
         if ($keyword) {
             $query = $query->orWhere('nick_name', 'like', "%$keyword%")
                 ->orWhere('cellphone', 'like', "%$keyword%")
                 ->orWhere('id', "%$keyword%")
                 ->orWhere('real_name', 'like', "%$keyword%");
         }
+
+
+        $page_size = $request->input('size', self::PAGE_SIZE);
         $data = $query->paginate($page_size);
-        //TODO::根据关系表只显示本级以下代理商
         return self::jsonReturn($data);
     }
 

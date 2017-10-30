@@ -11,6 +11,7 @@ use App\Http\Model\RecommendCode;
 use App\Http\Model\Role;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -159,12 +160,22 @@ class AgentController extends Controller
      */
     public function selectorOptionsList(Request $request)
     {
-        $list = Cache::rememberForever(self::AgentSelectorListCackeKey, function () {
-            return Agent::where('is_locked', '!=', 1)
+        if (Auth::user()->isSystemAdmin()) {
+            $list = Agent::where('is_locked', '!=', 1)
                 ->orderByDesc('updated_time')->select('id', 'agent_level', 'agent_name')
                 ->get();
+        } else {
+            $thisAgent = Auth::user()->agent;
+            $list = Agent::getAllChildrenAgentWithMyself($thisAgent);
+        }
 
-        });
+
+//        $list = Cache::rememberForever(self::AgentSelectorListCackeKey, function () {
+//            return Agent::where('is_locked', '!=', 1)
+//                ->orderByDesc('updated_time')->select('id', 'agent_level', 'agent_name')
+//                ->get();
+//
+//        });
         return self::jsonReturn($list);
     }
 

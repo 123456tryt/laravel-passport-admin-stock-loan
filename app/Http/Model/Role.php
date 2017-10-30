@@ -12,7 +12,7 @@ class Role extends Base
     protected $guarded = ['id'];
     public $timestamps = false;
 
-
+    const ROLE_ADMIN_SUPER = 999;
     const ROLE_ADMIN_SYSTEM = 1;
     const ROLE_ADMIN_AGENT = 2;
 

@@ -45,4 +45,21 @@ class Agent extends Base
         return $this->hasMany(AgentProfitRateConfig::Class, 'agent_id', 'id');
 
     }
+
+
+    public static function getAllChildrenAgentWithMyself(Agent $agent)
+    {
+        $array[] = $agent;
+        while ($agent) {
+            $child = self::where('parent_id', $agent->id);
+            if ($child) {
+                $array[] = $child;
+                $agent = $child;
+            } else {
+                $agent = null;
+            }
+        }
+        return $array;
+    }
+
 }

@@ -2,8 +2,9 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
+use App\Http\Model\Role;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
 /**
@@ -79,5 +80,11 @@ class User extends Authenticatable
     public function percentages()
     {
         return $this->hasMany('App\Http\Model\EmployeeProfitRateConfig', 'employee_id');
+    }
+
+    //是否是系统管理员
+    public function isSystemAdmin()
+    {
+        return $this->role_id == Role::ROLE_ADMIN_SYSTEM;
     }
 }
