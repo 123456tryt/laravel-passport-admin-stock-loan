@@ -18,5 +18,11 @@ class ClientWithdraw extends Base
         return $this->belongsTo('\App\Http\Model\Client', 'cust_id', 'id');
     }
 
+    public function bankcard()
+    {
+
+
+        return $this->hasOne(ClientBankCard::Class, 'id', 'bankcard_id');
+    }
 
 }

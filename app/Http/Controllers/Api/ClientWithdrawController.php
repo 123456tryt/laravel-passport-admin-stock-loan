@@ -29,16 +29,23 @@ class ClientWithdrawController extends Controller
     {
         $page_size = $request->input('size', self::PAGE_SIZE);
         $agent_id = $request->input('agent_id');
+        $query = ClientWithdraw::orderByDesc('id')->with('client', 'bankcard');
 
-        $query = ClientWithdraw::orderByDesc('id')->with('client');
-
-        $range = $request->range;
-        if (count($range) == 2 && strlen($range[0]) > 10 && strlen($range[1]) > 10) {
-            $from_time = Carbon::parse($range[0]);
-            $to_time = Carbon::parse($range[1]);
-            $query->whereBetween('created_time', [$from_time, $to_time]);
-            $request->page = 1;
+        $fromDate = $request->fromDate;
+        $toDate = $request->toDate;
+        if (strlen($fromDate) > 9) {
+            $fromDate = Carbon::parse($fromDate);
+            $query->where('created_time', '>', $fromDate);
         }
+        if (strlen($toDate) > 9) {
+            $query->where('created_time', '<', $toDate);
+        }
+
+        $cash_status = intval($request->cash_status);
+        if ($cash_status) {
+            $query->where(compact('cash_status'));
+        }
+
         $keyword = $request->input('keyword');
         if ($keyword) {
             $likeString = "%$keyword%";
@@ -63,6 +70,13 @@ class ClientWithdrawController extends Controller
         $withdrawInfo->in_amount = $withdrawInfo->cash_amount - $withdrawInfo->fee;
         $withdrawInfo->save();
         return self::jsonReturn($withdrawInfo, self::CODE_SUCCESS, '修改提现状态成功');
+    }
+
+
+    public function info(Request $request)
+    {
+        $withdrawInfo = ClientWithdraw::find($request->id);
+        return self::jsonReturn($withdrawInfo);
     }
 
 }

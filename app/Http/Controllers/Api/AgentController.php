@@ -205,8 +205,8 @@ class AgentController extends Controller
             ->with('parent', 'info', 'percentages');
         if ($keyword) {
             $query->orWhere('agent_name', 'like', "%$keyword%")
-                ->orWhere('agnet_number', 'like', "$keyword")
-                ->orWhere('id', 'like', "" % $keyword % "");
+                ->orWhere('agent_number', 'like', "$keyword")
+                ->orWhere('id', 'like', "%$keyword%");
         }
         $data = $query->paginate($per_page);
         return self::jsonReturn($data);

@@ -71,6 +71,7 @@ Route::group([
 
     Route::get("/withdrawList", "Api\ClientWithdrawController@list");
     Route::post("/withdrawUpdate", "Api\ClientWithdrawController@update");
+    Route::post("/withdrawInfo", "Api\ClientWithdrawController@info");
 
 
     //客户充值列表
