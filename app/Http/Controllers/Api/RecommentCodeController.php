@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Model\Agent;
 use App\Http\Model\RecommendCode;
 use App\Http\Model\Role;
 use Illuminate\Http\Request;
@@ -65,7 +66,34 @@ class RecommentCodeController extends Controller
             $condition['rec_code'] = $rec_code;
             $recommendCodeInstance = RecommendCode::create($condition);
         }
-        $data = ['user' => $user, 'rec_code' => $recommendCodeInstance];
+
+        $web_host = null;
+        $mobile_host = null;
+
+        $agent = $user->agent;
+        //递归查找网络域名
+        $TOKEN = 'jjjerk';
+        while (!$web_host) {
+            if ($agent->is_independent > 0 && $agent->info) {
+                $web_host = $agent->info->web_domain;
+                $mobile_host = $agent->info->mobile_domain;
+            } else {
+                $agent = Agent::find($agent->parent_id);
+                $web_host = $agent ? null : $TOKEN;
+            }
+        }
+        if ($web_host == $TOKEN) {
+            $web_host = 'https://www.gubao.com';
+            $mobile_host = 'https://m.gubao.com';
+        }
+        $code = $recommendCodeInstance->rec_code;
+        $data = [
+            'code' => $code,
+            'web_host' => "{$web_host}?code={$code}",
+            'mobile_host' => "{$mobile_host}?code={$code}",
+        ];
+
+
         return self::jsonReturn($data);
     }
 
