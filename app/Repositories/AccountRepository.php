@@ -88,6 +88,11 @@ class AccountRepository extends Base
         }
     }
 
+    /**
+     * 获取账号数据统计
+     * @param $user
+     * @return array
+     */
     public function getCount($user)
     {
         $data = [

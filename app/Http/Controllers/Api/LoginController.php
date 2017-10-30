@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\WechatRepository;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\WechatController;
 
@@ -65,22 +66,31 @@ class LoginController extends Controller
         return parent::jsonReturn([], parent::CODE_SUCCESS, "success");
     }
 
-    public function redirectOauthPage(Request $request)
-    {
-        $wechat = new WechatController();
-        $url = $request->get("url");
-        $getOpenIdUrl = PC_SITE_URL . "v1/loginFromOpenId?callbackUrl=" . $url;
-        return $wechat->redirectOauthUrl($getOpenIdUrl);
-    }
-
-    public function loginFormOpenId(Request $request)
+    /**
+     * 获取用户openid并进行相应操作
+     * @param Request $request
+     * @param Response $response
+     * @return $this
+     */
+    public function loginFromOpenId(Request $request, Response $response)
     {
         $url = $request->get("callbackUrl");
 
-        $wechat = new WechatController;
+        $wechat = WechatController::instance($request);
         $userInfo = $wechat->getOauthUserInfo();
-        $openId = $userInfo->openid;
+        $openId = $userInfo["original"]["openid"];
 
+        $user = User::where("openid", "like", "%$openId%")->where("is_login_forbidden", 0)->first();
+        if ($user) {
+            $ret = apiLogin($user->{CUSTOMER_USERNAME_FIELD}, $user->password);
+            //TODO 假设回调url上没有其他参数
+            $url = "http://dev.591wmj.com/3.html?access_token=" . $ret["access_token"] . "&callbackUrl=" . $url;
+        } else {
+            $url = "http://dev.591wmj.com/3.html?openid=" . $openId;
+        }
 
+        return $response->header("Location", $url);
     }
+
+
 }

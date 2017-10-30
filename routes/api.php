@@ -16,8 +16,6 @@ Route::group([
     'prefix' => 'v1',
     'middleware' => ['api']
 ], function () {
-    Route::get("/foo", "Api\FooController@say");
-
     Route::post("/getUserInfo", "Api\UserDataController@getUserInfo");
 
     Route::post("/getIndexData", "Api\OthersController@getIndexData");
@@ -74,7 +72,13 @@ Route::group([
     Route::post('/settleup', 'Api\StockFinanceController@settleup')->middleware("auth:api");
     Route::post('/getContract', 'Api\StockFinanceController@getContract');
 
-    Route::any('/wechat', 'Api\WechatController@index');
-    Route::post('/redirectOauthPage', 'Api\LoginController@redirectOauthPage');
+    Route::any('/wechat', function (Request $request) {
+        $wechat = \App\Http\Controllers\Api\WechatController::instance($request);
+        if ($wechat) {
+            return $wechat->index();
+        }
+    });
+    Route::any('/redirectOauthPage', 'Api\LoginController@redirectOauthPage');
     Route::any('/loginFromOpenId', 'Api\LoginController@loginFromOpenId');
+    Route::post('/bindAccountFromWechat', 'Api\RegisterController@bindAccountFromWechat');
 });

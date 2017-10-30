@@ -105,6 +105,57 @@ class RegisterController extends Controller
     }
 
     /**
+     * 微信绑定账户
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bindAccountFromWechat(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            "cellphone" => ["required", "regex:/^1[0-9]{10}$/"],
+            "password" => ["required", "regex:" . self::$password_reg],
+            "phoneCode" => "required",
+            "openid" => "required|min:1",
+        ], [
+            "cellphone.required" => "手机号码不能为空",
+            "password.required" => "密码不能为空",
+            "cellphone.regex" => "请填写正确的手机号码",
+            "password.regex" => "密码应为6-20位数字或字符或特殊符号组成",
+            "phoneCode.required" => "手机验证码不能为空",
+            "openid.required" => "微信id错误",
+            "openid.min" => "微信id错误",
+        ]);
+
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+
+        $checkPhoneCode = $this->sms->checkVerify($request->get("cellphone"), $request->get("phoneCode"));
+        if (!$checkPhoneCode) {
+            return parent::jsonReturn([], parent::CODE_FAIL, "短信验证码错误");
+        }
+
+        $data = $request->only(["cellphone", "nick_name", "password", "recCode", "openid"]);
+        $data = array_merge($data, [
+            "reg_source" => 0,
+            "reg_ip" => $request->ip(),
+        ]);
+        $ipInfo = getIpInfo($data["reg_ip"]);
+        if ($ipInfo) {
+            $data["ip_location"] = $ipInfo["country"] . $ipInfo["region"] . $ipInfo["city"] . $ipInfo["isp"];
+        }
+
+        $ret = $this->register->bindAccountFromWechat($data);
+        if ($ret) {
+            $res = apiLogin($request->get("cellphone"), $request->get("password"));
+            return parent::jsonReturn($res, parent::CODE_SUCCESS, "绑定成功");
+        } else {
+            return parent::jsonReturn([], parent::CODE_FAIL,
+                $this->register->getErrorMsg() ?: "绑定错误");
+        }
+    }
+
+    /**
      * 发送短信（注册）
      * @param Request $request
      * @param bool $isCheckUnique

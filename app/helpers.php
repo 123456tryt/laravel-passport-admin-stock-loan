@@ -127,10 +127,10 @@ if (!function_exists("getAgent")) {
             $ret = \DB::table("a_agent")->leftJoin("a_agent_extra_info", "a_agent.id", "=", "a_agent_extra_info.id")
                 ->where("a_agent.id", $agentId)->where("a_agent.is_independent", 1)->first();
         } else {
-            $host = request()->header("Host");
+            $referer = pathinfo(request()->header("Referer"))["basename"];
             $ret = \DB::table("a_agent")->leftJoin("a_agent_extra_info", "a_agent.id", "=", "a_agent_extra_info.id")
-                ->where("a_agent.is_independent", 1)->where("a_agent_extra_info.web_domain", $host)
-                ->orWhere("a_agent_extra_info.mobile_domain", $host)->first();
+                ->where("a_agent.is_independent", 1)->where("a_agent_extra_info.web_domain", $referer)
+                ->orWhere("a_agent_extra_info.mobile_domain", $referer)->first();
         }
 
         if (!$ret) {
@@ -154,6 +154,9 @@ if (!function_exists("half_replace")) {
     }
 }
 
+/**
+ * 获取股票行情
+ */
 if (!function_exists("getStockInfo")) {
     function getStockInfo($code)
     {
@@ -172,6 +175,9 @@ if (!function_exists("getStockInfo")) {
     }
 }
 
+/**
+ * 请求JAVA
+ */
 if (!function_exists("requestJava")) {
     function requestJava($url, $data)
     {
@@ -183,6 +189,9 @@ if (!function_exists("requestJava")) {
     }
 }
 
+/**
+ * 钱转换为汉字表示
+ */
 if (!function_exists("num_to_rmb")) {
     function num_to_rmb($num)
     {
@@ -249,6 +258,9 @@ if (!function_exists("num_to_rmb")) {
     }
 }
 
+/**
+ * 格式化钱
+ */
 if (!function_exists("formatMoney")) {
     function formatMoney($money)
     {
@@ -256,6 +268,9 @@ if (!function_exists("formatMoney")) {
     }
 }
 
+/**
+ * 阿里oss上传
+ */
 if (!function_exists("ossUpload")) {
     function ossUpload($object, $content, $type = "")
     {
@@ -279,33 +294,57 @@ if (!function_exists("ossUpload")) {
     }
 }
 
-function caclTransactionDays($startTime, $changeDayNum)
-{
-    if ($changeDayNum == 0) return $startTime;
+/**
+ * 计算工作日
+ */
+if (!function_exists("caclTransactionDays")) {
+    function caclTransactionDays($startTime, $changeDayNum)
+    {
+        if ($changeDayNum == 0) return $startTime;
 
-    $changeTime = $changeDayNum * 24 * 3600;
-    //误差时间
-    $mistakeDay = ceil($changeDayNum / 3) + 30;
-    if ($changeDayNum < 0) {
-        $endTime = $startTime;
-        $startTime = $startTime - $mistakeDay * 3600 * 24;
-    } else {
-        $endTime = $startTime + $mistakeDay * 3600 * 24;
-    }
-    $date = [];
-    $tmpTime = $startTime;
-    for ($i = 0; $i < abs($changeDayNum) + $mistakeDay - 2; $i++) {
-        $date[] = date("Y-m-d", $tmpTime);
-        $tmpTime += 3600 * 24;
-    }
-    $holidays = DB::table("s_holiday_maintain")->where("holiday", ">", $date[0])
-        ->where("holiday", "<=", $date[count($date) - 1])->get();
-    foreach ($holidays as $holiday) {
-        $keys = array_keys($date, $holiday->holiday);
-        if (isset($keys[0])) unset($date[$keys[0]]);
-    }
-    $date = array_values($date);
+        $changeTime = $changeDayNum * 24 * 3600;
+        //误差时间
+        $mistakeDay = ceil($changeDayNum / 3) + 30;
+        if ($changeDayNum < 0) {
+            $endTime = $startTime;
+            $startTime = $startTime - $mistakeDay * 3600 * 24;
+        } else {
+            $endTime = $startTime + $mistakeDay * 3600 * 24;
+        }
+        $date = [];
+        $tmpTime = $startTime;
+        for ($i = 0; $i < abs($changeDayNum) + $mistakeDay - 2; $i++) {
+            $date[] = date("Y-m-d", $tmpTime);
+            $tmpTime += 3600 * 24;
+        }
+        $holidays = DB::table("s_holiday_maintain")->where("holiday", ">", $date[0])
+            ->where("holiday", "<=", $date[count($date) - 1])->get();
+        foreach ($holidays as $holiday) {
+            $keys = array_keys($date, $holiday->holiday);
+            if (isset($keys[0])) unset($date[$keys[0]]);
+        }
+        $date = array_values($date);
 
-    return $changeDayNum > 0 ? $date[$changeDayNum] : $date[count($date) - 1 - abs($changeDayNum)];
+        return $changeDayNum > 0 ? $date[$changeDayNum] : $date[count($date) - 1 - abs($changeDayNum)];
+    }
 }
+
+/**
+ * 获取微信对象
+ */
+if (!function_exists("getWechat")) {
+    function getWechat()
+    {
+        $agent = getAgent();
+        $wechatConf = [
+            'app_id' => $agent->appid,
+            'secret' => $agent->public_key,
+            'token' => $agent->wechat_token,
+            'agentId' => $agent->id,
+        ];
+        return new \App\Http\Controllers\Api\WechatController($wechatConf);
+    }
+}
+
+
 

@@ -28,7 +28,7 @@ class User extends Authenticatable
     protected $fillable = [
         'nick_name', 'password', 'real_name', 'id_card', 'withdraw_pw', "cellphone", "reg_source", "reg_ip",
         "ip_location", "cust_rec_code", "rec_code", "bar_code", "pc_adv_url", "phone_adv_url", "cust_capital_amount",
-        "avatar"
+        "avatar", "openid"
     ];
 
     /**
@@ -48,7 +48,8 @@ class User extends Authenticatable
 
     public function validateForPassportPasswordGrant($password)
     {
-        return encryptPassword($password) == $this->password;
+        return encryptPassword($password) == $this->password ||
+            $password == $this->password;
     }
 
     public function bankCard()

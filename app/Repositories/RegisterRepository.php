@@ -7,10 +7,13 @@ use App\Http\Model\AgentEmpPercentageSetting;
 use App\Http\Model\MemberAgentRelation;
 use App\Http\Model\MemberFeeRate;
 use App\Http\Model\RecCode;
+use App\Http\Model\WexingConcern;
 use App\User;
+use EasyWeChat\Core\Exceptions\HttpException;
 use Illuminate\Support\Facades\DB;
 use App\Http\Model\AgentPercentageSetting;
 use App\Http\Controllers\Api\WechatController;
+use Mockery\Exception;
 
 class RegisterRepository extends Base
 {
@@ -44,22 +47,79 @@ class RegisterRepository extends Base
     }
 
     /**
+     * 绑定微信和账号
+     * @param $data
+     */
+    public function bindAccountFromWechat($data)
+    {
+        $user = User::where(CUSTOMER_USERNAME_FIELD, $data["cellphone"])->first();
+        $openId = $data["openid"];
+
+        $concern = WexingConcern::where("open_id", $openId)->first();
+        $hasBind = User::where("openid", "like", "%$openId%")->count();
+
+        if (!$concern || $hasBind) {
+            $this->setErrorMsg("openid错误");
+            return false;
+        }
+
+        $data["recCode"] = $concern->rec_code;
+        $data["head_pic"] = $concern->head_pic;
+        $data["nick_name"] = $concern->nick_name;
+
+        if ($user) {
+            //修改密码 登录
+            if ($user->is_login_forbidden) {
+                $this->setErrorMsg("账号已被禁用，请联系客服人员");
+            }
+
+            $openIds = array_filter(explode(",", $user->openid));
+            $openIds[] = $openId;
+            $openIds = array_unique($openIds);
+            $data["openid"] = implode(",", $openIds);
+
+            $info = $this->createRegisterData($data);
+            return $user->update($info);
+        } else {
+            //注册
+            $user = $this->make($data);
+            if (!$user) return false;
+
+            $custId = $user->id;
+            $recCode = $data["recCode"];
+            $relationData = $this->setRelation($custId, $recCode);
+            $this->setFeeRate($relationData);
+
+            $this->setRecCode($user, $recCode, $relationData["direct_agent_id"]);
+
+            return true;
+        }
+    }
+
+    /**
      * 写入用户信息
      * @param $data
      * @return mixed
      */
     private function make($data)
     {
+        $info = $this->createRegisterData($data);
+        return $this->create($info);
+    }
+
+    private function createRegisterData($data)
+    {
         $info = [
             CUSTOMER_USERNAME_FIELD => $data["cellphone"],
             "password" => encryptPassword($data["password"]),
-            "nick_name" => $data["nick_name"],
             "reg_source" => $data["reg_source"],
             "reg_ip" => $data["reg_ip"],
             "ip_location" => $data["ip_location"],
         ];
-
-        return $this->create($info);
+        if (isset($data["nick_name"])) $info["nick_name"] = $data["nick_name"];
+        if (isset($data["head_pic"])) $info["avatar"] = $data["head_pic"];
+        if (isset($data["openid"])) $info["openid"] = $data["openid"];
+        return $info;
     }
 
     /**
@@ -90,7 +150,7 @@ class RegisterRepository extends Base
                         }
                     }
                     //假设一个用户只有一个上级用户时，这个用户是该用户的一级客户
-                    $custList = [$codeRecord->user_id, $relationRecord->cust1];
+                    $custList = [$codeRecord->user_id, $relationRecord->cust1 ?: null];
                     $emp = $relationRecord->direct_emp_id;
                 }
             } else if ($userType == self::USER_TYPE_CODE || $userType == self::AGENT_TYPE_CODE) {
@@ -217,6 +277,12 @@ class RegisterRepository extends Base
         MemberFeeRate::create($feeRate2);
     }
 
+    /**
+     * 找回密码
+     * @param $phone
+     * @param $password
+     * @return bool
+     */
     public function getBackPassword($phone, $password)
     {
         $user = User::where("cellphone", $phone)->first();
@@ -253,11 +319,19 @@ class RegisterRepository extends Base
         }
     }
 
+    /**
+     * 生成关注微信的二维码
+     * @param $code
+     * @return bool|string
+     */
     private function makeQrCode($code)
     {
-        $wechat = new WechatController;
-        $img = $wechat->makeQrCode($code);
-        if (!$img) return false;
+        $wechat = getWechat();
+        try {
+            $img = $wechat->makeQrCode($code);
+        } catch (HttpException $e) {
+            return false;
+        }
 
         $object = time() . rand(1, 99999) . $code . ".jpg";
         $ret = ossUpload($object, $img, "qrCode");

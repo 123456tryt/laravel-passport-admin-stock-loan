@@ -103,6 +103,11 @@ class AccountController extends Controller
             parent::jsonReturn([], parent::CODE_FAIL, '撤销失败');
     }
 
+    /**
+     * 获取账户数据统计
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getCount(Request $request)
     {
         $user = $request->user();
