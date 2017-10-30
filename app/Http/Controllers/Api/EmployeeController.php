@@ -3,17 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Model\Agent;
-use App\Http\Model\AgentInfo;
-use App\Http\Model\AgentProfitRateConfig;
 use App\Http\Model\Employee;
 use App\Http\Model\EmployeeProfitRateConfig;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Mockery\Exception;
 
 /**
  * Class EmployeeController 代理商员工控制器
@@ -33,13 +28,10 @@ class EmployeeController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             'name' => 'required|unique:a_agent_emp',//验证登陆用户名唯一
-            'email' => 'required|unique:a_agent_emp',//验证登陆用户名唯一
+            'email' => 'unique:a_agent_emp',//验证登陆用户名唯一
             'phone' => 'required|unique:a_agent_emp',
             'employee_name' => 'required',
-            'is_forbid' => [
-                'required',
-                Rule::in(['0', '1']),
-            ],
+            'is_forbid' => ['required', Rule::in(['0', '1'])],
         ], [
             'phone.unique' => "联系人手机号码已注册",
             'name.unique' => "登陆用户名不能重复",
@@ -178,16 +170,15 @@ class EmployeeController extends Controller
     {
         $page_size = $request->input('size', self::PAGE_SIZE);
 
-        $staff_name = $request->input('keyword');
+        $keyword = $request->input('keyword');
         $agent_id = $request->agent_id;
 
-        $query = Employee::orderByDesc('updated_time')->with('agent', 'role');
+        $query = Employee::orderByDesc('updated_time')->with('agent', 'role', 'percentages');
         if ($agent_id) {
             $query->where(compact('agent_id'));
         }
-        if ($staff_name) {
-            $_GET['page'] = 1;
-            $query->where('employee_name', 'like', "%$staff_name%")->orWhere('phone', 'like', "%$staff_name%");
+        if ($keyword) {
+            $query->orWhere('employee_name', 'like', "%$keyword%")->orWhere('phone', 'like', "%$keyword%")->orWhere('id', 'like', "%$keyword%");
         }
         $list = $query->paginate($page_size);
 

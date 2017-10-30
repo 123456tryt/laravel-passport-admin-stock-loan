@@ -60,12 +60,10 @@ Route::group([
     Route::get("/clientAccountList", "Api\ClientFlowController@list");
 
 
-
-
-    //ClientBankCardController
-    Route::get("/bankCardList", "Api\ClientBankCardController@list");
-    Route::post("/bankCardUpdate", "Api\ClientBankCardController@update");
-
+    //银行卡信息
+    Route::get("/bankCardList", "Api\ClientBankCardController@list");//列表
+    Route::post("/bankCardUpdate", "Api\ClientBankCardController@update");//更新
+    Route::post("/bankCardInfo", "Api\ClientBankCardController@info");//获取单挑银行卡信息
 
     Route::get("/withdrawList", "Api\ClientWithdrawController@list");
     Route::post("/withdrawUpdate", "Api\ClientWithdrawController@update");

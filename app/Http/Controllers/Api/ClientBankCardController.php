@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Model\Client;
 use App\Http\Model\ClientBankCard;
 use Illuminate\Http\Request;
 
@@ -31,10 +32,11 @@ class ClientBankCardController extends Controller
 
         $query = ClientBankCard::orderByDesc('id')->with('client');
         if ($keyword) {
-            $query = $query->orWhere('bank_reg_cellphone', 'like', "%$keyword%")
-                ->orWhere('cust_id', '=', "$keyword")
-                ->orWhere('open_province', 'like', "%$keyword%")
-                ->orWhere('open_district', 'like', "%$keyword%");
+            $clientIds = Client::orwhere('id', 'like', "%$keyword%")
+                ->orWhere('real_name', 'like', "%$keyword%")
+                ->orWhere('cellphone', 'like', "%$keyword%")->pluck('id')->all();
+            $clientIds = array_values($clientIds);
+            $query = $query->whereIn('cust_id', $clientIds);
         }
         $data = $query->paginate($page_size);
         //TODO::根据关系表只显示本级以下代理商
@@ -51,6 +53,13 @@ class ClientBankCardController extends Controller
                 'bank_name', 'bank_card', 'open_bank', 'open_district', 'open_province', 'bank_reg_cellphone'
             ]));
         $cardInfo->save();
+        return self::jsonReturn($cardInfo, self::CODE_SUCCESS, '修改客户成功');
+    }
+
+
+    public function info(Request $request)
+    {
+        $cardInfo = ClientBankCard::find($request->id);
         return self::jsonReturn($cardInfo, self::CODE_SUCCESS, '修改客户成功');
     }
 
