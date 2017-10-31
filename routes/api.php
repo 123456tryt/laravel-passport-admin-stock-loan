@@ -26,13 +26,16 @@ Route::group([
     Route::post("/agentSelectorList", "Api\AgentController@selectorOptionsList");//代理商下拉 搜索
     Route::get("/agentList", "Api\AgentController@list"); //代理商列表
     Route::post("/agentInfo", "Api\AgentController@info");//代理商详细信息
-    Route::any("/agentChildrenList", "Api\AgentController@childrenAgent");//获取代理商的后代代理商
+    Route::post("/agentChildrenList", "Api\AgentController@childrenAgent");//获取代理商的后代代理商
 
     Route::post("/agentChangeAdminPassword", "Api\AgentController@changeAgentAdminUserPassword");//修改代理商管理员密码
     Route::post("/agentChangeBasic", "Api\AgentController@updateAgentBasic");//修改代理商基本信息
     Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");//修改代理附加信息
     Route::post("/agentChangePercentage", "Api\AgentController@updateAgentPercentage");//修改代理商分成比例配置
     Route::get("/agentMoneyPeakList", "Api\AgentPeakController@list");//代理商峰值
+
+    //短信
+    Route::get("/agentMessageList", "Api\UMsgController@list");//代理商峰值
 
 
     //代理商佣金分成

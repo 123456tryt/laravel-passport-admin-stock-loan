@@ -226,10 +226,9 @@ class AgentController extends Controller
 
     public function childrenAgent(Request $request)
     {
-
         $thisAgent = Agent::with('parent', 'percentages', 'info')->find($request->agent_id);
         if ($thisAgent) {
-            $list = Cache::remember(self::generateCacheKeyByReqeust(), 1, function () use ($thisAgent) {
+            $list = Cache::remember(self::generateCacheKeyByReqeust(), 120, function () use ($thisAgent) {
                 return $this->getAllChildrenAgentWithMyselfWithInfoParentPercentage($thisAgent);
             });
 
