@@ -129,6 +129,8 @@ Route::group([
     Route::post("/uStockFinancing/update/{id}", "Api\System\UStockFinancingController@update");
     Route::post("/uStockFinancings", "Api\System\UStockFinancingController@index");
     Route::post("/uStockFinancing/{id}", "Api\System\UStockFinancingController@show");
+    //持仓
+    Route::post("/uStockFinanceHoldings/stock_finance_id/{stock_finance_id}", "Api\System\UStockFinanceHoldingController@index_stock_finance");
     //风控日志管理
     Route::post("/stockFinanceRiskLogs", "Api\System\StockFinanceRiskLogController@index");
     Route::post("/stockFinanceRiskLog/{id}", "Api\System\StockFinanceRiskLogController@show");
@@ -155,6 +157,10 @@ Route::group([
     Route::post("/parentStockFinance/store", "Api\System\ParentStockFinanceController@store");
     Route::post("/parentStockFinance/{id}", "Api\System\ParentStockFinanceController@show");
 
+    //访问javaApi
+    Route::post("/javaApi/eveningUp", "Api\System\JavaApiController@eveningUp");
+    Route::post("/javaApi/eveningupPerHolding", "Api\System\JavaApiController@eveningupPerHolding");
+    Route::post("/javaApi/xrdr", "Api\System\JavaApiController@xrdr");
 
     //管理后台用户相关
     Route::post('/logout', "Api\UserController@logoutApi");//注销

@@ -25,6 +25,14 @@ class UStockFinancing extends Base
     }
 
     /**
+     * belongsTo产品
+     */
+    public function stock_finance_product()
+    {
+        return $this->belongsTo(StockFinanceProduct::Class, 'product_id', 'id');
+    }
+
+    /**
      * 总资产
      *
      * @param  string $value
@@ -34,4 +42,5 @@ class UStockFinancing extends Base
     {
         return 0;
     }
+
 }
