@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
 
-class StockFinanceRiskController extends Controller
+class StockFinanceRiskLogController extends Controller
 {
     use \App\Http\Controllers\Load\ShowTrait;
 
-    public static $model_name = 'StockFinanceRisk';
+    public static $model_name = 'StockFinanceRiskLog';
 
     public function __construct()
     {

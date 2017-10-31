@@ -116,8 +116,8 @@ Route::group([
     Route::post("/uStockFinancings", "Api\System\UStockFinancingController@index");
     Route::post("/uStockFinancing/{id}", "Api\System\UStockFinancingController@show");
     //风控日志管理
-    Route::post("/stockFinanceRisks", "Api\System\StockFinanceRiskController@index");
-    Route::post("/stockFinanceRisk/{id}", "Api\System\StockFinanceRiskController@show");
+    Route::post("/stockFinanceRiskLogs", "Api\System\StockFinanceRiskLogController@index");
+    Route::post("/stockFinanceRiskLog/{id}", "Api\System\StockFinanceRiskLogController@show");
     //子账户流水记录（配资记录）
     Route::post("/uStockFinancingFlows", "Api\System\UStockFinancingFlowController@index");
     Route::post("/uStockFinancingFlow/{id}", "Api\System\UStockFinancingFlowController@show");

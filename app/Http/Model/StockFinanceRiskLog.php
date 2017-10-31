@@ -2,7 +2,7 @@
 
 namespace App\Http\Model;
 
-class StockFinanceRisk extends Base
+class StockFinanceRiskLog extends Base
 {
     protected $table = "s_stock_finance_risk_control_log";
 
