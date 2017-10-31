@@ -27,10 +27,28 @@ class AgentCashController extends Controller
         $keyword = $request->input('keyword');
         $query = AgentCashFlow::orderByDesc('id')->with('agent');
         if ($keyword) {
-            $agent_ids = Agent::orWhere('phone', 'like', "%$keyword%")->orWhere('agent_name', 'like', "%$keyword%")->orWhere('id', 'like', "%$keyword%")->pluck('id')->all();
+            $agent_ids = Agent::orWhere('agent_number', 'like', "%$keyword%")
+                ->orWhere('agent_name', 'like', "%$keyword%")->orWhere('id', 'like', "%$keyword%")->pluck('id')->all();
             $query->whereIn('agent_id', array_values($agent_ids));
         }
         $data = $query->paginate($per_page);
+        return self::jsonReturn($data);
+    }
+
+
+    public function info(Request $request)
+    {
+        $data = AgentCashFlow::find($request->id);
+        return self::jsonReturn($data);
+    }
+
+
+    public function update(Request $request)
+    {
+        $instance = AgentCashFlow::find($request->id);
+        $data = $request->only('cash_status', 'fee', 'remark');
+        $data['in_amount'] = $instance->cash_amount - $request->fee;
+        $rest = $instance->fill($data)->save();
         return self::jsonReturn($data);
     }
 

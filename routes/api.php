@@ -41,7 +41,16 @@ Route::group([
     //代理商佣金分成
     Route::get('/agentCommissionList', 'Api\AgentCommissionController@list');//代理商利息佣金
 
-    Route::get('/agentCashList', 'Api\AgentCashController@list');//代理商提现记录 for 审核
+
+    //代理商提现
+    Route::get('/agentCashList', 'Api\AgentCashController@list');
+    Route::post('/agentCashInfo', 'Api\AgentCashController@info');
+    Route::post('/agentCashUpdate', 'Api\AgentCashController@update');
+
+
+
+
+
 
     Route::post('/recommendCode', 'Api\RecommentCodeController@info');//获取代理商或者员工的推荐码
 
