@@ -26,7 +26,7 @@ class AgentController extends Controller
 
     public function __construct()
     {
-        $this->middleware("auth:api")->except(['search']);
+        $this->middleware("auth:api")->except(['search', 'childrenAgent']);
     }
 
     /*
@@ -223,6 +223,22 @@ class AgentController extends Controller
         return self::jsonReturn($data);
     }
 
+
+    public function childrenAgent(Request $request)
+    {
+
+        $thisAgent = Agent::with('parent', 'percentages', 'info')->find($request->agent_id);
+        if ($thisAgent) {
+            $list = Cache::remember(self::generateCacheKeyByReqeust(), 1, function () use ($thisAgent) {
+                return $this->getAllChildrenAgentWithMyselfWithInfoParentPercentage($thisAgent);
+            });
+
+            return self::jsonReturn($list, self::CODE_SUCCESS);
+        } else {
+            return self::jsonReturn([], self::CODE_FAIL, '找不到代理商,无效ID');
+        }
+    }
+
     /**
      * 修改代理商的管理员密码
      * @param Request $request
@@ -343,5 +359,31 @@ class AgentController extends Controller
 
         }
     }
+
+
+    private function getAllChildrenAgentWithMyselfWithInfoParentPercentage(Agent $agent)
+    {
+        $collections = collect([$agent]);
+
+        $parentIds = [$agent->id];
+        $i = 0;
+        while (count($parentIds)) {
+            $childrens = Agent::whereIn('parent_id', $parentIds)->with('parent', 'percentages', 'info')->get();
+            if (count($childrens)) {
+                $collections = $collections->merge($childrens);
+                $parentIds = $childrens->pluck('id')->all();
+                $parentIds = array_values($parentIds);
+            } else {
+                $parentIds = null;
+            }
+            //双保险
+            if ($i > 4) {
+                $parentIds = null;
+            }
+            $i++;
+        }
+        return $collections;
+    }
+
 
 }

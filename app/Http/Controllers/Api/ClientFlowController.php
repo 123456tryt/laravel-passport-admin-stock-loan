@@ -74,6 +74,8 @@ class ClientFlowController extends Controller
         $description = $request->description;
 
         ClientFLow::create(compact('cust_id', 'operator_id', 'flow_type', 'description', 'amount_of_account', 'account_left', 'remark'));
+
+
         return self::jsonReturn([], self::CODE_SUCCESS, '添加客户流水成功成功');
     }
 

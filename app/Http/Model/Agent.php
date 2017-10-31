@@ -49,17 +49,20 @@ class Agent extends Base
 
     public static function getAllChildrenAgentWithMyself(Agent $agent)
     {
-        $array[] = $agent;
-        while ($agent) {
-            $child = self::where('parent_id', $agent->id);
-            if ($child) {
-                $array[] = $child;
-                $agent = $child;
+        $collections = collect([$agent]);
+
+        $parentIds = [$agent->id];
+        while (count($parentIds)) {
+            $childrens = self::whereIn('parent_id', $parentIds);
+            if (count($childrens)) {
+                $collections = $collections->merge($childrens);
+                $parentIds = $childrens->pluck('id')->all();
+                $parentIds = array_values($parentIds);
             } else {
-                $agent = null;
+                $parentIds = null;
             }
         }
-        return $array;
+        return $collections;
     }
 
 }

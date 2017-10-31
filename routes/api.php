@@ -26,6 +26,8 @@ Route::group([
     Route::post("/agentSelectorList", "Api\AgentController@selectorOptionsList");//代理商下拉 搜索
     Route::get("/agentList", "Api\AgentController@list"); //代理商列表
     Route::post("/agentInfo", "Api\AgentController@info");//代理商详细信息
+    Route::any("/agentChildrenList", "Api\AgentController@childrenAgent");//获取代理商的后代代理商
+
     Route::post("/agentChangeAdminPassword", "Api\AgentController@changeAgentAdminUserPassword");//修改代理商管理员密码
     Route::post("/agentChangeBasic", "Api\AgentController@updateAgentBasic");//修改代理商基本信息
     Route::post("/agentChangeInfo", "Api\AgentController@updateAgentInfo");//修改代理附加信息
@@ -70,11 +72,11 @@ Route::group([
     Route::post("/withdrawInfo", "Api\ClientWithdrawController@info");
 
 
-    //客户充值列表
-    Route::get("/clientRechargeList", "Api\ClientRechargeController@list");
-
     //用户账户充值
+    Route::get("/clientRechargeList", "Api\ClientRechargeController@list");
     Route::post("/clientAcountRecharge", "Api\ClientRechargeController@clientAcountRecharge");
+    Route::post("/clientRechargeInfo", "Api\ClientRechargeController@info");
+    Route::post("/clientRechargeUpdate", "Api\ClientRechargeController@update");
 
 
     //系统设置

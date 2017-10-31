@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Gregwar\Captcha\CaptchaBuilder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -70,5 +70,11 @@ class Controller extends BaseController
     static function fakePaginationForRelationSubQuerySearch($list)
     {
         return ['data' => $list, 'current_page' => 1, 'per_page' => count($list), 'total' => count($list)];
+    }
+
+    static protected function generateCacheKeyByReqeust()
+    {
+        $req = request();
+        return $req->getUri() . implode('_', $req->all());
     }
 }
