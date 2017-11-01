@@ -57,7 +57,7 @@ class Controller extends BaseController
      */
     static function jsonReturn($data = [], int $code_status = self::CODE_SUCCESS, string $message = '', int $httpStatusCode = 200)
     {
-        $json['status'] = $code_status;
+        $json['status'] = $code_status ? 1 : 0;
         $json['data'] = $data;
         $json['msg'] = $message;
         if (config('app.debug')) {

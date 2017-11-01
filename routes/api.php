@@ -48,7 +48,10 @@ Route::group([
     Route::post('/agentCashUpdate', 'Api\AgentCashController@update');
 
 
-
+    //代理商修改自己的提现银行卡
+    Route::post('/agentBankCardSendSms', 'Api\AgentWithdrawBankcardCardController@sendMsmCode');
+    Route::post('/agentBankCardInfo', 'Api\AgentWithdrawBankcardCardController@info');
+    Route::post('/agentBankCardUpdate', 'Api\AgentWithdrawBankcardCardController@update');
 
 
 

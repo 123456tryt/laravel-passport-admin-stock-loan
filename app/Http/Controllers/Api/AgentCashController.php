@@ -31,6 +31,10 @@ class AgentCashController extends Controller
                 ->orWhere('agent_name', 'like', "%$keyword%")->orWhere('id', 'like', "%$keyword%")->pluck('id')->all();
             $query->whereIn('agent_id', array_values($agent_ids));
         }
+        $cash_status = $request->cash_status;
+        if ($cash_status) {
+            $query = $query->where(compact('cash_status'));
+        }
         $data = $query->paginate($per_page);
         return self::jsonReturn($data);
     }
