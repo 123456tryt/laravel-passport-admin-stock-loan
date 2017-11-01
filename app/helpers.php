@@ -158,20 +158,30 @@ if (!function_exists("half_replace")) {
  * 获取股票行情
  */
 if (!function_exists("getStockInfo")) {
-    function getStockInfo($code)
+    function getStockInfo($code, $isStrict = false)
     {
         $name = "stockmarket";
         $keys = Redis::hkeys($name);
         $keyList = [];
+        $i = 0; //数量限制
         foreach ($keys as $v) {
-            if (strpos($v, (string)$code) !== false) $keyList[] = $v;
+            if ($isStrict) {
+                if ($v == $code) $keyList[] = $v;
+            } else {
+                if ($i > 4) break;
+                if (strpos($v, (string)$code) !== false) {
+                    $keyList[] = $v;
+                    $i++;
+                }
+            }
         }
+
         $dataList = $keyList ? Redis::hmGet($name, $keyList) : [];
         $newData = [];
         array_walk($dataList, function ($v, $k) use (&$newData) {
-            if ($t = json_decode($v)) $newData[] = $t;
+            if ($t = json_decode($v, true)) $newData[] = $t;
         });
-        return $newData;
+        return $isStrict ? ($newData[0] ?? null) : $newData;
     }
 }
 

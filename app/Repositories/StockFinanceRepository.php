@@ -8,13 +8,27 @@ use App\Http\Model\StockFinanceHoldings;
 use App\Http\Model\StockFinanceProducts;
 use App\Http\Model\StockFinanceSettleup;
 use App\Http\Model\StockFinancing;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
 
 class StockFinanceRepository extends Base
 {
     const PAGE_SIZE = 10;
     const ONE_MONTH_DAYS = 30;
+    private $transactionRepository = null;
 
+    public function __construct(Application $app, TransactionRepository $transactionRepository)
+    {
+        parent::__construct($app);
+
+        $this->transactionRepository = $transactionRepository;
+    }
+
+    /**
+     * 获取产品
+     * @param $agent
+     * @return array
+     */
     public function getProducts($agent)
     {
         $ret = StockFinanceProducts::where("agent_id", $agent->id)->orderBy("product_times", "asc")
@@ -29,13 +43,19 @@ class StockFinanceRepository extends Base
         return $data;
     }
 
+    /**
+     * 获取配资记录
+     * @param $user
+     * @return mixed
+     */
     public function getStockFinances($user)
     {
         $ret = StockFinancing::where("cust_id", $user->id)->orderBy("status")->orderBy("created_time", "desc")->
         select(["id", "product_id", "product_type", "status", "init_caution_money", "post_finance_caution_money",
             "post_add_caution_money", "current_finance_amount", "stock_finance_begin_time", "stock_finance_settleup",
             "available_amount", "precautious_line_amount", "liiquidation_line_amount", "next_interest_charge_time",
-            "is_auto_supply_caution_money", "created_time", "interest_charged_day"])->paginate(self::PAGE_SIZE);
+            "is_auto_supply_caution_money", "created_time", "interest_charged_day", "freeze_buying_money",
+            "freeze_charge_money"])->paginate(self::PAGE_SIZE);
         $rets = $ret->getCollection();
         $data = [];
         foreach ($rets as $v) {
@@ -47,21 +67,41 @@ class StockFinanceRepository extends Base
         return $ret;
     }
 
+    /**
+     * 获取配资详情
+     * @param $user
+     * @param $id
+     * @return bool
+     */
     public function getStockFinance($user, $id)
     {
         $ret = StockFinancing::where("cust_id", $user->id)->where("id", $id)->
         select(["id", "product_id", "product_type", "status", "init_caution_money", "post_finance_caution_money",
             "post_add_caution_money", "current_finance_amount", "stock_finance_begin_time", "stock_finance_settleup",
             "available_amount", "precautious_line_amount", "liiquidation_line_amount", "next_interest_charge_time",
-            "is_auto_supply_caution_money", "created_time", "interest_charged_day"])->first();
+            "is_auto_supply_caution_money", "created_time", "interest_charged_day", "freeze_buying_money",
+            "freeze_charge_money"])->first();
         if (!$ret) return false;
 
         $data = $this->getInfo($ret);
+        if ($ret->status == 4) {
+            $data["transactionList"] = $this->transactionRepository->getMakeDealList($ret->id) ?: [];
+        } else {
+            $data["transactionList"] = $this->transactionRepository->getHoldingsList($ret->id) ?: [];
+        }
 
-        //持仓详情
         return $data;
     }
 
+    /**
+     * 创建合同
+     * @param $user
+     * @param $productId
+     * @param $money
+     * @param bool $isReturn
+     * @param string $stockFinanceId
+     * @return string
+     */
     public function makeContract($user, $productId, $money, $isReturn = false, $stockFinanceId = "")
     {
         $data = [];
@@ -113,6 +153,11 @@ class StockFinanceRepository extends Base
         }
     }
 
+    /**
+     * 获取配资记录详情
+     * @param $stockFinance
+     * @return mixed
+     */
     private function getInfo($stockFinance)
     {
         $t = $stockFinance->toArray();
@@ -161,7 +206,7 @@ class StockFinanceRepository extends Base
             $t["post_add_caution_money"];
 
 
-        $financeInfo = self::getStockFinanceAbout($stockFinance);
+        $financeInfo = $this->transactionRepository->getStockFinanceAbout($stockFinance);
 
         $t["totalFinanceAmount"] = $t["freeze_money"] + $t["current_finance_amount"];
         $t["totalAssets"] = $financeInfo["totalAssets"];
@@ -176,6 +221,11 @@ class StockFinanceRepository extends Base
         return $t;
     }
 
+    /**
+     * 过滤返回的数据
+     * @param $data
+     * @return mixed
+     */
     private function filterData($data)
     {
         unset($data["product_id"]);
@@ -200,57 +250,5 @@ class StockFinanceRepository extends Base
         return $data;
     }
 
-    //获取合约总资产和利润
-    static public function getStockFinanceAbout($stockFinance)
-    {
-        $about = [];
-        if ($stockFinance->status == 4) {
-            $settleup = $stockFinance->settleup()->first();
-            if ($settleup) {
-                $about["value"] = 0;
-                $about["totalAssets"] = 0;
-                $about["profitAndLoss"] = $settleup->gain_loss ? -$settleup->gain_loss_amount : $settleup->gain_loss_amount;
-            } else {
-                $about["value"] = 0;
-                $about["totalAssets"] = 0;
-                $about["profitAndLoss"] = 0;
-            }
-
-        } else {
-            $about["value"] = self::getStockFinanceValue($stockFinance->id);
-            //TODO: 合约总资产 可用余额+冻结买入资金+冻结手续费资金+股票市值
-            $about["totalAssets"] = $stockFinance->available_amount + $stockFinance->freeze_buying_money + $stockFinance->
-                freeze_charge_money + $about["value"];
-            //TODO：收益 合约总资产-总配资金额
-            $about["profitAndLoss"] = $about["totalAssets"] - ($stockFinance->current_finance_amount + $stockFinance->init_caution_money +
-                    $stockFinance->post_finance_caution_money + $stockFinance->post_add_caution_money);
-        }
-
-        return $about;
-    }
-
-    /**
-     * 获取持仓市值
-     * @param $id
-     * @param string $type 1：根据配资id 2：根据持仓id
-     */
-    static public function getStockFinanceValue($id, $type = "1")
-    {
-        //TODO 股票市值=卖出累计金额+持仓数量*股票现价
-        if ($type == 1) {
-            $ret = StockFinanceHoldings::where("stock_finance_id", $id);
-        } else {
-            $ret = StockFinanceHoldings::where("id", $id);
-        }
-        $ret = $ret->get();
-        $value = 0;
-        foreach ($ret as $v) {
-            //TODO 先用持仓数量
-            $stockInfo = getStockInfo($v->stock_code);
-            $stockInfo = $stockInfo[0] ?? [];
-            $value += $v->total_sold_amount + $stockInfo["price"] * $v->holdings_quantity;
-        }
-        return $value;
-    }
 
 }

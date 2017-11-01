@@ -60,6 +60,7 @@ Route::group([
 
     Route::post('/getFundsDetails', 'Api\FundsDetailController@getFundsDetails');
 
+    //配资相关
     Route::post('/getProducts', 'Api\StockFinanceController@getProducts');
     Route::post('/getStockFinances', 'Api\StockFinanceController@getStockFinances')->middleware("auth:api")
         ->middleware("App\Http\Middleware\UserForbidden");
@@ -82,6 +83,16 @@ Route::group([
         ->middleware("App\Http\Middleware\UserForbidden");
     Route::post('/getContract', 'Api\StockFinanceController@getContract');
 
+    //交易相关
+    Route::post('/getStockFinanceCount', 'Api\TransactionController@getCount');
+    Route::post('/getStockPool', 'Api\TransactionController@getStockPool');
+    Route::post('/addStockToPool', 'Api\TransactionController@addStockToPool');
+    Route::post('/delStockFromPool', 'Api\TransactionController@delStockFromPool');
+    Route::post('/getStocks', 'Api\TransactionController@getStockList');
+    Route::post('/getRevocableEntrusts', 'Api\TransactionController@getRevocableEntrustList');
+    Route::post('/getEntrusts', 'Api\TransactionController@getEntrustList');
+
+    //微信相关
     Route::any('/wechat', function (Request $request) {
         $wechat = \App\Http\Controllers\Api\WechatController::instance($request);
         if ($wechat) {
