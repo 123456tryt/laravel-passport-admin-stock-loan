@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Load;
 trait ShowBaseTrait
 {
     //常用过滤参数
-    static protected $base_params = ['field', 'where', 'search', 'whereIn', 'has', 'count', 'order', 'offset', 'limit', 'load'];
+    static protected $base_params = ['field', 'where', 'search', 'where_in', 'has', 'count', 'order', 'offset', 'limit', 'load'];
     //load懒惰式加载路径参数
     static protected $load_paths = [];
     //已处理的load_path;
@@ -183,7 +183,14 @@ trait ShowBaseTrait
     private static function _filter_orm_1($params, $Model, $model_name)
     {
         //where过滤
-        if (!empty($params['where'])) $Model->where($params['where']);
+
+        if (!empty($params['where'])) {
+            foreach ($params['where'] as $k => $v) {
+                if ($v === null) continue;
+                $where[] = [$k, $v];
+            }
+            if (!empty($where)) $Model->where($where);
+        }
         //where like过滤
         if (!empty($params['search'])) {
             foreach ($params['search'] as $k => $v) {
@@ -192,8 +199,12 @@ trait ShowBaseTrait
             }
             if (!empty($search)) $Model->where($search);
         }
-        //whereIn过滤
-        if (!empty($params['whereIn'])) $Model->whereIn($params['whereIn'][0], $params['whereIn'][1]);
+        //where_in过滤
+        if (!empty($params['where_in'])) {
+            foreach ($params['where_in'] as $k => $v) {
+                $Model->whereIn($k, $v);
+            }
+        }
         //whereMust过滤
         if (!empty(config('select.' . $model_name . '.whereMust'))) $Model->whereRaw(config('select.' . $model_name . '.whereMust'));
         //has过滤

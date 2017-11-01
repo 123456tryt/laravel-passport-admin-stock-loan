@@ -64,13 +64,13 @@ class JavaApiController extends Controller
     {
         $Clinet = new Client();
         $params = request()->all();
-        if (empty($params['stockFinanceHoldId']) || empty($params['stockCode']) || empty($params['addXrStockAmount']) || empty($params['addDrAmount'])) return;
+        if (empty($params['stockFinanceHoldId']) || empty($params['stockCode']) || (empty($params['addXrStockAmount']) && empty($params['addDrAmount']))) return;
         $option = [
             'form_params' => [
                 'stockFinanceHoldId' => $params['stockFinanceHoldId'],
                 'stockCode' => $params['stockCode'],
-                'addXrStockAmount' => $params['addXrStockAmount'],
-                'addDrAmount' => $params['addDrAmount'],
+                'addXrStockAmount' => isset($params['addXrStockAmount']) ? $params['addXrStockAmount'] : '',
+                'addDrAmount' => isset($params['addDrAmount']) ? $params['addDrAmount'] : '',
             ],
         ];
         $rs = json_decode($Clinet->request('POST', 'http://www.baidu.com/backend/api/1.0/xrdr', $option)->getBody(), true);

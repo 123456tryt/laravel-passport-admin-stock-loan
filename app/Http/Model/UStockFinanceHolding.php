@@ -17,6 +17,14 @@ class UStockFinanceHolding extends Base
     }
 
     /**
+     * belongsTo客户
+     */
+    public function client()
+    {
+        return $this->belongsTo(Client::Class, 'cust_id', 'id');
+    }
+
+    /**
      * 配送数量
      *
      * @param  string $value

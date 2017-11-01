@@ -20,10 +20,10 @@ class UStockFinanceHoldingController extends Controller
         $agent_id = \Auth::user()->agent_id;
         if (!$agent_id || !$stock_finance_id) return;
         $params = $data ?: request()->all();
-        $params['where'][] = ['stock_finance_id', $stock_finance_id];
+        $params['where']['stock_finance_id'] = $stock_finance_id;
         $keyWord = config('select.' . static::$model_name . '.keyWord');
         if ($keyWord == 'agent_id') {
-            $params['where'][] = ['agent_id', $agent_id];
+            $params['where']['agent_id'] = $agent_id;
         }
         $rs = static::_run_orm($params);
         return self::jsonReturn($rs);
