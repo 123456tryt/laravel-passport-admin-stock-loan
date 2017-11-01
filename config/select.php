@@ -3,12 +3,12 @@ return [
     'SystemParams' => [
         'field' => ['*'],
         'whereMust' => '',
-        'keyWord' => 'agent_id'
+        'keyWord' => ''
     ],
     'StockFinanceProduct' => [
         'field' => ['*'],
         'whereMust' => '',
-        'keyWord' => 'agent_id'
+        'keyWord' => ''
     ],
     'StockFee' => [
         'field' => ['*'],
