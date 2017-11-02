@@ -84,6 +84,7 @@ Route::group([
     Route::post('/getContract', 'Api\StockFinanceController@getContract');
 
     //交易相关
+    Route::post('/getHoldings', 'Api\TransactionController@getHoldingsList');
     Route::post('/getStockFinanceCount', 'Api\TransactionController@getCount');
     Route::post('/getStockPool', 'Api\TransactionController@getStockPool');
     Route::post('/addStockToPool', 'Api\TransactionController@addStockToPool');
@@ -91,6 +92,10 @@ Route::group([
     Route::post('/getStocks', 'Api\TransactionController@getStockList');
     Route::post('/getRevocableEntrusts', 'Api\TransactionController@getRevocableEntrustList');
     Route::post('/getEntrusts', 'Api\TransactionController@getEntrustList');
+    Route::post('/getEntrustsHistory', 'Api\TransactionController@getEntrustList');
+    Route::post('/getMakedeals', 'Api\TransactionController@getMakedealList');
+    Route::post('/getMakedealsHistory', 'Api\TransactionController@getMakedealListHistory');
+    Route::post('/getStockFinanceDetails', 'Api\TransactionController@getDetails');
 
     //微信相关
     Route::any('/wechat', function (Request $request) {

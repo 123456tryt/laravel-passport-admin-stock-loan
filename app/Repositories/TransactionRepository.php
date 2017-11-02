@@ -4,7 +4,9 @@ namespace App\Repositories;
 
 use App\Http\Model\CustStock;
 use App\Http\Model\StockFinanceEntrust;
+use App\Http\Model\StockFinanceFlow;
 use App\Http\Model\StockFinanceHoldings;
+use App\Http\Model\StockFinanceMakedeal;
 use App\Http\Model\StockFinanceMakedealHistory;
 use App\Http\Model\StockFinancing;
 use Illuminate\Foundation\Application;
@@ -12,16 +14,44 @@ use Illuminate\Foundation\Application;
 class TransactionRepository extends Base
 {
     const PAGE_SIZE = 15;
+    private $stockFinanceFlowTypeList = [
+        "", "期初配资额", "期初保证金", "追加保证金", "追配保证金", "追加配资额", "委托买入", "买入已成交",
+        "买入部分成交", "买入撤单成功", "委托卖出", "卖出已成交", "卖出部分已成交", "卖出撤单成功", "利润提取",
+        "配资结算", "停牌回收"
+    ];
+    private $entrustTypeList = [
+        "-1" => "已报",
+        "1" => "已报",
+        "2" => [
+            "1" => "未成交",
+            "2" => "部分成交",
+            "3" => "部成部撤",
+            "4" => "已撤单",
+            "5" => "已成交",
+            "6" => "委托失败",
+        ],
+        "3" => "委托失败",
+        "4" => "委托撤销中",
+        "5" => [
+            "1" => "未成交",
+            "2" => "部分成交",
+            "3" => "部成部撤",
+            "4" => "已撤单",
+            "5" => "已成交",
+            "6" => "委托失败",
+        ],
+        "6" => "委托撤销失败",
+    ];
 
     /**
      * 获取持仓列表
      * @param $stockFinanceId
      * @return mixed
      */
-    public function getHoldingsList($stockFinanceId)
+    public function getHoldingsList($user, $stockFinanceId)
     {
-        $list = StockFinanceHoldings::where("stock_finance_id", $stockFinanceId)->orderBy("created_time", "desc")
-            ->get();
+        $list = StockFinanceHoldings::where("stock_finance_id", $stockFinanceId)->where("cust_id", $user->id)
+            ->orderBy("created_time", "desc")->get();
         $newList = [];
         foreach ($list as $v) {
             $data = $v->toArray();
@@ -46,14 +76,32 @@ class TransactionRepository extends Base
     }
 
     /**
-     * 历史交易
+     * 成交记录
      * @param $stockFinanceId
      * @return mixed
      */
-    public function getMakeDealList($stockFinanceId)
+    public function getMakeDealList($user, $isToday = true)
     {
-        $ret = StockFinanceMakedealHistory::where("stock_finance_id", $stockFinanceId)->orderBy("created_time", "desc")
-            ->paginate(self::PAGE_SIZE);
+        $fields = ["id", "makedeal_date", "stock_code", "stock_name", "sell_buy", "makedeal_price", "makedeal_quantity",
+            "makedeal_amount"];
+        if ($isToday) {
+            $ret = StockFinanceMakedeal::where("cust_id", $user->id)->orderBy("created_time", "desc")
+                ->select($fields)->paginate(self::PAGE_SIZE);
+        } else {
+            $ret = StockFinanceMakedealHistory::where("cust_id", $user->id)->orderBy("created_time", "desc")
+                ->select($fields)->paginate(self::PAGE_SIZE);
+        }
+        $data = $ret->getCollection();
+        $newData = [];
+        foreach ($data as $v) {
+            $v = $v->toArray();
+            $v["makedeal_price"] = formatMoney($v["makedeal_price"]);
+            $v["makedeal_amount"] = formatMoney($v["makedeal_amount"]);
+            $newData[] = $v;
+        }
+        $ret = $ret->toArray();
+        $ret["data"] = $newData;
+
         return $ret;
     }
 
@@ -136,14 +184,17 @@ class TransactionRepository extends Base
     }
 
     /**
-     * 获取委托记录
+     * 获取当日委托记录
      * @param $user
      * @param array $entrustStatus
      * @param array $custStatus
      */
     public function getTodayEntrustList($user, $entrustStatus = [], $custStatus = [])
     {
-        $query = StockFinanceEntrust::where("cust_id", $user->id)->orderBy("created_time", "desc");
+        $query = StockFinanceEntrust::where("cust_id", $user->id)->orderBy("created_time", "desc")->select(
+            ["id", "cust_id", "stock_finance_entrust_time", "stock_finance_withdraw_time", "stock_code", "stock_name",
+                "sold_or_buy", "entrust_price", "entrust_amount", "entrust_price_type", "stock_finance_entrust_status",
+                "cust_action", "remark", "created_time"]);
         if ($entrustStatus) {
             $query = $query->whereIn("stock_finance_entrust_status", $entrustStatus);
         }
@@ -156,12 +207,78 @@ class TransactionRepository extends Base
         foreach ($data as $v) {
             $parentEntrust = $v->parentEntrust()->first();
             $v = $v->toArray();
+            $v["type_text"] = $this->getEntrustTypeText($v["cust_action"], $v["stock_finance_entrust_status"]);
             $v["bargain_amount"] = $parentEntrust ? $parentEntrust->bargain_amount : 0;
             $v["bargain_average_price"] = $parentEntrust ? $parentEntrust->bargain_average_price : 0;
-            $newData[] = $v;
+            $newData[] = $this->formatEntrustData($v);
         }
         $ret = $ret->toArray();
         $ret["data"] = $newData;
+        return $ret;
+    }
+
+    /**
+     * 获取历史委托
+     * @param $user
+     * @return mixed
+     */
+    public function getEntrustListHistory($user)
+    {
+        $ret = StockFinanceEntrust::where("cust_id", $user->id)->orderBy("created_time", "desc")->select(
+            ["id", "cust_id", "stock_finance_entrust_time", "stock_finance_withdraw_time", "stock_code", "stock_name",
+                "sold_or_buy", "entrust_price", "entrust_amount", "entrust_price_type", "stock_finance_entrust_status",
+                "cust_action", "remark", "created_time"])->paginate(self::PAGE_SIZE);
+        $data = $ret->getCollection();
+        $newData = [];
+        foreach ($data as $v) {
+            $parentEntrust = $v->parentEntrust()->first();
+            $v = $v->toArray();
+            $v["type_text"] = $this->getEntrustTypeText($v["cust_action"], $v["stock_finance_entrust_status"]);
+            $v["bargain_amount"] = $parentEntrust ? $parentEntrust->bargain_amount : 0;
+            $v["bargain_average_price"] = $parentEntrust ? $parentEntrust->bargain_average_price : 0;
+            $newData[] = $this->formatEntrustData($v);
+        }
+        $ret = $ret->toArray();
+        $ret["data"] = $newData;
+        return $ret;
+    }
+
+    /**
+     * 获取资金流水
+     * @param $user
+     * @return mixed
+     */
+    public function getDetails($user)
+    {
+        $ret = StockFinanceFlow::where("cust_id", $user->id)->orderBy("updated_time", "desc")
+            ->paginate(self::PAGE_SIZE);
+        $data = $ret->getCollection();
+        $newData = [];
+        foreach ($data as $v) {
+            $t = $v->toArray();
+            $t["account_type_text"] = $this->stockFinanceFlowTypeList[$t["account_type"]] ?? "";
+            //获取证券代码、证券名称
+            $t["stock_code"] = $t["stock_name"] = "";
+            if ($t["entrust_id"]) {
+                $entrush = $v->entrushHistory()->first();
+                if (!$entrush) {
+                    $entrush = $v->entrust()->first();
+                }
+
+                if ($entrush) {
+                    $t["stock_code"] = $entrush->stock_code;
+                    $t["stock_name"] = $entrush->stock_name;
+                }
+            }
+
+            $t["available_amount"] = formatMoney($t["available_amount"]);
+            $t["account_money"] = formatMoney($t["account_money"]);
+
+            $newData[] = $t;
+        }
+        $ret = $ret->toArray();
+        $ret["data"] = $newData;
+
         return $ret;
     }
 
@@ -207,7 +324,7 @@ class TransactionRepository extends Base
      */
     public function getStockFinanceValue($id, $type = "1")
     {
-        //TODO 股票市值=卖出累计金额+持仓数量*股票现价
+        //TODO 股票市值=持仓数量*股票现价
         if ($type == 1) {
             $ret = StockFinanceHoldings::where("stock_finance_id", $id);
         } else {
@@ -218,9 +335,43 @@ class TransactionRepository extends Base
         foreach ($ret as $v) {
             //TODO 先用持仓数量
             $stockInfo = getStockInfo($v->stock_code, true);
-            $value += $v->total_sold_amount + ($stockInfo["price"] ?? 0) * $v->holdings_quantity;
+            $value += ($stockInfo["price"] ?? 0) * $v->holdings_quantity;
         }
         return $value;
+    }
+
+    /**
+     * 获取委托状态
+     * @param $custStatus
+     * @param $entrustStatus
+     * @return mixed|string
+     */
+    private function getEntrustTypeText($custStatus, $entrustStatus)
+    {
+        if (isset($this->entrustTypeList[$custStatus])) {
+            $t = $this->entrustTypeList[$custStatus];
+            if (!is_array($t)) {
+                return $t;
+            }
+
+            return $t["$entrustStatus"] ?? "";
+        }
+
+        return "";
+    }
+
+    /**
+     * 格式化委托记录
+     * @param $data
+     * @return mixed
+     */
+    private function formatEntrustData($data)
+    {
+        $data["entrust_price"] = formatMoney($data["entrust_price"]);
+        $data["entrust_amount"] = formatMoney($data["entrust_amount"]);
+        $data["bargain_average_price"] = formatMoney($data["bargain_average_price"]);
+
+        return $data;
     }
 
 }

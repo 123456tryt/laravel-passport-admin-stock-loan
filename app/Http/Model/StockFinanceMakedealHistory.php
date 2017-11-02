@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockFinanceMakedealHistory extends Base
 {
-    protected $table = "u_stock_finance_makedeal_history";
+    protected $table = "u_stock_finance_day_makedeal_history";
 
 }

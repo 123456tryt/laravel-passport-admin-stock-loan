@@ -12,8 +12,40 @@ class TransactionController extends Controller
 
     public function __construct(TransactionRepository $transaction)
     {
-        $this->middleware("auth:api");
+        $this->middleware(["auth:api", "App\Http\Middleware\UserForbidden"]);
         $this->transaction = $transaction;
+    }
+
+    /**
+     * 委托买入
+     */
+    public function entrustBuy(Request $request)
+    {
+
+    }
+
+    /**
+     * 委托卖出
+     */
+    public function entrustCell(Request $request)
+    {
+
+    }
+
+    /**
+     * 撤销委托卖出
+     */
+    public function cancelEntrustCell(Request $request)
+    {
+
+    }
+
+    /**
+     * 撤销委托买入
+     */
+    public function cancelEntrustBuy(Request $request)
+    {
+
     }
 
     /**
@@ -35,6 +67,27 @@ class TransactionController extends Controller
         }
 
         $ret = $this->transaction->getCount($user, $request->get("id"));
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, "查询错误");
+    }
+
+    /**
+     * 获取子账户持仓列表
+     * @param Request $request
+     */
+    public function getHoldingsList(Request $request)
+    {
+        $user = $request->user();
+        $validator = \Validator::make($request->all(), [
+            "id" => "required|integer|min:1"
+        ], [
+            "id错误"
+        ]);
+
+        if ($validator->fails()) {
+            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+        }
+        $ret = $this->transaction->getHoldingsList($user, $request->get("id"));
         return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
             parent::jsonReturn([], parent::CODE_FAIL, "查询错误");
     }
@@ -98,7 +151,7 @@ class TransactionController extends Controller
     }
 
     /**
-     * 模糊搜索股票信息
+     * 获取模糊搜索股票信息
      * @param Request $request
      */
     public function getStockList(Request $request)
@@ -124,9 +177,16 @@ class TransactionController extends Controller
             获取错误");
     }
 
-    public function revokeEntrust(Request $request)
+    /**
+     * 获取资金流水
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDetails(Request $request)
     {
-
+        $ret = $this->transaction->getDetails($request->user());
+        return $ret !== false ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, "data error");
     }
 
     /**
@@ -137,6 +197,30 @@ class TransactionController extends Controller
     public function getEntrustList(Request $request)
     {
         $ret = $this->transaction->getTodayEntrustList($request->user(), $entrustStatus = [], $custStatus = []);
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, $this->transaction->getErrorMsg() ?: "
+            获取错误");
+    }
+
+    /**
+     * 获取当日成交
+     * @param Request $request
+     */
+    public function getMakedealList(Request $request)
+    {
+        $ret = $this->transaction->getMakedealList($request->user(), $isToday = true);
+        return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
+            parent::jsonReturn([], parent::CODE_FAIL, $this->transaction->getErrorMsg() ?: "
+            获取错误");
+    }
+
+    /**
+     * 获取历史成交
+     * @param Request $request
+     */
+    public function getMakedealListHistory(Request $request)
+    {
+        $ret = $this->transaction->getMakedealList($request->user(), $isToday = false);
         return $ret ? parent::jsonReturn($ret, parent::CODE_SUCCESS, "success") :
             parent::jsonReturn([], parent::CODE_FAIL, $this->transaction->getErrorMsg() ?: "
             获取错误");

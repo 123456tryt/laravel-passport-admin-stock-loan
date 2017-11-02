@@ -85,9 +85,9 @@ class StockFinanceRepository extends Base
 
         $data = $this->getInfo($ret);
         if ($ret->status == 4) {
-            $data["transactionList"] = $this->transactionRepository->getMakeDealList($ret->id) ?: [];
+            $data["transactionList"] = $this->transactionRepository->getMakeDealList($ret->id, false) ?: [];
         } else {
-            $data["transactionList"] = $this->transactionRepository->getHoldingsList($ret->id) ?: [];
+            $data["transactionList"] = $this->transactionRepository->getHoldingsList($user, $ret->id) ?: [];
         }
 
         return $data;
